@@ -1,54 +1,66 @@
 <template>
   <div :class="'post ' + post.classes">
-    <div class="post-label">
-      <div class="post-info">
-        <p class="author"> {{ post.authorNickname }}</p>
-        <p class="date"> {{ post.creationTime }}</p>
-      </div>
-      <div class="avatar">
-        <img :src="post.avatar" alt="avatar">
-      </div>
+    <div class="top">
+      <el-link :href="backendURL + '/' + post.authorLogin" type="primary">{{ post.authorNickname }}</el-link>
+      <span class="date"> {{ formattedCreationTime }}</span>
     </div>
-
-    <div class="post-content">
-      <h1 class="title"> {{ post.title }} </h1>
-      <component :is="dynamicComponent"/>
-      <div class="post-footer">
-        <p><span class="tags">tags: </span>{{Array.from(post.tags).join(", ")}}</p>
-      </div>
-      <div v-if="showEditingButtons" class="editing-buttons">
-        <img src="@/assets/icons/pencil.svg" alt="edit post" class="editing-button" @click="this.isEditing = true">
-        <img src="@/assets/icons/trash-bin.svg" alt="delete post" class="editing-button" @click="deletePost">
-      </div>
-      <div v-if="showCommentsCount" class="comments-count">
-        <a href="#"><p>{{post.comments.length}}</p><img class="comment-icon" src="@/assets/icons/comment-icon.svg" alt="comment icon"></a>
+    <div class="columns">
+      <UserAvatarComponent :is-comment="false" :avatar-url="post.avatar" label="my mother taught me this trick"/>
+      <div class="post-content">
+        <h1 class="title"> {{ post.title }} </h1>
+        <div class="text" v-html="processedText"></div>
+        <div v-if="post.tags.length > 0" class="tags">
+          <div class="tag">
+            <template v-for="(tag, index) in post.tags" :key="tag">
+              <el-link class="tag-link" type="primary">#{{tag}}</el-link><span v-if="index < post.tags.length - 1">, </span>
+            </template>
+          </div>
+        </div>
+        <el-divider v-if="post.isReactable || post.reactions.length > 0 || getCurrentUserLogin()"/>
+        <div class="icon-buttons">
+          <div class="left-buttons">
+            <Reactions
+              type="post"
+              :reactions="post.reactions"
+              :isReactable="post.isReactable"
+              :post-login="post.authorLogin"
+              :post-uri="post.uri"
+            />
+          </div>
+          <FooterButtons :post="post" :show-comments-count="showCommentsCount"/>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, h } from 'vue'
+import { computed } from 'vue'
 import type {PostView} from "@/api/postService.ts";
+import Reactions from "@/components/post/reaction/Reactions.vue";
+import {backendURL} from "@/main.ts";
+import {getCurrentUserLogin} from "@/api/userService.ts";
+
+import { ref } from 'vue';
+import {getDateTimeString} from "@/components/post/util.ts";
+import UserAvatarComponent from "@/components/post/UserAvatarComponent.vue";
+import FooterButtons from "@/components/post/FooterButtons.vue";
+
+const isEditing = ref(false);
 
 const props = defineProps<{
   post: PostView,
   showEditingButtons: boolean,
   showCommentsCount: boolean,
+  redirectOnDelete?: string,
 }>();
 
-const dynamicComponent = computed(() => {
-  const text = processText(props.post.text);
+const processedText = computed(() => {
+  return processText(props.post.text);
+});
 
-  // Option 1: Using h function (recommended)
-  return () => h('div', { class: 'text' }, text);
-
-  // Option 2: Using render function
-  // return {
-  //   render() {
-  //     return h('div', { class: 'text' }, text);
-  //   }
-  // };
+const formattedCreationTime = computed(() => {
+  return getDateTimeString(props.post.creationTime);
 });
 
 function processText(text: string): string {
@@ -60,8 +72,9 @@ function processText(text: string): string {
   result = replacePatternWithTag(result, /\[s\]([\s\S]*?)\[\/s\]/, 'del', null, null);
   result = replacePatternWithTag(result, /\[\+\]([\s\S]*?)\[\/\+\]/, 'span', null, "bigger");
   result = replacePatternWithTag(result, /\[-\]([\s\S]*?)\[\/-\]/, 'span', null, "smaller");
+  result = replacePatternWithTag(result, /\[l\]([\s\S]*?)\[\/l\]\n?/, 'span', "display: block; text-align: left;", null);
   result = replacePatternWithTag(result, /\[c\]([\s\S]*?)\[\/c\]\n?/, 'span', "display: block; text-align: center;", null);
-  result = replacePatternWithTag(result, /\[r\]([\s\S]*?)\[\/r\]\n?/, 'span', "display: block; text-align: right;", null);
+  result = replacePatternWithTag(result, /\[g\]([\s\S]*?)\[\/g\]\n?/, 'span', null, "gothic");
   result = replaceCenterVertically(result);
   result = replaceStyles(result);
 
@@ -222,5 +235,91 @@ function replaceCode(text: string): string {
 </script>
 
 <style scoped>
+:root {
+  --icon-hover-color: #b15100;
+}
+.el-link {
+  font-size: 16px;
+}
 
+.tag > .el-link {
+  font-size: 14px;
+}
+
+.post > .top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+.icon-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.tags {
+  text-align: right;
+  margin: 5px 0 8px 0;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.tag-link {
+  color: var(--comment) !important;
+  font-size: 14px !important;
+}
+
+.tags span {
+  color: var(--comment);
+  font-size: 14px;
+}
+
+.date {
+  color: var(--comment);
+  font-size: 14px;
+}
+
+.columns {
+  display: flex;
+  gap: 10px;
+}
+
+h1.title {
+  line-height: 24px;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.date {
+  color: var(--comment);
+}
+
+.el-divider--horizontal {
+  margin: 12px 0 8px 0;
+}
+
+.preface .post-label {
+  display: none;
+}
+.preface .title {
+  margin-top: 18px !important;
+  margin-left: 0 !important;
+}
+
+@media (min-width: 800px) {
+}
+</style>
+
+<style>
+.post-content-img {
+  max-width: 100%;
+}
+
+.dark .editing-button {
+  filter: invert(100%);
+}
+.text {
+  white-space: pre-wrap;
+}
 </style>

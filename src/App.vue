@@ -1,4 +1,10 @@
 <template>
+  <!-- Comment form -->
+  <!-- Add post form -->
+  <!-- Edit posts -->
+  <!-- Review login -->
+  <!-- Review registration -->
+  <!-- Store user in session -->
   <router-view/>
 </template>
 
@@ -15,11 +21,17 @@ import { RouterView } from 'vue-router'
 :root {
   --comment: #606060;
   --dark-gray: #303030;
-  --el-font-family:  monospace !important;
-  --el-color-primary: #303030 !important;
+  --el-font-family: 'JetBrains Mono', monospace !important;
+  --el-color-primary: #4c4c4c !important;
 
   --el-collapse-header-font-size: 16px !important;
   --el-collapse-content-font-size: 16px !important;
+}
+
+.el-popper,
+.el-popper.is-light,
+.el-popper.el-tooltip__popper {
+  font-family: var(--el-font-family) !important;
 }
 
 .el-collapse {
@@ -39,7 +51,29 @@ h3 {
   display: inline-block;
 }
 
+h3 {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.el-popconfirm__action {
+  display: flex;
+  justify-content: space-between;
+}
+
+.el-button--small {
+  font-size: 14px;
+}
+
+.el-popconfirm {
+  align-content: center;
+  font-family: 'JetBrains Mono', monospace;
+}
+
 input {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+button {
   font-family: 'JetBrains Mono', monospace;
 }
 
@@ -58,6 +92,17 @@ textarea {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+#app > router-view {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .bigger {
@@ -68,6 +113,9 @@ textarea {
   font-size: 14px;
 }
 
+.gothic {
+  font-family: "Fortuna Gothic FlorishC Regular",fantasy;
+}
 .white {
   color: white;
 }
@@ -82,6 +130,9 @@ textarea {
 
 body {
   margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100%;
 }
 
 .snakes > .post-content {
@@ -106,8 +157,6 @@ body {
   color: black;
   background-color: white;
 }
-
-
 
 .dragon-post .text {
   background-image: url("http://127.0.0.1:8887/88110491-7cc8-4e68-9550-e45824692ffc.png");

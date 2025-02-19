@@ -80,12 +80,15 @@ export default {
         },
     },
     additionalInfo: {
-        title: 'Additional info',
+        title: 'Registration',
         form: {
-            header: 'Additional info',
+            description: {
+                line1: 'You are registered now.',
+                line2: 'Please fill in the following info to to complete your profile.',
+            },
             fields: {
                 sex: {
-                    label: 'sex',
+                    label: 'gender',
                     male: 'male',
                     female: 'female',
                     unknown: 'unknown',
@@ -94,14 +97,14 @@ export default {
                     label: 'timezone',
                 },
                 language: {
-                    label: 'language',
+                    label: 'preferred language',
                     en: 'English',
                     kk: 'Qazaq',
                     kk_cyrillic: 'Қазақ',
                     ru: 'Русский',
                 },
                 nsfw: {
-                    label: 'nsfw',
+                    label: 'NSFW policy',
                     show: 'show',
                     hide: 'do not show',
                     warn: 'blur before showing',
@@ -117,6 +120,183 @@ export default {
                 skip: {
                     label: 'skip',
                 },
+            },
+        }
+    },
+    diaryInfo: {
+        title: 'Registration',
+        form: {
+            description: {
+                line1: 'Now fill in you diary info and defaults.',
+            },
+            fields: {
+                name: {
+                    label: 'diary name',
+                },
+                description: {
+                    label: 'subtitle',
+                },
+                read_privacy: {
+                    label: 'allowed to read',
+                    registered: 'registered users',
+                    everyone: 'everyone',
+                    friends: 'friends',
+                    nobody: 'only me',
+                },
+                comment_privacy: {
+                    label: 'allowed to comment',
+                    registered: 'registered users',
+                    everyone: 'everyone',
+                    friends: 'friends',
+                    nobody: 'only me',
+                },
+            },
+            buttons: {
+                send: {
+                    label: 'send',
+                },
+                skip: {
+                    label: 'skip',
+                },
+            },
+        }
+    },
+    reactions: {
+        reaction: {
+            anonymous: 'anonymous: '
+        },
+        add_reaction: {
+            search: 'Search reactions...',
+            no_reactions: 'No reactions found',
+            recent: 'Recent reactions',
+            basic: 'Basic reactions',
+        },
+    },
+    post: {
+        form: {
+            title: 'New post:',
+            fields: {
+                title: {
+                    label: 'Title:',
+                },
+                textarea: {
+                    buttons: {
+                        bold: {
+                            tooltip: 'Bold text',
+                        },
+                        italic: {
+                            tooltip: 'Italic text',
+                        },
+                        underline: {
+                            tooltip: 'Underline text',
+                        },
+                        strikethrough: {
+                            tooltip: 'Strikethrough text',
+                        },
+                        expandable: {
+                            tooltip: 'Add \'Read more..\' section',
+                        },
+                        link: {
+                            tooltip: 'Insert link',
+                        },
+                        image: {
+                            tooltip: 'Insert image',
+                        },
+                        slider: {
+                            tooltip: 'Insert slider',
+                        },
+                        left: {
+                            tooltip: 'Align text to the left',
+                        },
+                        center: {
+                            tooltip: 'Align text to the center',
+                        },
+                        right: {
+                            tooltip: 'Align text to the right',
+                        },
+                        bigger: {
+                            tooltip: 'Increase text size',
+                        },
+                        smaller: {
+                            tooltip: 'Decrease text size',
+                        },
+                        gothic: {
+                            tooltip: 'Gothic font',
+                        },
+                        code: {
+                            tooltip: 'Insert code block',
+                        },
+                        css: {
+                            tooltip: 'Add custom CSS classes',
+                        },
+                    },
+                },
+                tags: {
+                    label: 'tags:',
+                },
+                classes: {
+                    label: 'html classes:',
+                },
+                read: {
+                    label: 'read:',
+                },
+                comment: {
+                    label: 'comment:',
+                },
+                react: {
+                    label: 'react:',
+                },
+                advanced: {
+                    label: 'advanced options',
+                },
+            },
+            button: {
+                send: 'publish'
+            }
+        },
+        view: {
+            footer: {
+                buttons: {
+                    delete: {
+                        question: 'Are you sure you want to delete this post?',
+                        confirm: 'Delete',
+                        cancel: 'Cancel',
+                    }
+                }
+            }
+        }
+    },
+    comment: {
+        form: {
+            button: {
+                send: 'add comment',
+            },
+        },
+        view: {
+            footer: {
+                buttons: {
+                    delete: {
+                        question: 'Are you sure you want to delete this comment?',
+                        confirm: 'Delete',
+                        cancel: 'Cancel',
+                    }
+                }
+            }
+        }
+    },
+    groups: {
+        basic: {
+            everyone: {
+                label: 'everyone',
+            },
+            registered: {
+                label: 'registered users',
+            },
+            friends: {
+                label: 'friends',
+            },
+            nobody: {
+                label: 'only me',
             },
         }
     }

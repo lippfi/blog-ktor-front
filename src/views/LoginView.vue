@@ -1,5 +1,6 @@
 <template>
-  <div class="centralized_block">
+  <div class="container">
+    <div/>
     <div class="main">
       <div style="text-align: center;">
         <h1>{{$t('login.form.header')}}</h1>
@@ -19,15 +20,18 @@
         <el-button type="primary" round @click="submitForm(loginFormRef)">{{ $t('login.form.button.label') }}</el-button>
       </div>
     </div>
+    <div/>
+    <LanguageChooser />
   </div>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, reactive, ref} from 'vue'
+import {computed, onMounted, reactive, ref} from 'vue'
 import type {FormInstance, FormRules} from "element-plus";
 import {isEmailBusy, isLoginBusy, isNicknameBusy, signIn, signUp} from "@/api/userService.ts";
 import router from "@/router";
 import {useI18n} from "vue-i18n";
+import LanguageChooser from '@/components/LanguageChooser.vue';
 
 const { t } = useI18n()
 
@@ -47,10 +51,10 @@ const loginForm = reactive<LoginForm>({
   password: '',
 })
 
-const rules = reactive<FormRules<LoginForm>>({
+const rules = computed<FormRules<LoginForm>>(() => ({
   login: [{ required: true, message: t('login.form.errors.login_required'), trigger: 'blur'}],
   password: [{ required: true, message: t('login.form.errors.password_required'), trigger: 'blur'}],
-})
+}))
 
 const submitForm = (form: FormInstance | undefined) => {
   if (!form) return
@@ -76,15 +80,17 @@ const submitForm = (form: FormInstance | undefined) => {
   }
 }
 
-.centralized_block {
-  position: absolute;
-  padding: 200px 0 25px 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 350px;
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  align-items: center;
+  padding-bottom: 10px;
 }
 
 .main {
+  width: 300px;
   padding: 0 25px 25px 25px;
 }
 
