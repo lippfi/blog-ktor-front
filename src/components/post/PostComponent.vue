@@ -50,7 +50,6 @@ const isEditing = ref(false);
 
 const props = defineProps<{
   post: PostView,
-  showEditingButtons: boolean,
   showCommentsCount: boolean,
   redirectOnDelete?: string,
 }>();
