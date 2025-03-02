@@ -1,12 +1,44 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import {uploadFiles} from "@/api/storageService.ts";
-import {ElMessage} from "element-plus";
+import {ElMessage, type MentionOption} from "element-plus";
 import {useI18n} from "vue-i18n";
 import {DataBoard, Tickets} from "@element-plus/icons-vue";
 
 const { t } = useI18n()
 const tooltipDelay = 300
+
+const DEFAULT_ICON = `<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzYwNjI2NiIgZD0iTTEyIDRhNCA0IDAgMSAwIDAgOCA0IDQgMCAwIDAgMC04em0wIDEwYy00LjQyIDAgLTggMS43OSAtOCA0djJoMTZ2LTJjMC0yLjIxLTMuNTgtNC04LTR6Ii8+PC9zdmc+" style="width: 0.9em; height: 0.9em; opacity: 0.8; margin-right: 4px; vertical-align: middle;" />`
+
+const getUserAvatar = (login: string): string => {
+  console.log('getting avatar for', login)
+  const user = (MOCK_DATA['@'] as UserMention[]).find(item => 
+    item.login === login
+  )
+  console.log('user', user)
+  if (user && 'avatar' in user) {
+    // todo img size shouldn't be in pixels, but square and height: 100%
+    return `<img src="${user.avatar}" style="width: 34px; height: 34px; margin-right: 4px; vertical-align: middle;" />`
+  }
+  return DEFAULT_ICON
+}
+
+const observer = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    mutation.addedNodes.forEach((node) => {
+      if (node instanceof HTMLElement) {
+        const spans = node.querySelectorAll('span')
+        spans.forEach(span => {
+          console.log(span)
+          if (span instanceof HTMLElement && span.textContent) {
+            const login = span.textContent.split(/\s+/)[0] // Get first word
+            span.innerHTML = `${getUserAvatar(login)}${span.textContent}`
+          }
+        })
+      }
+    })
+  })
+})
 const content = ref<string>()
 
 const wrapSelectedText = (prefix: string, suffix: string) => {
@@ -384,6 +416,63 @@ const wrapWithLink = () => {
     }
   }
 }
+
+const options = ref<MentionOption[]>([])
+interface UserMention {
+  login: string;
+  name: string;
+  avatar: string;
+}
+
+const MOCK_DATA: Record<string, (string | UserMention)[]> = {
+  '@': [
+    { login: 'galina', name: 'андрей', avatar: 'https://beon.vip/uploads_user/1000/1000/0_3688.jpg' },
+    { login: 'detectiv', name: 'детектив шимпански', avatar: 'https://i.pinimg.com/550x/56/90/72/569072435a51a4c2690e08a3026de5a0.jpg' },
+    { login: 'devilmaytry', name: 'Devil Hunter', avatar: 'https://beon.vip/uploads_user/10000/9709/0_2106.jpg' },
+    { login: 'deanon', name: 'Наталья морская пехота', avatar: 'https://beon.vip/uploads_user/4000/3527/0_7623.jpg' },
+  ],
+  ':': ['heart', 'her_tebe', 'hehehe',],
+}
+
+
+const processSpans = () => {
+  // Wait for the next tick and add a small delay to ensure mention component has updated
+  nextTick(() => {
+    setTimeout(() => {
+      // Disconnect previous observation if any
+      observer.disconnect()
+
+      const mentionList = document.querySelector('.el-mention-dropdown__list')
+      if (mentionList) {
+        // Process existing spans
+        mentionList.querySelectorAll('span').forEach(span => {
+          if (span instanceof HTMLElement && span.textContent) {
+            const login = span.textContent.split(/\s+/)[0] // Get first word
+            span.innerHTML = `${getUserAvatar(login)}${span.textContent}`
+          }
+        })
+        // Start observing
+        observer.observe(mentionList, { childList: true, subtree: true })
+      }
+    }, 50) // Small delay to ensure DOM is updated
+  })
+}
+
+const handleMentionSearch = (_: string, prefix: string) => {
+  options.value = (MOCK_DATA[prefix] || []).map((item) => {
+    if (typeof item === 'string') {
+      return { value: item }
+    } else {
+      return {
+        value: item.login,
+        label: item.login + ' (' + item.name + ')',
+        avatar: item.avatar
+      }
+    }
+  })
+  console.log('search')
+  processSpans()
+}
 </script>
 
 <template>
@@ -466,7 +555,16 @@ const wrapWithLink = () => {
         <el-button @click="wrapWithClasses" class="format-btn">CSS</el-button>
       </el-tooltip>
     </div>
-    <el-input type="textarea" :rows="9" v-model="content"/>
+    <el-mention 
+      type="textarea" 
+      :prefix="['@', ':']" 
+      :options="options" 
+      :rows="9" 
+      v-model="content" 
+      @search="handleMentionSearch"
+      @change="processSpans"
+      @select="processSpans"
+    />
   </div>
 </template>
 
