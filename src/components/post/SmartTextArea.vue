@@ -473,6 +473,63 @@ const handleMentionSearch = (_: string, prefix: string) => {
   console.log('search')
   processSpans()
 }
+
+const handleMentionSelect = (option: MentionOption) => {
+  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  if (!textarea) return
+
+  // Get the current cursor position
+  const start = textarea.selectionStart
+  const end = textarea.selectionEnd
+
+  // Calculate the position where the mention should start (after the @ or : symbol)
+  let mentionStart = start
+  const text = textarea.value
+  for (let i = start - 1; i >= 0; i--) {
+    if (text[i] === '@' || text[i] === ':') {
+      mentionStart = i
+      break
+    }
+  }
+
+  // Remove the trigger character and partial input
+  const beforeMention = text.substring(0, mentionStart)
+  const afterMention = text.substring(end)
+
+  // Create the mention text
+  const mentionText = (text[mentionStart] === '@' ? '@' : ':') + option.value
+
+  // Focus the textarea
+  textarea.focus()
+
+  try {
+    // Set the selection to cover the area we want to replace
+    textarea.setSelectionRange(mentionStart, end)
+
+    // Use execCommand to preserve undo history
+    document.execCommand('insertText', false, mentionText)
+
+    // Move cursor to the end of the inserted mention
+    const newPosition = mentionStart + mentionText.length
+    textarea.setSelectionRange(newPosition, newPosition)
+
+    // Ensure v-model is updated
+    textarea.dispatchEvent(new Event('input', { bubbles: true }))
+  } catch (e) {
+    // Fallback: direct manipulation if execCommand fails
+    textarea.value = beforeMention + mentionText + afterMention
+
+    // Move cursor to the end of the inserted mention
+    const newPosition = mentionStart + mentionText.length
+    textarea.setSelectionRange(newPosition, newPosition)
+
+    // Ensure v-model is updated
+    textarea.dispatchEvent(new Event('input', { bubbles: true }))
+  }
+
+  // Process spans after the mention is inserted
+  processSpans()
+}
 </script>
 
 <template>
@@ -563,7 +620,7 @@ const handleMentionSearch = (_: string, prefix: string) => {
       v-model="content" 
       @search="handleMentionSearch"
       @change="processSpans"
-      @select="processSpans"
+      @select="handleMentionSelect"
     />
   </div>
 </template>
