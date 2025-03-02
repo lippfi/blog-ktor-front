@@ -1,6 +1,18 @@
 <script setup lang="ts">
-import {Close, Grid} from "@element-plus/icons-vue";
-import { ref } from 'vue'
+import {
+  Grid, Hide,
+  HomeFilled,
+  Memo,
+  Message,
+  Search,
+  Setting,
+  SwitchButton,
+  User
+} from "@element-plus/icons-vue";
+import {ref} from 'vue'
+import {useI18n} from "vue-i18n";
+
+const { t } = useI18n()
 
 const isVisible = ref(false)
 
@@ -10,23 +22,91 @@ const toggleMenu = () => {
 </script>
 
 <template>
-  <el-icon class="menu-icon" @click="toggleMenu">
+  <el-icon class="menu-toggle-button" @click="toggleMenu">
     <Grid/>
   </el-icon>
-  <el-drawer v-model="isVisible" title="I am the title" :with-header="false" size="350px">
-    <el-icon class="menu-icon" @click="toggleMenu">
-      <Close/>
-    </el-icon>
+  <el-drawer v-model="isVisible" title="I am the title" :with-header="false" size="300px">
+    <div class="menu-items">
+      <div class="menu-item">
+        <el-icon size="20">
+          <HomeFilled/>
+        </el-icon>
+        {{ t('menu.home') }}
+      </div>
+      <div class="menu-item">
+        <el-icon size="20">
+          <User/>
+        </el-icon>
+        {{ t('menu.profile') }}
+      </div>
+      <div class="menu-item">
+        <el-icon size="20">
+          <Memo/>
+        </el-icon>
+        {{ t('menu.diary') }}
+      </div>
+      <div class="menu-item">
+        <el-icon size="20">
+          <Message/>
+        </el-icon>
+        {{ t('menu.messages') }}
+      </div>
+      <div class="menu-item">
+        <el-icon size="20">
+          <Search/>
+        </el-icon>
+        {{ t('menu.search') }}
+      </div>
+      <div class="menu-item">
+        <el-icon size="20">
+          <Setting/>
+        </el-icon>
+        {{ t('menu.settings') }}
+      </div>
+      <div class="menu-item">
+        <el-icon size="20">
+          <Hide/>
+        </el-icon>
+        {{ t('menu.designOff') }}
+      </div>
+      <div class="menu-item">
+        <el-icon size="20">
+          <SwitchButton/>
+        </el-icon>
+        {{ t('menu.logout') }}
+      </div>
+    </div>
   </el-drawer>
 </template>
 
 <style scoped>
-.menu-icon {
+.menu-toggle-button {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 30px;
+  right: 30px;
   font-size: 24px;
   cursor: pointer;
   z-index: 1000;
+}
+
+.menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-item {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px;
+  transition: all 0.15s ease;
+}
+
+.menu-item:hover {
+  background-color: #303030;
+  color: white;
 }
 </style>

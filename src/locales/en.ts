@@ -299,5 +299,15 @@ export default {
                 label: 'only me',
             },
         }
+    },
+    menu: {
+        home: 'Home',
+        profile: 'Profile',
+        diary: 'Diary',
+        messages: 'Messages',
+        search: 'Search',
+        designOff: 'Turn off design',
+        settings: 'Settings',
+        logout: 'Logout',
     }
 }
