@@ -42,7 +42,7 @@ const basicReactions: BasicReactionResponse[] = [
   {
     id: 'begemot',
     name: 'begemot',
-    iconUrl: 'https://cdn.discordapp.com/attachments/1341110526255566890/1342136224839761940/-2.png?ex=67b88943&is=67b737c3&hm=74b5c193887c3ef363727e467fa0ac26d4eeced5a407a502d1b51dd98438d922&'
+    iconUrl: 'src/assets/icons/begemot.png'
   }
 ];
 
