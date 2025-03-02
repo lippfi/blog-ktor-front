@@ -3,6 +3,7 @@
       placement="top"
       :width="292"
       trigger="click"
+      v-model:visible="isPopoverVisible"
   >
     <template #reference>
       <div class="clickable">
@@ -51,6 +52,7 @@ const searchResults = ref<BasicReactionResponse[]>([]);
 const isSearching = ref(false);
 const searchError = ref<string | null>(null);
 const searchQuery = ref('');
+const isPopoverVisible = ref(false);
 
 watch(searchQuery, (newQuery) => {
   if (!newQuery.trim()) {
@@ -70,6 +72,7 @@ const emit = defineEmits<{
 
 const handleReactionSelect = (reaction: BasicReactionResponse) => {
   emit('reaction-selected', reaction);
+  isPopoverVisible.value = false;
 };
 </script>
 

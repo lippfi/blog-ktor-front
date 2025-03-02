@@ -14,7 +14,7 @@
         <button v-for="reaction in searchResults" 
                 :key="reaction.id" 
                 class="reaction-button"
-                @click="$emit('select-reaction', reaction)">
+                @click="handleReactionSelect(reaction)">
           <img :src="reaction.iconUrl" :alt="reaction.name" />
         </button>
       </div>
@@ -27,7 +27,7 @@
           <button v-for="reaction in recentReactions" 
                   :key="reaction.id" 
                   class="reaction-button"
-                  @click="$emit('select-reaction', reaction)">
+                  @click="handleReactionSelect(reaction)">
             <img :src="reaction.iconUrl" :alt="reaction.name" />
           </button>
         </div>
@@ -39,7 +39,7 @@
           <button v-for="reaction in basicReactions" 
                   :key="reaction.id" 
                   class="reaction-button"
-                  @click="$emit('select-reaction', reaction)">
+                  @click="handleReactionSelect(reaction)">
             <img :src="reaction.iconUrl" :alt="reaction.name" />
           </button>
         </div>
@@ -75,9 +75,14 @@ watch(searchQuery, (newQuery) => {
   )
 })
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'select-reaction', reaction: BasicReactionResponse): void
 }>()
+
+const handleReactionSelect = (reaction: BasicReactionResponse) => {
+  searchQuery.value = '';
+  emit('select-reaction', reaction);
+}
 </script>
 
 <style scoped>
