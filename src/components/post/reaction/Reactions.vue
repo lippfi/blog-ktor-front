@@ -23,6 +23,13 @@ watch(() => props.reactions, (newReactions) => {
   localReactions.value = [...newReactions]
 })
 
+function handleReactionRemove(reactionToRemove: ReactionView) {
+  const index = localReactions.value.findIndex(r => r.id === reactionToRemove.id)
+  if (index !== -1) {
+    localReactions.value.splice(index, 1)
+  }
+}
+
 function handleReactionSelect(reaction: BasicReactionResponse) {
   // Check if reaction already exists
   const existingReaction = localReactions.value.find(r => r.name === reaction.name)
@@ -103,6 +110,7 @@ function handleReactionSelect(reaction: BasicReactionResponse) {
         :post-login="type === 'post' ? postLogin : undefined"
         :post-uri="type === 'post' ? postUri : undefined"
         :comment-id="type === 'comment' ? commentId : undefined"
+        @remove="() => handleReactionRemove(reaction)"
       />
       <div v-if="index < localReactions.length - 1 || isReactable" style="width: 5px"/>
     </template>

@@ -17,6 +17,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update'): void
+  (e: 'remove'): void
 }>()
 
 const localReaction = ref<ReactionView>({
@@ -45,6 +46,11 @@ async function toggleReaction() {
   } else if (!localReaction.value.userReacted && index !== -1) {
     localReaction.value.userNicknames.splice(index, 1)
     localReaction.value.count -= 1
+
+    if (localReaction.value.count === 0) {
+      emit('remove')
+      return
+    }
   }
 
   // Send request in background
