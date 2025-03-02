@@ -5,11 +5,14 @@
   <!-- Review login -->
   <!-- Review registration -->
   <!-- Store user in session -->
+  <MenuComponent v-if="getCurrentUserLogin()"/>
   <router-view/>
 </template>
 
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+import MenuComponent from "@/views/MenuComponent.vue";
+import {getCurrentUserLogin} from "@/api/userService.ts";
 </script>
 
 <style>
