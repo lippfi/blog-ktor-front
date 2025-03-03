@@ -158,7 +158,7 @@ onMounted(() => {
   display: flex;
   flex-direction: v-bind(flex_direction);
   width: v-bind(chooser_width);
-  max-height: 325px;
+  max-height: 317px;
 }
 
 .left-button, .right-button {

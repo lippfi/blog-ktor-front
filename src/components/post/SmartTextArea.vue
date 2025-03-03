@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
 import {uploadFiles} from "@/api/storageService.ts";
-import {ElMessage, type MentionOption} from "element-plus";
+import {ElMessage} from "element-plus";
 import {useI18n} from "vue-i18n";
 import {DataBoard, Tickets} from "@element-plus/icons-vue";
 
@@ -540,7 +540,7 @@ const handleMentionSelect = (option: MentionOption) => {
   const isAfterReaction = textBeforeMention.match(/:[a-zA-Z0-9_-]+:$/)
 
   // Create the mention text
-  const mentionText = text[mentionStart] === '@' 
+  const mentionText = text[mentionStart] === '@'
     ? '@' + option.value + ' '
     : (isAfterReaction ? ':' : '') + ':' + option.value + ':'
 
@@ -658,16 +658,43 @@ const handleMentionSelect = (option: MentionOption) => {
         <el-button @click="wrapWithClasses" class="format-btn">CSS</el-button>
       </el-tooltip>
     </div>
-    <el-mention 
-      type="textarea" 
-      :prefix="['@', ':']" 
-      :options="options" 
-      :rows="9" 
-      v-model="content" 
+    <el-mention
+      type="textarea"
+      :prefix="['@', ':']"
+      :options="options"
+      :rows="7"
+      v-model="content"
       @search="handleMentionSearch"
       @change="processSpans"
       @select="handleMentionSelect"
     />
+    <div class="footer-buttons">
+      <el-button @click="" class="format-btn">
+        <span style="font-size: 20px; margin-top: -2px;">
+          @
+        </span>
+      </el-button>
+      <el-button @click="" class="format-btn">
+        <el-icon size="20">
+          <svg fill="currentColor" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+               viewBox="0 0 330 330" xml:space="preserve">
+            <g id="XMLID_26_">
+            	<path id="XMLID_27_" d="M165,0C74.019,0,0,74.019,0,165s74.019,165,165,165s165-74.019,165-165S255.981,0,165,0z M165,300
+            		c-74.44,0-135-60.561-135-135S90.56,30,165,30s135,60.561,135,135S239.439,300,165,300z"/>
+              <path id="XMLID_30_" d="M215.911,200.912H114.088c-6.067,0-11.537,3.654-13.858,9.26c-2.321,5.605-1.038,12.057,3.252,16.347
+            		C119.914,242.95,141.762,252,165,252c23.238,0,45.086-9.05,61.518-25.481c4.29-4.29,5.573-10.741,3.252-16.347
+            		C227.448,204.566,221.978,200.912,215.911,200.912z"/>
+              <path id="XMLID_31_" d="M115.14,147.14c3.72-3.72,5.86-8.88,5.86-14.14c0-5.26-2.14-10.42-5.86-14.141
+            		C111.42,115.14,106.26,113,101,113c-5.27,0-10.42,2.14-14.14,5.859C83.13,122.58,81,127.74,81,133c0,5.26,2.13,10.42,5.86,14.14
+            		c3.72,3.72,8.88,5.86,14.14,5.86C106.26,153,111.42,150.859,115.14,147.14z"/>
+              <path id="XMLID_71_" d="M229,113c-5.26,0-10.42,2.14-14.14,5.859c-3.72,3.721-5.86,8.87-5.86,14.141c0,5.26,2.14,10.42,5.86,14.14
+            		c3.72,3.72,8.88,5.86,14.14,5.86c5.26,0,10.42-2.141,14.14-5.86c3.73-3.72,5.86-8.88,5.86-14.14c0-5.26-2.13-10.42-5.86-14.141
+            		C239.42,115.14,234.27,113,229,113z"/>
+            </g>
+            </svg>
+        </el-icon>
+      </el-button>
+    </div>
   </div>
 </template>
 
@@ -676,10 +703,30 @@ const handleMentionSelect = (option: MentionOption) => {
   margin-left: 0;
 }
 .el-textarea__inner {
-  border-radius: 0 0 var(--el-input-border-radius, var(--el-border-radius-base)) var(--el-input-border-radius, var(--el-border-radius-base)) !important;
+  border-radius: 0 0 0 0 !important;
   border-top: none !important;
+  border-bottom: none !important;
   width: 100% !important;
   min-width: 0 !important;
+  box-shadow:
+      0 0 0 0 var(--el-input-border-color, var(--el-border-color)) inset,
+      -1px 0 0 0 var(--el-input-border-color, var(--el-border-color)) inset,
+      0 0 0 0 var(--el-input-border-color, var(--el-border-color)) inset,
+      1px 0 0 0 var(--el-input-border-color, var(--el-border-color)) inset;
+}
+.el-textarea__inner:hover {
+  box-shadow:
+      0 0 0 0 var(--el-input-hover-border-color, var(--el-border-color)) inset,
+      -1px 0 0 0 var(--el-input-hover-border-color, var(--el-border-color)) inset,
+      0 0 0 0 var(--el-input-hover-border-color, var(--el-border-color)) inset,
+      1px 0 0 0 var(--el-input-hover-border-color, var(--el-border-color)) inset;
+}
+.el-textarea__inner:focus {
+  box-shadow:
+      0 0 0 0 var(--el-input-focus-border-color, var(--el-border-color)) inset,
+      -1px 0 0 0 var(--el-input-focus-border-color, var(--el-border-color)) inset,
+      0 0 0 0 var(--el-input-focus-border-color, var(--el-border-color)) inset,
+      1px 0 0 0 var(--el-input-focus-border-color, var(--el-border-color)) inset;
 }
 </style>
 <style scoped>
@@ -699,8 +746,47 @@ const handleMentionSelect = (option: MentionOption) => {
   box-sizing: border-box;
   border-radius: var(--el-input-border-radius,var(--el-border-radius-base)) var(--el-input-border-radius,var(--el-border-radius-base)) 0 0;
 }
+.footer-buttons {
+  display: flex;
+  padding: 4px;
+  gap: 5px;
+  justify-content: start;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+  background-color: var(--el-fill-color-blank);
+  border-radius: 0 0 var(--el-input-border-radius,var(--el-border-radius-base)) var(--el-input-border-radius,var(--el-border-radius-base));
+  box-shadow:
+      0 -1px 0 0 var(--el-input-border-color, var(--el-border-color)) inset,
+      -1px 0 0 0 var(--el-input-border-color, var(--el-border-color)) inset,
+      0 0 0 0 var(--el-input-border-color, var(--el-border-color)) inset,
+      1px 0 0 0 var(--el-input-border-color, var(--el-border-color)) inset;
+  transition: var(--el-transition-box-shadow);
+}
+.textarea:hover .footer-buttons {
+  box-shadow:
+      0 -1px 0 0 var(--el-border-color-hover, var(--el-border-color)) inset,
+      -1px 0 0 0 var(--el-border-color-hover, var(--el-border-color)) inset,
+      0 0 0 0 var(--el-border-color-hover, var(--el-border-color)) inset,
+      1px 0 0 0 var(--el-border-color-hover, var(--el-border-color)) inset;
+  transition: var(--el-transition-box-shadow);
+}
+.textarea:focus-within .footer-buttons {
+  box-shadow:
+      0 -1px 0 0 var(--el-color-primary, var(--el-border-color)) inset,
+      -1px 0 0 0 var(--el-color-primary, var(--el-border-color)) inset,
+      0 0 0 0 var(--el-color-primary, var(--el-border-color)) inset,
+      1px 0 0 0 var(--el-color-primary, var(--el-border-color)) inset;
+  transition: var(--el-transition-box-shadow);
+}
 
 .text-buttons > .el-button {
+  height: 28px;
+  align-items: center;
+}
+.footer-buttons > .el-button {
   height: 28px;
   align-items: center;
 }
@@ -721,9 +807,17 @@ const handleMentionSelect = (option: MentionOption) => {
   align-items: center;
   justify-content: center;
 }
+.footer-buttons .format-btn {
+  background-color: var(--el-fill-color-blank);
+  color: var(--el-input-text-color,var(--el-text-color-regular));
+  height: 28px;
+}
 
-.format-btn:hover {
+.text-buttons .format-btn:hover {
   background-color: #505050;
+}
+.footer-buttons .format-btn:hover {
+  background-color: #dddddd;
 }
 
 .format-btn[class*="format-btn"]:first-of-type { font-weight: bold; }
