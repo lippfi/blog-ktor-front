@@ -10,17 +10,24 @@ const tooltipDelay = 300
 
 const DEFAULT_ICON = `<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzYwNjI2NiIgZD0iTTEyIDRhNCA0IDAgMSAwIDAgOCA0IDQgMCAwIDAgMC04em0wIDEwYy00LjQyIDAgLTggMS43OSAtOCA0djJoMTZ2LTJjMC0yLjIxLTMuNTgtNC04LTR6Ii8+PC9zdmc+" style="width: 0.9em; height: 0.9em; opacity: 0.8; margin-right: 4px; vertical-align: middle;" />`
 
-const getUserAvatar = (login: string): string => {
-  console.log('getting avatar for', login)
-  const user = (MOCK_DATA['@'] as UserMention[]).find(item => 
-    item.login === login
-  )
-  console.log('user', user)
-  if (user && 'avatar' in user) {
-    // todo img size shouldn't be in pixels, but square and height: 100%
-    return `<img src="${user.avatar}" style="width: 34px; height: 34px; margin-right: 4px; vertical-align: middle;" />`
+const getUserAvatar = (text: string): string => {
+  if (text.startsWith(':') && text.endsWith(':')) {
+    // For reactions (format: ":name:")
+    const name = text.slice(1, -1) // Remove leading and trailing ':'
+    const reaction = MOCK_DATA[':'].find(item => item.name === name)
+    if (reaction) {
+      return `<img src="${reaction.iconUrl}" style="width: 24px; height: 24px; margin-right: 4px; vertical-align: middle;" />`
+    }
+  } else if (!text.includes(':')) {
+    // For user mentions
+    const user = MOCK_DATA['@'].find(item => item.login === text)
+    if (user) {
+      // todo img size shouldn't be in pixels, but square and height: 100%
+      return `<img src="${user.avatar}" style="width: 34px; height: 34px; margin-right: 4px; vertical-align: middle;" />`
+    }
+    return DEFAULT_ICON
   }
-  return DEFAULT_ICON
+  return ''
 }
 
 const observer = new MutationObserver((mutations) => {
@@ -29,10 +36,9 @@ const observer = new MutationObserver((mutations) => {
       if (node instanceof HTMLElement) {
         const spans = node.querySelectorAll('span')
         spans.forEach(span => {
-          console.log(span)
           if (span instanceof HTMLElement && span.textContent) {
-            const login = span.textContent.split(/\s+/)[0] // Get first word
-            span.innerHTML = `${getUserAvatar(login)}${span.textContent}`
+            const text = span.textContent.split(/\s+/)[0] // Get first word
+            span.innerHTML = `${getUserAvatar(text)}${span.textContent}`
           }
         })
       }
@@ -424,14 +430,43 @@ interface UserMention {
   avatar: string;
 }
 
-const MOCK_DATA: Record<string, (string | UserMention)[]> = {
+interface UserMention {
+  login: string
+  name: string
+  avatar: string
+}
+
+interface Reaction {
+  name: string
+  iconUrl: string
+}
+
+interface MentionOption {
+  value: string
+  label: string
+  avatar: string
+}
+
+type MentionPrefix = '@' | ':'
+type ReactionName = `:${string}:`
+
+type MentionData = {
+  [K in MentionPrefix]: K extends '@' ? UserMention[] : Reaction[]
+}
+
+const MOCK_DATA: MentionData = {
   '@': [
     { login: 'galina', name: 'андрей', avatar: 'https://beon.vip/uploads_user/1000/1000/0_3688.jpg' },
     { login: 'detectiv', name: 'детектив шимпански', avatar: 'https://i.pinimg.com/550x/56/90/72/569072435a51a4c2690e08a3026de5a0.jpg' },
     { login: 'devilmaytry', name: 'Devil Hunter', avatar: 'https://beon.vip/uploads_user/10000/9709/0_2106.jpg' },
     { login: 'deanon', name: 'Наталья морская пехота', avatar: 'https://beon.vip/uploads_user/4000/3527/0_7623.jpg' },
   ],
-  ':': ['heart', 'her_tebe', 'hehehe',],
+  ':': [
+    { name: 'like', iconUrl: 'https://a.slack-edge.com/production-standard-emoji-assets/14.0/google-small/1f44d@2x.png' },
+    { name: 'heart', iconUrl: 'https://a.slack-edge.com/production-standard-emoji-assets/14.0/google-small/2764-fe0f@2x.png' },
+    { name: 'sad_cat', iconUrl: 'https://emoji.slack-edge.com/T0288D531/sad_cat/4253f3b1013d6920.png' },
+    { name: 'begemot', iconUrl: 'src/assets/icons/begemot.png' },
+  ],
 }
 
 
@@ -458,19 +493,23 @@ const processSpans = () => {
   })
 }
 
-const handleMentionSearch = (_: string, prefix: string) => {
-  options.value = (MOCK_DATA[prefix] || []).map((item) => {
-    if (typeof item === 'string') {
-      return { value: item }
-    } else {
+const handleMentionSearch = (_: string, prefix: MentionPrefix) => {
+  if (prefix === '@') {
+    options.value = MOCK_DATA['@'].map((user): MentionOption => ({
+      value: user.login,
+      label: `${user.login} (${user.name})`,
+      avatar: user.avatar
+    }))
+  } else {
+    options.value = MOCK_DATA[':'].map((reaction): MentionOption => {
+      const reactionName: ReactionName = `:${reaction.name}:`
       return {
-        value: item.login,
-        label: item.login + ' (' + item.name + ')',
-        avatar: item.avatar
+        value: reaction.name,
+        label: reactionName,
+        avatar: reaction.iconUrl
       }
-    }
-  })
-  console.log('search')
+    })
+  }
   processSpans()
 }
 
@@ -496,8 +535,14 @@ const handleMentionSelect = (option: MentionOption) => {
   const beforeMention = text.substring(0, mentionStart)
   const afterMention = text.substring(end)
 
+  // Check if we're inserting after another reaction
+  const textBeforeMention = text.substring(0, mentionStart + 1)
+  const isAfterReaction = textBeforeMention.match(/:[a-zA-Z0-9_-]+:$/)
+
   // Create the mention text
-  const mentionText = (text[mentionStart] === '@' ? '@' : ':') + option.value
+  const mentionText = text[mentionStart] === '@' 
+    ? '@' + option.value + ' '
+    : (isAfterReaction ? ':' : '') + ':' + option.value + ':'
 
   // Focus the textarea
   textarea.focus()
@@ -509,9 +554,10 @@ const handleMentionSelect = (option: MentionOption) => {
     // Use execCommand to preserve undo history
     document.execCommand('insertText', false, mentionText)
 
-    // Move cursor to the end of the inserted mention
     const newPosition = mentionStart + mentionText.length
-    textarea.setSelectionRange(newPosition, newPosition)
+    setTimeout(() => {
+      textarea.setSelectionRange(newPosition, newPosition)
+    }, 0)
 
     // Ensure v-model is updated
     textarea.dispatchEvent(new Event('input', { bubbles: true }))

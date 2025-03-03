@@ -106,10 +106,7 @@ const get_selected_avatar = (): string | null => {
 }
 
 const selectAvatar = (avatar: string) => {
-  console.log("Trying to select avatar")
-  console.log("avatar = " + avatar)
   const select = document.querySelector(`input[name="avatar"][value="${avatar}"]`) as HTMLInputElement | null
-  console.log(select)
   if (select !== null) {
     select.checked = true
   }
