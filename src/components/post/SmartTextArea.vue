@@ -1,12 +1,90 @@
 <script setup lang="ts">
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import {uploadFiles} from "@/api/storageService.ts";
 import {ElMessage} from "element-plus";
 import {useI18n} from "vue-i18n";
 import {DataBoard, Tickets} from "@element-plus/icons-vue";
+import ReactionList from "./reaction/ReactionList.vue";
+import type { BasicReactionResponse } from "@/api/reactionService.ts";
 
 const { t } = useI18n()
-const tooltipDelay = 300
+
+// Reuse the same reactions as in AddReaction component
+const basicReactions: BasicReactionResponse[] = [
+  {
+    id: 'like',
+    name: 'like',
+    iconUrl: 'https://a.slack-edge.com/production-standard-emoji-assets/14.0/google-small/1f44d@2x.png'
+  },
+  {
+    id: 'heart',
+    name: 'heart',
+    iconUrl: 'https://a.slack-edge.com/production-standard-emoji-assets/14.0/google-small/2764-fe0f@2x.png'
+  },
+  {
+    id: 'sad_cat',
+    name: 'sad_cat',
+    iconUrl: 'https://emoji.slack-edge.com/T0288D531/sad_cat/4253f3b1013d6920.png'
+  },
+  {
+    id: 'begemot',
+    name: 'begemot',
+    iconUrl: 'src/assets/icons/begemot.png'
+  }
+];
+
+const recentReactions = ref<BasicReactionResponse[]>([basicReactions[0], basicReactions[1]]);
+const isReactionPopoverVisible = ref(false);
+const tooltipDelay = 300;
+
+const handleReactionSelect = (reaction: BasicReactionResponse) => {
+  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement;
+  if (!textarea) return;
+
+  const reactionText = `:${reaction.name}:`;
+  const cursorPos = textarea.selectionStart;
+
+  try {
+    // Use execCommand to preserve undo history
+    document.execCommand('insertText', false, reactionText);
+
+    // Move cursor after the inserted reaction
+    const newPosition = cursorPos + reactionText.length;
+    textarea.setSelectionRange(newPosition, newPosition);
+
+    // Ensure v-model is updated
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  } catch (e) {
+    // Fallback: direct manipulation if execCommand fails
+    const beforeText = textarea.value.substring(0, cursorPos);
+    const afterText = textarea.value.substring(cursorPos);
+    textarea.value = beforeText + reactionText + afterText;
+
+    // Move cursor after the inserted reaction
+    const newPosition = cursorPos + reactionText.length;
+    textarea.setSelectionRange(newPosition, newPosition);
+
+    // Ensure v-model is updated
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+};
+
+const handleReactionSelectAndHideCompletion = (reaction: BasicReactionResponse) => {
+  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement;
+  if (!textarea) return;
+
+  try {
+    textarea.focus();
+    setTimeout(() => {
+      isReactionPopoverVisible.value = false
+      handleReactionSelect(reaction);
+    }, 0)
+  } finally {
+    setTimeout(() => {
+      hideCompletionDropdown()
+    }, 10)
+  }
+};
 
 const DEFAULT_ICON = `<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzYwNjI2NiIgZD0iTTEyIDRhNCA0IDAgMSAwIDAgOCA0IDQgMCAwIDAgMC04em0wIDEwYy00LjQyIDAgLTggMS43OSAtOCA0djJoMTZ2LTJjMC0yLjIxLTMuNTgtNC04LTR6Ii8+PC9zdmc+" style="width: 0.9em; height: 0.9em; opacity: 0.8; margin-right: 4px; vertical-align: middle;" />`
 
@@ -494,6 +572,22 @@ const processSpans = () => {
 }
 
 const handleMentionSearch = (_: string, prefix: MentionPrefix) => {
+  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  if (!textarea) return
+
+  const cursorPos = textarea.selectionStart
+  const text = textarea.value
+
+  // Check if we're after a completed word
+  if (prefix === ':') {
+    const textBeforeCursor = text.substring(0, cursorPos)
+    const isAfterCompletedWord = /:[a-zA-Z0-9_-]+:$/.test(textBeforeCursor)
+    if (isAfterCompletedWord) {
+      hideCompletionDropdown()
+      return
+    }
+  }
+
   if (prefix === '@') {
     options.value = MOCK_DATA['@'].map((user): MentionOption => ({
       value: user.login,
@@ -512,6 +606,39 @@ const handleMentionSearch = (_: string, prefix: MentionPrefix) => {
   }
   processSpans()
 }
+
+function hideCompletionDropdown() {
+  options.value = []
+}
+
+function handleKeyDown(event: KeyboardEvent) {
+  // Only handle keys when there are no options
+  if (options.value.length === 0) {
+    // Handle Enter and arrow keys
+    if (event.key === 'Enter' || 
+        event.key === 'ArrowUp' || 
+        event.key === 'ArrowDown') {
+      // Stop el-mention from handling the event
+      event.stopPropagation()
+    }
+  }
+}
+
+// Set up event listener when component is mounted
+onMounted(() => {
+  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  if (textarea) {
+    textarea.addEventListener('keydown', handleKeyDown, true)  // Use capture phase
+  }
+})
+
+// Clean up event listener when component is unmounted
+onBeforeUnmount(() => {
+  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  if (textarea) {
+    textarea.removeEventListener('keydown', handleKeyDown, true)  // Match capture phase in cleanup
+  }
+})
 
 const handleMentionSelect = (option: MentionOption) => {
   const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
@@ -674,26 +801,40 @@ const handleMentionSelect = (option: MentionOption) => {
           @
         </span>
       </el-button>
-      <el-button @click="" class="format-btn">
-        <el-icon size="20">
-          <svg fill="currentColor" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-               viewBox="0 0 330 330" xml:space="preserve">
-            <g id="XMLID_26_">
-            	<path id="XMLID_27_" d="M165,0C74.019,0,0,74.019,0,165s74.019,165,165,165s165-74.019,165-165S255.981,0,165,0z M165,300
-            		c-74.44,0-135-60.561-135-135S90.56,30,165,30s135,60.561,135,135S239.439,300,165,300z"/>
-              <path id="XMLID_30_" d="M215.911,200.912H114.088c-6.067,0-11.537,3.654-13.858,9.26c-2.321,5.605-1.038,12.057,3.252,16.347
-            		C119.914,242.95,141.762,252,165,252c23.238,0,45.086-9.05,61.518-25.481c4.29-4.29,5.573-10.741,3.252-16.347
-            		C227.448,204.566,221.978,200.912,215.911,200.912z"/>
-              <path id="XMLID_31_" d="M115.14,147.14c3.72-3.72,5.86-8.88,5.86-14.14c0-5.26-2.14-10.42-5.86-14.141
-            		C111.42,115.14,106.26,113,101,113c-5.27,0-10.42,2.14-14.14,5.859C83.13,122.58,81,127.74,81,133c0,5.26,2.13,10.42,5.86,14.14
-            		c3.72,3.72,8.88,5.86,14.14,5.86C106.26,153,111.42,150.859,115.14,147.14z"/>
-              <path id="XMLID_71_" d="M229,113c-5.26,0-10.42,2.14-14.14,5.859c-3.72,3.721-5.86,8.87-5.86,14.141c0,5.26,2.14,10.42,5.86,14.14
-            		c3.72,3.72,8.88,5.86,14.14,5.86c5.26,0,10.42-2.141,14.14-5.86c3.73-3.72,5.86-8.88,5.86-14.14c0-5.26-2.13-10.42-5.86-14.141
-            		C239.42,115.14,234.27,113,229,113z"/>
-            </g>
-            </svg>
-        </el-icon>
-      </el-button>
+      <el-popover
+          placement="top"
+          :width="292"
+          trigger="click"
+          v-model:visible="isReactionPopoverVisible"
+      >
+        <template #reference>
+          <el-button class="format-btn">
+            <el-icon size="20">
+              <svg fill="currentColor" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                   viewBox="0 0 330 330" xml:space="preserve">
+                <g id="XMLID_26_">
+                	<path id="XMLID_27_" d="M165,0C74.019,0,0,74.019,0,165s74.019,165,165,165s165-74.019,165-165S255.981,0,165,0z M165,300
+                		c-74.44,0-135-60.561-135-135S90.56,30,165,30s135,60.561,135,135S239.439,300,165,300z"/>
+                  <path id="XMLID_30_" d="M215.911,200.912H114.088c-6.067,0-11.537,3.654-13.858,9.26c-2.321,5.605-1.038,12.057,3.252,16.347
+                		C119.914,242.95,141.762,252,165,252c23.238,0,45.086-9.05,61.518-25.481c4.29-4.29,5.573-10.741,3.252-16.347
+                		C227.448,204.566,221.978,200.912,215.911,200.912z"/>
+                  <path id="XMLID_31_" d="M115.14,147.14c3.72-3.72,5.86-8.88,5.86-14.14c0-5.26-2.14-10.42-5.86-14.141
+                		C111.42,115.14,106.26,113,101,113c-5.27,0-10.42,2.14-14.14,5.859C83.13,122.58,81,127.74,81,133c0,5.26,2.13,10.42,5.86,14.14
+                		c3.72,3.72,8.88,5.86,14.14,5.86C106.26,153,111.42,150.859,115.14,147.14z"/>
+                  <path id="XMLID_71_" d="M229,113c-5.26,0-10.42,2.14-14.14,5.859c-3.72,3.721-5.86,8.87-5.86,14.141c0,5.26,2.14,10.42,5.86,14.14
+                		c3.72,3.72,8.88,5.86,14.14,5.86c5.26,0,10.42-2.141,14.14-5.86c3.73-3.72,5.86-8.88,5.86-14.14c0-5.26-2.13-10.42-5.86-14.141
+                		C239.42,115.14,234.27,113,229,113z"/>
+                </g>
+              </svg>
+            </el-icon>
+          </el-button>
+        </template>
+        <ReactionList 
+          :basic-reactions="basicReactions"
+          :recent-reactions="recentReactions"
+          @select-reaction="handleReactionSelectAndHideCompletion"
+        />
+      </el-popover>
     </div>
   </div>
 </template>
@@ -818,6 +959,16 @@ const handleMentionSelect = (option: MentionOption) => {
 }
 .footer-buttons .format-btn:hover {
   background-color: #dddddd;
+}
+
+/* Ensure proper z-index for the reaction popover */
+.el-popover {
+  z-index: 2000;
+}
+
+/* Add transition for smoother popover appearance */
+.el-popover[role="tooltip"] {
+  transition: opacity 0.2s, transform 0.2s;
 }
 
 .format-btn[class*="format-btn"]:first-of-type { font-weight: bold; }
