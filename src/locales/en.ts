@@ -229,6 +229,9 @@ export default {
                         css: {
                             tooltip: 'Add custom CSS classes',
                         },
+                        mention: {
+                            placeholder: 'Search users...',
+                        },
                     },
                 },
                 tags: {

@@ -2,9 +2,14 @@
   <div class="reaction-list">
     <el-input 
       v-model="searchQuery" 
-      style="width: 100%; margin-bottom: 16px;"
+      class="reaction-search"
       :placeholder="$t('reactions.add_reaction.search')"
-    />
+      clearable
+    >
+      <template #prefix>
+        <el-icon><Search /></el-icon>
+      </template>
+    </el-input>
 
     <template v-if="searchQuery">
       <div v-if="searchResults.length === 0" class="search-status">
@@ -52,6 +57,7 @@
 import { ref, watch } from 'vue'
 import type { BasicReactionResponse } from '@/api/reactionService.ts'
 import {useI18n} from "vue-i18n";
+import { Search } from '@element-plus/icons-vue';
 
 const { t } = useI18n()
 
@@ -88,6 +94,22 @@ const handleReactionSelect = (reaction: BasicReactionResponse) => {
 <style scoped>
 .reaction-list {
   padding: 8px;
+}
+
+.reaction-search {
+  margin-bottom: 16px;
+
+  :deep(.el-input__wrapper) {
+    box-shadow: 0 0 0 1px var(--el-border-color) inset;
+
+    &:hover {
+      box-shadow: 0 0 0 1px var(--el-border-color-hover) inset;
+    }
+
+    &.is-focus {
+      box-shadow: 0 0 0 1px var(--el-color-primary) inset;
+    }
+  }
 }
 
 .section {

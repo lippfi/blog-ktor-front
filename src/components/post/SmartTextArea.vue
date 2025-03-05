@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { ref, nextTick, onMounted, onBeforeUnmount, computed } from 'vue'
 import {uploadFiles} from "@/api/storageService.ts";
 import {ElMessage} from "element-plus";
 import {useI18n} from "vue-i18n";
-import {DataBoard, Tickets} from "@element-plus/icons-vue";
+import {DataBoard, Tickets, Search} from "@element-plus/icons-vue";
 import ReactionList from "./reaction/ReactionList.vue";
 import type { BasicReactionResponse } from "@/api/reactionService.ts";
 
@@ -35,7 +35,17 @@ const basicReactions: BasicReactionResponse[] = [
 
 const recentReactions = ref<BasicReactionResponse[]>([basicReactions[0], basicReactions[1]]);
 const isReactionPopoverVisible = ref(false);
+const showUserPopover = ref(false);
+const userSearchQuery = ref('');
 const tooltipDelay = 300;
+
+const filteredUsers = computed(() => {
+  const query = userSearchQuery.value.toLowerCase();
+  return MOCK_DATA['@'].filter(user => 
+    user.login.toLowerCase().includes(query) || 
+    user.name.toLowerCase().includes(query)
+  );
+});
 
 const handleReactionSelect = (reaction: BasicReactionResponse) => {
   const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement;
@@ -68,6 +78,57 @@ const handleReactionSelect = (reaction: BasicReactionResponse) => {
     textarea.dispatchEvent(new Event('input', { bubbles: true }));
   }
 };
+
+const focusTextarea = () => {
+  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement;
+  if (textarea) {
+    textarea.focus();
+  }
+}
+
+const selectUser = (user: UserMention) => {
+  insertMention(user);
+  showUserPopover.value = false;
+}
+
+const insertMention = (user: UserMention) => {
+  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement;
+  if (!textarea) return;
+
+  const mention = `@${user.login} `;
+  const startPos = textarea.selectionStart;
+  const endPos = textarea.selectionEnd;
+
+  // Focus the textarea
+  textarea.focus();
+
+  try {
+    // Save the current selection
+    const selectionStart = startPos;
+    const selectionEnd = startPos + mention.length;
+
+    // Use execCommand to preserve undo history
+    document.execCommand('insertText', false, mention);
+
+    // Move cursor after the inserted mention
+    textarea.setSelectionRange(selectionEnd, selectionEnd);
+
+    // Ensure v-model is updated
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  } catch (e) {
+    // Fallback: direct manipulation if execCommand fails
+    const textBefore = textarea.value.substring(0, startPos);
+    const textAfter = textarea.value.substring(endPos);
+    textarea.value = textBefore + mention + textAfter;
+
+    // Move cursor after the inserted mention
+    const newCursorPos = startPos + mention.length;
+    textarea.setSelectionRange(newCursorPos, newCursorPos);
+
+    // Ensure v-model is updated
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+}
 
 const handleReactionSelectAndHideCompletion = (reaction: BasicReactionResponse) => {
   const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement;
@@ -796,11 +857,44 @@ const handleMentionSelect = (option: MentionOption) => {
       @select="handleMentionSelect"
     />
     <div class="footer-buttons">
-      <el-button @click="" class="format-btn">
-        <span style="font-size: 20px; margin-top: -2px;">
-          @
-        </span>
-      </el-button>
+      <el-popover
+          placement="top"
+          :width="292"
+          trigger="click"
+          v-model:visible="showUserPopover"
+      >
+        <template #default>
+          <div class="user-list">
+            <el-input
+              v-model="userSearchQuery"
+              :placeholder="$t('post.form.fields.textarea.buttons.mention.placeholder')"
+              clearable
+              class="user-search"
+            >
+              <template #prefix>
+                <el-icon><Search /></el-icon>
+              </template>
+            </el-input>
+            <div v-for="user in filteredUsers" 
+                 :key="user.login"
+                 class="user-item"
+                 @click="selectUser(user)">
+              <img :src="user.avatar" alt="avatar"/>
+              <span class="user-info">
+                <span class="login">{{ user.login }}</span>
+                <span class="name">{{ user.name }}</span>
+              </span>
+            </div>
+          </div>
+        </template>
+        <template #reference>
+          <el-button @focus="focusTextarea" class="format-btn">
+            <span style="font-size: 20px; margin-top: -2px;">
+              @
+            </span>
+          </el-button>
+        </template>
+      </el-popover>
       <el-popover
           placement="top"
           :width="292"
@@ -808,7 +902,7 @@ const handleMentionSelect = (option: MentionOption) => {
           v-model:visible="isReactionPopoverVisible"
       >
         <template #reference>
-          <el-button class="format-btn">
+          <el-button @click="focusTextarea" @focus="focusTextarea" class="format-btn">
             <el-icon size="20">
               <svg fill="currentColor" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                    viewBox="0 0 330 330" xml:space="preserve">
@@ -947,6 +1041,61 @@ const handleMentionSelect = (option: MentionOption) => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.user-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 8px;
+
+  .user-search {
+    margin-bottom: 8px;
+
+    :deep(.el-input__wrapper) {
+      box-shadow: 0 0 0 1px var(--el-border-color) inset;
+
+      &:hover {
+        box-shadow: 0 0 0 1px var(--el-border-color-hover) inset;
+      }
+
+      &.is-focus {
+        box-shadow: 0 0 0 1px var(--el-color-primary) inset;
+      }
+    }
+  }
+
+  .user-item {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+
+    img {
+      height: 34px;
+      width: 34px;
+    }
+
+    &:hover {
+      background-color: var(--el-fill-color-light);
+    }
+
+    .user-info {
+      margin-left: 8px;
+      display: flex;
+      flex-direction: column;
+
+      .login {
+        color: var(--el-text-color-primary);
+      }
+
+      .name {
+        font-size: 12px;
+        color: var(--el-text-color-secondary);
+      }
+    }
+  }
 }
 .footer-buttons .format-btn {
   background-color: var(--el-fill-color-blank);
