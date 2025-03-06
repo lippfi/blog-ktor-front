@@ -5,7 +5,13 @@
       <span class="date"> {{ formattedCreationTime }}</span>
     </div>
     <div class="columns">
-      <UserAvatarComponent :is-comment="false" :avatar-url="post.avatar" label="my mother taught me this trick"/>
+      <UserAvatarComponent 
+        :is-comment="false" 
+        :avatar-url="post.avatar" 
+        :login="post.authorLogin" 
+        :label="post.authorNickname"
+        :nickname="post.authorNickname"
+      />
       <div class="post-content">
         <h1 class="title"> {{ post.title }} </h1>
         <div class="text" v-html="processedText"></div>
@@ -40,7 +46,6 @@ import type {PostView} from "@/api/postService.ts";
 import Reactions from "@/components/post/reaction/Reactions.vue";
 import {backendURL} from "@/main.ts";
 import {getCurrentUserLogin} from "@/api/userService.ts";
-
 import { ref } from 'vue';
 import {getDateTimeString} from "@/components/post/util.ts";
 import UserAvatarComponent from "@/components/post/UserAvatarComponent.vue";

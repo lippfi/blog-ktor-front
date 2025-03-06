@@ -178,4 +178,12 @@ body {
 .dragon-post .editing-button {
   filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(87deg) brightness(119%) contrast(119%);
 }
+
+.el-message-box__btns {
+  gap: 10px;
+}
+
+.el-message-box {
+  font-family: var(--el-font-family) !important;
+}
 </style>

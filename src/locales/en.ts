@@ -303,6 +303,60 @@ export default {
             },
         }
     },
+    userAvatar: {
+        menu: {
+            profile: 'Profile',
+            diary: 'Diary',
+            privateMessage: 'Private message',
+            addFriend: 'Add friend',
+            removeFriend: 'Remove friend',
+            block: 'Block'
+        },
+        dialog: {
+            addFriend: {
+                title: 'Add Friend',
+                label: 'Friend label (optional)',
+                message: 'Message (optional)',
+                cancel: 'Cancel',
+                confirm: 'Add Friend'
+            },
+            block: {
+                title: 'Block User',
+                message: 'Are you sure that you want to block {nickname}?',
+                warning: 'You will not be able to see their posts and it will be impossible to undo this action in the next 7 days.',
+                hideFromFeed: {
+                    suggestion: 'Maybe you want to hide their posts from your feed?',
+                    button: 'Hide from feed'
+                },
+                cancel: 'Cancel',
+                confirm: 'Block'
+            },
+            removeFriend: {
+                message: 'Are you sure that you want remove {nickname} from your friend list?',
+                title: 'Remove friend',
+                confirm: 'Yes',
+                cancel: 'No'
+            }
+        },
+        notifications: {
+            block: {
+                success: 'User {nickname} has been blocked',
+                error: 'Failed to block user'
+            },
+            hideFromFeed: {
+                success: 'Posts from {nickname} will be hidden from your feed',
+                error: 'Failed to hide posts from feed'
+            },
+            addFriend: {
+                success: 'Friend request sent successfully',
+                error: 'Failed to send friend request'
+            },
+            removeFriend: {
+                success: '{nickname} was removed from your friend list',
+                error: 'Failed to remove friend'
+            }
+        }
+    },
     menu: {
         home: 'Home',
         profile: 'Profile',

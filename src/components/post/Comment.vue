@@ -8,11 +8,9 @@ import Reactions from "@/components/post/reaction/Reactions.vue";
 import { ref } from 'vue';
 import { deleteComment as deleteCommentApi } from "@/api/postService";
 import { ElMessage } from 'element-plus';
-import { useRouter } from 'vue-router';
 import FooterButtons from "@/components/post/FooterButtons.vue";
 
 const emit = defineEmits(['commentDeleted']);
-const router = useRouter();
 
 const props = defineProps<{
   comment: CommentView,
@@ -27,7 +25,13 @@ const formattedCreationTime = computed(() => {
 
 <template>
   <div class="comment">
-    <UserAvatarComponent :is-comment="true" :avatar-url="comment.avatar" label="my mother taught me this trick"/>
+    <UserAvatarComponent 
+      :is-comment="true" 
+      :avatar-url="comment.avatar" 
+      :login="comment.authorLogin" 
+      :label="comment.authorNickname"
+      :nickname="comment.authorNickname"
+    />
     <div class="right">
       <div class="header">
         <el-link :href="backendURL + '/' + comment.authorLogin" type="primary">{{ comment.authorNickname }}</el-link>

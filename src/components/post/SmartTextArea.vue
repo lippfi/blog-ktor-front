@@ -937,7 +937,7 @@ const handleMentionSelect = (option: MentionOption) => {
 .el-button+.el-button {
   margin-left: 0;
 }
-.el-textarea__inner {
+.textarea .el-textarea__inner {
   border-radius: 0 0 0 0 !important;
   border-top: none !important;
   border-bottom: none !important;
@@ -949,14 +949,14 @@ const handleMentionSelect = (option: MentionOption) => {
       0 0 0 0 var(--el-input-border-color, var(--el-border-color)) inset,
       1px 0 0 0 var(--el-input-border-color, var(--el-border-color)) inset;
 }
-.el-textarea__inner:hover {
+.textarea .el-textarea__inner:hover {
   box-shadow:
       0 0 0 0 var(--el-input-hover-border-color, var(--el-border-color)) inset,
       -1px 0 0 0 var(--el-input-hover-border-color, var(--el-border-color)) inset,
       0 0 0 0 var(--el-input-hover-border-color, var(--el-border-color)) inset,
       1px 0 0 0 var(--el-input-hover-border-color, var(--el-border-color)) inset;
 }
-.el-textarea__inner:focus {
+.textarea .el-textarea__inner:focus {
   box-shadow:
       0 0 0 0 var(--el-input-focus-border-color, var(--el-border-color)) inset,
       -1px 0 0 0 var(--el-input-focus-border-color, var(--el-border-color)) inset,
