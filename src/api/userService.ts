@@ -19,6 +19,12 @@ interface UserBase {
     nickname: string;
     avatarUri?: string;
 }
+interface FriendBase {
+    label: string;
+    login: string;
+    nickname: string;
+    avatarUri?: string;
+}
 
 interface UserUpdateRequest {
     user: {

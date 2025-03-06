@@ -190,6 +190,7 @@ function replaceSlider(text: string): string {
     result = result.replace(match[0], '<el-carousel-item>' + match[1] + '</el-carousel-item>');
     match = result.match(slidePattern);
   }
+  console.log(result)
   return result;
 }
 
