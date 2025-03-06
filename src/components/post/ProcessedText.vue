@@ -1,9 +1,12 @@
 <template>
-  <div class="text" v-html="processedText"></div>
+  <div class="text">
+    <runtime-template :template="processedText" />
+  </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import RuntimeTemplate from 'vue3-runtime-template';
 
 const props = defineProps<{
   text: string
