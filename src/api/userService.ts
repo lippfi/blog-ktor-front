@@ -19,7 +19,7 @@ interface UserBase {
     nickname: string;
     avatarUri?: string;
 }
-interface FriendBase {
+export interface FriendBase {
     label: string;
     login: string;
     nickname: string;

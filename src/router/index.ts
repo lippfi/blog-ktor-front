@@ -6,6 +6,91 @@ import DiaryView from "@/views/DiaryView.vue";
 import type {CommentView, PostView as PostViewData, ReactionView} from "@/api/postService.ts";
 import PostView from "@/views/PostView.vue";
 
+export const profileStub = {
+  text: "Hi there! Welcome to my webpage.\n" +
+      "\n" +
+      "My name is Filipp and I am a software developer from Kazakhstan, currently living in Cyprus.\n" +
+      "\n" +
+      "I’ve bought this domain to sign my Java packages. According to Java naming conventions reversed domain names are used to begin package names, and with this domain I can use the reversed subdomain fi.lipp.***** which is my first and last name. It’s kinda cool, isn’t it?",
+  friends: [
+    {
+      label: "гей",
+      login: "hiccup",
+      nickname: "валера по вызову",
+      avatar: "https://i0.beon.fun/35/30/3035/avatars/29.png",
+    },
+    {
+      label: "собака",
+      login: "hiccup",
+      nickname: "плюшевая пенетрация",
+      avatar: "https://beon.vip/uploads_user/10000/9709/0_2106.jpg",
+    },
+    {
+      label: "краш",
+      login: "hiccup",
+      nickname: "suberosp",
+      avatar: "https://beon.vip/uploads_user/1000/1000/0_3688.jpg",
+    },
+    {
+      label: "",
+      login: "hiccup",
+      nickname: "фанат путина",
+      avatar: "https://i0.beon.fun/82/36/3682/avatars/33.png",
+    },
+    {
+      label: "",
+      login: "hiccup",
+      nickname: "турки не",
+      avatar: "https://beon.vip/uploads_user/22000/21299/0_3467.jpg",
+    },
+    {
+      label: "",
+      login: "hiccup",
+      nickname: "болеют",
+      avatar: "https://beon.vip/uploads_user/1000/99/0_8745.jpg",
+    },
+    {
+      label: "",
+      login: "hiccup",
+      nickname: "простатитом",
+      avatar: "https://beon.vip/uploads_user/27000/26893/0_5870.jpg",
+    },
+    {
+      label: "",
+      login: "hiccup",
+      nickname: "гена горин",
+      avatar: "https://beon.vip/uploads_user/3000/2587/0_8148.jpg",
+    },
+  ],
+  achievements: [
+    {
+      image: "https://i.imgur.com/0000000.png",
+      name: "лайкарь",
+      description: "поставить 100 лайков пользователю, который тебя не лайкает",
+    },
+    {
+      image: "https://i.imgur.com/0000000.png",
+      name: "срачер",
+      description: "самый гнилой базар",
+    },
+    {
+      image: "https://i.imgur.com/0000000.png",
+      name: "премия беонвина",
+      description: "самый тупой пост недели",
+    },
+    {
+      image: "https://i.imgur.com/0000000.png",
+      name: "мразь",
+      description: "закинуть админа в чс",
+    },
+    {
+      image: "https://i.imgur.com/0000000.png",
+      name: "тряпка",
+      description: "убрать человека из чс",
+    },
+  ],
+}
+
 const stubReaction: ReactionView = {
   id: 'tastatarstn',
   name: 'sad_cat',
@@ -104,6 +189,11 @@ const router = createRouter({
       props: {
         post: stubPost,
       }
+    },
+    {
+      path: "/profile",
+      name: "profile",
+      component: () => import('../views/ProfileView.vue'),
     },
   ],
 })
