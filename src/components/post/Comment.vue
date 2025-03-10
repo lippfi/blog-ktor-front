@@ -26,7 +26,7 @@ const formattedCreationTime = computed(() => {
 <template>
   <div class="comment">
     <UserAvatarComponent 
-      :is-comment="true" 
+      avatar-size="80px"
       :avatar-url="comment.avatar" 
       :login="comment.authorLogin" 
       :label="comment.authorNickname"

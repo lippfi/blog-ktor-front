@@ -63,10 +63,9 @@ const props = defineProps<{
   login: string,
   label: string,
   nickname: string,
-  isComment: boolean,
+  avatarSize: string,
 }>();
 
-const avatarSize = props.isComment ? '80px' : '100px';
 const isFriend: boolean = false; // todo implementation
 
 const handleMenuClick = async (command: string) => {
@@ -225,6 +224,10 @@ const handleMenuClick = async (command: string) => {
   text-align: center;
   font-size: 11px;
   color: var(--comment);
+}
+
+.avatar img {
+  border-radius: 3px;
 }
 
 .avatar-image {
