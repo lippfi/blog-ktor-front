@@ -67,11 +67,7 @@ import type {FormInstance, FormRules} from "element-plus";
 import type { Sex, NSFWPolicy, Language, UserAdditionalInfo } from "@/api/userService.ts";
 import { updateAdditionalInfo } from "@/api/userService.ts";
 import router from "@/router";
-import type { ReactionView } from '@/api/postService';
 import {useI18n} from "vue-i18n";
-import AddReaction from "@/components/post/reaction/AddReaction.vue";
-import Reaction from "@/components/Reaction.vue";
-import Reactions from "@/components/post/reaction/Reactions.vue";
 
 const { t } = useI18n()
 

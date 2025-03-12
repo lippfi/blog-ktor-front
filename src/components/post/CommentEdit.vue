@@ -1,16 +1,51 @@
 <script setup lang="ts">
 import AvatarChooser from "@/components/post/AvatarChooser.vue";
 import SmartTextArea from "@/components/post/SmartTextArea.vue";
+import {defineEmits, watchEffect} from "vue";
+
+const props = defineProps<{
+  id?:string;
+  avatar?: string;
+  content?: string;
+}>();
+
+const emit = defineEmits(['cancelEdit']);
+
+const localId = defineModel<string>('id')
+const localContent = defineModel<string>('content', { required: true });
+const localAvatar = defineModel<string>('localAvatar')
+
+watchEffect(() => {
+  if (props.id) {
+    localId.value = props.id
+  }
+  if (props.content) {
+    localContent.value = props.content;
+  }
+  if (props.avatar) {
+    localAvatar.value = props.avatar
+  }
+});
+
+function cancelEdit() {
+  emit('cancelEdit', '');
+}
+
+function isEdit(){
+  return localId
+}
+
 </script>
 
 <template>
-  <div class="comment-add">
+  <div class="comment-edit">
     <div class="form">
-      <AvatarChooser :avatar-size="80" :outline-size="3" :show-buttons="true" :is-vertical="true"/>
+      <AvatarChooser :avatar-size="80" :outline-size="3" :show-buttons="true" :is-vertical="true" :selected-avatar="localAvatar"/>
       <div class="right">
-        <SmartTextArea/>
+        <SmartTextArea :content="localContent"/>
         <div class="footer">
           <el-button type="primary">{{ $t('comment.form.button.send') }}</el-button>
+          <el-button v-if="isEdit()" type="primary" @click="cancelEdit">{{ $t('comment.form.button.cancel') }}</el-button>
         </div>
       </div>
     </div>
@@ -21,7 +56,7 @@ import SmartTextArea from "@/components/post/SmartTextArea.vue";
 .chooser-container {
   height: 236px;
 }
-.comment-add {
+.comment-edit {
   width: 100%;
   min-width: 0;  /* Prevent flex items from overflowing */
   box-sizing: border-box;
