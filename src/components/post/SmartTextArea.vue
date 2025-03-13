@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick, onMounted, onBeforeUnmount, computed } from 'vue'
+import {ref, nextTick, onMounted, onBeforeUnmount, computed, watchEffect} from 'vue'
 import {uploadFiles} from "@/api/storageService.ts";
 import {ElMessage} from "element-plus";
 import {useI18n} from "vue-i18n";
@@ -8,6 +8,11 @@ import ReactionList from "./reaction/ReactionList.vue";
 import type { BasicReactionResponse } from "@/api/reactionService.ts";
 
 const { t } = useI18n()
+
+
+const props = defineProps<{
+  content?: string;
+}>();
 
 // Reuse the same reactions as in AddReaction component
 const basicReactions: BasicReactionResponse[] = [
@@ -184,7 +189,13 @@ const observer = new MutationObserver((mutations) => {
     })
   })
 })
-const content = ref<string>()
+const content = defineModel<string>('content', { default: ""})
+
+watchEffect(() => {
+  if (props.content) {
+    content.value = props.content;
+  }
+});
 
 const wrapSelectedText = (prefix: string, suffix: string) => {
   const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
@@ -855,6 +866,7 @@ const handleMentionSelect = (option: MentionOption) => {
       @search="handleMentionSearch"
       @change="processSpans"
       @select="handleMentionSelect"
+      class="post-input"
     />
     <div class="footer-buttons">
       <el-popover
@@ -943,6 +955,7 @@ const handleMentionSelect = (option: MentionOption) => {
   border-bottom: none !important;
   width: 100% !important;
   min-width: 0 !important;
+  overflow-y: auto !important;
   box-shadow:
       0 0 0 0 var(--el-input-border-color, var(--el-border-color)) inset,
       -1px 0 0 0 var(--el-input-border-color, var(--el-border-color)) inset,
@@ -1029,7 +1042,6 @@ const handleMentionSelect = (option: MentionOption) => {
 .text-buttons::-webkit-scrollbar {
   height: 1px;
 }
-
 .format-btn {
   height: 28px;
   min-width: 30px;

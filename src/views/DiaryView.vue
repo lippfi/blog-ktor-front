@@ -1,19 +1,39 @@
-<template>
-  <div class="centralized_block">
-    <PostComponent v-for="post in posts" :post="post" :show-comments-count="true"/>
-    <PostAddComponent/>
-  </div>
-</template>
-
 <script setup lang="ts">
-import PostComponent from "@/components/post/PostComponent.vue";
-import PostAddComponent from "@/components/post/PostAddComponent.vue";
-import type {PostView} from "@/api/postService.ts";
+import Post from "@/components/post/Post.vue";
+import PostEdit from "@/components/post/PostEdit.vue";
+import PostClientMock from "@/api/postClient/postClientMock.ts";
+import type { Post as PostModel} from "@/models/posts/post.ts";
+import { mapPostDtoToPost } from "@/models/posts/mapper.ts";
+import { ref, onMounted } from 'vue';
 
 const props = defineProps<{
-  posts: PostView[],
+  diaryId?: string;
+  page?: string;
 }>();
+
+const posts = ref<PostModel[]>([]);
+
+onMounted(async () => {
+  const postsClient = new PostClientMock();
+  let page = 1;
+  if (props.page) {
+    page = parseInt(props.page);
+  }
+  if (!props.diaryId) return;
+
+  const searchResult = await postsClient.getDiaryPosts(props.diaryId, page);
+  if (searchResult.type === 'ok') {
+    posts.value = searchResult.data.result.map((c) => mapPostDtoToPost(c));
+  }
+});
 </script>
+
+<template>
+  <div class="centralized_block">
+    <Post v-for="post in posts" :post="post" :show-comments-count="true" />
+    <PostEdit />
+  </div>
+</template>
 
 <style scoped>
 .centralized_block {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ReactionView } from '@/api/postService.ts'
+import type { Reaction as ReactionModel} from '@/models/posts/post.ts'
 import type { BasicReactionResponse } from '@/api/reactionService.ts'
 import { addPostReaction, addCommentReaction } from '@/api/reactionService.ts'
 import { getCurrentUserNickname } from '@/api/userService.ts'
@@ -8,7 +8,7 @@ import AddReaction from '@/components/post/reaction/AddReaction.vue'
 import {ref, watch} from 'vue'
 
 const props = defineProps<{
-  reactions: ReactionView[],
+  reactions: ReactionModel[],
   isReactable: boolean,
   type: 'post' | 'comment',
   postLogin?: string,
@@ -16,14 +16,14 @@ const props = defineProps<{
   commentId?: string,
 }>()
 
-const localReactions = ref<ReactionView[]>([...props.reactions])
+const localReactions = ref<ReactionModel[]>([...props.reactions])
 
 // Keep localReactions in sync with props
 watch(() => props.reactions, (newReactions) => {
   localReactions.value = [...newReactions]
 })
 
-function handleReactionRemove(reactionToRemove: ReactionView) {
+function handleReactionRemove(reactionToRemove: ReactionModel) {
   const index = localReactions.value.findIndex(r => r.id === reactionToRemove.id)
   if (index !== -1) {
     localReactions.value.splice(index, 1)
@@ -69,7 +69,7 @@ function handleReactionSelect(reaction: BasicReactionResponse) {
   }
 
   // Create new reaction if it doesn't exist
-  const newReaction: ReactionView = {
+  const newReaction: ReactionModel = {
     name: reaction.name,
     iconUri: reaction.iconUrl,
     count: 1,

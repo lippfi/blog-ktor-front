@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ReactionView } from '@/api/postService'
+import type { ReactionView } from '@/api/postClient/postClient.ts'
 import { addPostReaction, removePostReaction, addCommentReaction, removeCommentReaction } from '@/api/reactionService'
 import { getCurrentUserNickname } from "@/api/userService.ts"
 import { ref, watch } from 'vue'

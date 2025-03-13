@@ -30,7 +30,6 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { getAvatars } from "@/hooks/userAPI"
 import {ArrowDownBold, ArrowLeft, ArrowLeftBold, ArrowRightBold, ArrowUpBold} from "@element-plus/icons-vue";
 
 interface Props {
@@ -42,6 +41,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const emit = defineEmits(['update:selectedAvatar']) // Добавляем emit
 
 const avatars = ref<string[]>([])
 const isLoaded = ref(false)
@@ -91,7 +91,7 @@ const scroll_right = () => {
   }
 }
 
-const get_selected_avatar = (): string | null => {
+const getSelectedAvatar  = (): string | null => {
   const selected = document.querySelector('input[name="avatar"]:checked') as HTMLInputElement | null
   if (selected === null) {
     if (props.selectedAvatar !== undefined && props.selectedAvatar !== null) {
@@ -143,6 +143,22 @@ const fetchAvatars = async () => {
     console.error('Failed to fetch avatars:', error)
   }
 }
+
+const handleAvatarChange = () => {
+  const selectedAvatar = getSelectedAvatar()
+  if (selectedAvatar !== null) {
+    emit('update:selectedAvatar', selectedAvatar) // Отправляем выбранный аватар родителю
+  }
+}
+
+watch(customAvatar, () => {
+  handleAvatarChange()
+})
+
+const avatarInputs = document.querySelectorAll('input[name="avatar"]')
+avatarInputs.forEach((input) => {
+  input.addEventListener('change', handleAvatarChange)
+})
 
 onMounted(() => {
   fetchAvatars()

@@ -88,7 +88,6 @@ type Result =
     | { type: 'error'; message: string };
 
 type LoginResult = Result;
-type RegistrationResult = Result;
 
 async function authenticatedRequest(
     endpoint: string,

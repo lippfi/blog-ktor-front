@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type {PostView} from "@/api/postService.ts";
-import PostComponent from "@/components/post/PostComponent.vue";
-import CommentAdd from "@/components/post/CommentAdd.vue";
+import type { Post as PostModel } from "@/models/posts/post.ts";
+import Post from "@/components/post/Post.vue";
+import CommentEdit from "@/components/post/CommentEdit.vue";
 import Comment from "@/components/post/Comment.vue";
 
 const props = defineProps<{
-  post: PostView,
+  post: PostModel,
 }>();
 </script>
 
 <template>
   <div class="centralized_block">
-    <PostComponent :post="post" :show-editing-buttons="false" :show-comments-count="false"/>
+    <Post :post="post" :show-editing-buttons="false" :show-comments-count="false"/>
     <div class="comments_block">
       <Comment  v-for="comment in post.comments" :key="comment.id"
                 :comment="comment"
@@ -19,7 +19,7 @@ const props = defineProps<{
                 :is-reactable="true"
       />
     </div>
-    <CommentAdd/>
+    <CommentEdit/>
   </div>
 </template>
 
