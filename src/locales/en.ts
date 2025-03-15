@@ -186,7 +186,7 @@ export default {
                     label: 'skip',
                 },
                 continue: {
-                    label: 'skip',
+                    label: 'continue',
                 },
             }
         },

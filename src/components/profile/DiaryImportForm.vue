@@ -18,6 +18,7 @@ const importProgress = ref<number>(0);
 const error = ref<string>('');
 const currentStep = ref<string>('');
 let userEventSource: EventSource | null = null;
+let currentUserId: string | null = null;
 
 // Close EventSource when component is unmounted
 onUnmounted(() => {
@@ -82,14 +83,29 @@ const startImport = async () => {
 
 // Connect to user-specific events
 function connectToUserEvents(userId: string) {
+  currentUserId = userId;
+
   // Close existing connection if any
   if (userEventSource) {
     userEventSource.close();
   }
 
-  // Create new connection
-  userEventSource = new EventSource(`${importURL}/events/${userId}`);
+  // Reset progress and status
+  importProgress.value = 0;
+  currentStep.value = 'Connecting to import progress...';
 
+  // Create new connection
+  try {
+    // Try with the exact URL format from the working code
+    userEventSource = new EventSource(`http://0.0.0.0:8080/events/${userId}`);
+  } catch (e) {
+    console.error('Error creating EventSource:', e);
+    error.value = `Error creating EventSource: ${e instanceof Error ? e.message : 'Unknown error'}`;
+    importInProgress.value = false;
+    return;
+  }
+
+  // Add handler for 'progress' event type
   userEventSource.addEventListener('progress', function(event) {
     try {
       const data = JSON.parse(event.data);
@@ -97,12 +113,36 @@ function connectToUserEvents(userId: string) {
       currentStep.value = data.message;
     } catch (e) {
       console.error('Error parsing progress event:', e);
-      currentStep.value = 'Error parsing event: ' + event.data;
+      error.value = 'Error parsing event: ' + event.data;
+      importProgress.value = 0;
+      currentStep.value = 'Error parsing event data';
     }
   });
 
-  userEventSource.onerror = function(error) {
-    console.error('Error with user event source:', error);
+  // Add handler for 'message' event type (default event type)
+  userEventSource.onmessage = function(event) {
+    try {
+      const data = JSON.parse(event.data);
+      importProgress.value = data.percentage;
+      currentStep.value = data.message;
+    } catch (e) {
+      console.error('Error parsing message event:', e);
+      error.value = 'Error parsing event: ' + event.data;
+      importProgress.value = 0;
+      currentStep.value = 'Error parsing event data';
+    }
+  };
+
+  // Add handler for 'open' event
+  userEventSource.onopen = function() {
+    console.log('EventSource connection established');
+    currentStep.value = 'Connected to import progress...';
+  };
+
+  userEventSource.onerror = function(err) {
+    console.error('Error with user event source:', err);
+    error.value = 'Connection error. Reconnecting...';
+    importProgress.value = 0;
     currentStep.value = 'Connection error. Reconnecting...';
   };
 }
