@@ -161,6 +161,36 @@ export default {
             },
         }
     },
+    diaryImport: {
+        title: 'Import diary',
+        form: {
+            description: {
+                line1: 'You can import your diary from another website.',
+            },
+            fields: {
+                website: {
+                    label: 'website',
+                },
+                login: {
+                    label: 'login',
+                },
+                password: {
+                    label: 'password',
+                },
+            },
+            buttons: {
+                send: {
+                    label: 'import',
+                },
+                skip: {
+                    label: 'skip',
+                },
+            }
+        },
+        import: {
+            title: 'Import in progress..'
+        }
+    },
     reactions: {
         reaction: {
             anonymous: 'anonymous: '

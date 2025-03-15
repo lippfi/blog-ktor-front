@@ -6,11 +6,10 @@
         <h1>{{$t('registration.form.header')}}</h1>
       </div>
         <el-steps v-if="step > 0"
-            style="width: 410px"
-            :space="300"
             :active="step"
             finish-status="success"
         >
+          <el-step />
           <el-step />
           <el-step />
           <el-step />
@@ -20,8 +19,10 @@
         <RegistrationForm v-if="step === 0"/>
         <AdditionalInfoForm v-if="step === 1"/>
         <DiaryInfoForm v-if="step === 2"/>
+        <DiaryImportForm v-if="step === 3"/>
       </div>
     </div>
+    <div/>
     <LanguageChooser />
   </div>
 </template>
@@ -34,6 +35,7 @@ import AdditionalInfoForm from "@/components/AdditionalInfoForm.vue";
 import DiaryInfoForm from "@/components/DiaryInfoForm.vue";
 import LanguageChooser from '@/components/LanguageChooser.vue';
 import AddReaction from "@/components/post/reaction/AddReaction.vue";
+import DiaryImportForm from "@/components/profile/DiaryImportForm.vue";
 
 const { t } = useI18n();
 
@@ -41,7 +43,7 @@ onMounted(() => {
   document.title = t('registration.title');
 });
 
-let step = 0;
+let step = 3;
 </script>
 
 <style scoped>
