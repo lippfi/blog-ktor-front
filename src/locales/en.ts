@@ -185,6 +185,9 @@ export default {
                 skip: {
                     label: 'skip',
                 },
+                continue: {
+                    label: 'skip',
+                },
             }
         },
         import: {
