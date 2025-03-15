@@ -1,7 +1,7 @@
 <template>
   <div :class="'post ' + post.classes">
     <div class="top">
-      <el-link :href="backendURL + '/' + post.authorLogin" type="primary">{{ post.authorNickname }}</el-link>
+      <NicknameComponent :nickname="post.authorNickname" :login="post.authorLogin"/>
       <span class="date"> {{ formattedCreationTime }}</span>
     </div>
     <div class="columns">
@@ -51,6 +51,7 @@ import {getDateTimeString} from "@/components/post/util.ts";
 import UserAvatarComponent from "@/components/post/UserAvatarComponent.vue";
 import FooterButtons from "@/components/post/FooterButtons.vue";
 import ProcessedText from "@/components/post/ProcessedText.vue";
+import NicknameComponent from "@/components/NicknameComponent.vue";
 
 const isEditing = ref(false);
 

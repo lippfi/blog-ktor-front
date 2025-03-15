@@ -9,6 +9,7 @@ import { ref } from 'vue';
 import { deleteComment as deleteCommentApi } from "@/api/postService";
 import { ElMessage } from 'element-plus';
 import FooterButtons from "@/components/post/FooterButtons.vue";
+import NicknameComponent from "@/components/NicknameComponent.vue";
 
 const emit = defineEmits(['commentDeleted']);
 
@@ -34,7 +35,7 @@ const formattedCreationTime = computed(() => {
     />
     <div class="right">
       <div class="header">
-        <el-link :href="backendURL + '/' + comment.authorLogin" type="primary">{{ comment.authorNickname }}</el-link>
+        <NicknameComponent :nickname="comment.authorNickname" :login="comment.authorLogin"/>
         <span class="date">{{ formattedCreationTime }}</span>
       </div>
       <div class="content">

@@ -4,11 +4,9 @@ import type {
   ReadIncomingMessage,
   UnreadIncomingMessage
 } from "@/components/message/MessagePreview.vue";
-import {backendURL} from "@/main.ts";
 import UserAvatarComponent from "@/components/post/UserAvatarComponent.vue";
-import {computed} from "vue";
-import {getDateTimeString} from "@/components/message/utils.ts";
 import router from "@/router";
+import NicknameComponent from "@/components/NicknameComponent.vue";
 
 const props = defineProps<{
   message: UnreadIncomingMessage,
@@ -21,7 +19,7 @@ const getRandomWidth = () => `${Math.floor(Math.random() * (90 - 30 + 1)) + 30}%
     <UserAvatarComponent :avatar-url="message.avatar" :login="message.login" label="" :nickname="message.nickname" avatar-size="100px"/>
     <div class="non-avatar">
       <div class="header">
-        <el-link :href="backendURL + '/' + message.login" type="primary">{{ message.nickname }}</el-link>
+        <NicknameComponent :nickname="message.nickname" :login="message.login"/>
         <el-tag effect="dark" round type="danger">unread</el-tag>
       </div>
       <div class="message-content">
