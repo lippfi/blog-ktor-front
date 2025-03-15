@@ -161,29 +161,16 @@ body {
   background-color: white;
 }
 
-.dragon-post .text {
-  background-image: url("http://127.0.0.1:8887/88110491-7cc8-4e68-9550-e45824692ffc.png");
-  background-repeat: repeat-x;
-  background-position-y: bottom;
-}
-
-.dragon-post .post-label {
-  background: linear-gradient(45deg, yellow, red);
-}
-
-.dragon-post .editing-buttons {
-  background-color: red;
-}
-
-.dragon-post .editing-button {
-  filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(87deg) brightness(119%) contrast(119%);
-}
-
 .el-message-box__btns {
   gap: 10px;
 }
 
 .el-message-box {
   font-family: var(--el-font-family) !important;
+}
+
+.date {
+  color: var(--comment);
+  font-size: 14px;
 }
 </style>

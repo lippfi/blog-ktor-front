@@ -1,0 +1,122 @@
+<script setup lang="ts">
+import type {OutgoingMessage} from "@/components/message/MessagePreview.vue";
+import {backendURL} from "@/main.ts";
+import UserAvatarComponent from "@/components/post/UserAvatarComponent.vue";
+import {computed} from "vue";
+import {getDateTimeString} from "@/components/message/utils.ts";
+
+const props = defineProps<{
+  message: OutgoingMessage,
+}>();
+
+const formattedCreationTime = computed(() => {
+  return getDateTimeString(props.message.time); // todo do not show time in preview if day differs
+});
+</script>
+
+<template>
+  <div :class="'message_preview ' + (message.isRead? ' read' : 'unread')">
+    <UserAvatarComponent :avatar-url="message.avatar" :login="message.login" label="" :nickname="message.nickname" avatar-size="100px"/>
+    <div class="non-avatar">
+      <div class="header">
+        <el-link :href="backendURL + '/' + message.login" type="primary">{{ message.nickname }}</el-link>
+<!--        <el-tag v-if="!message.isRead" effect="dark" round type="danger">unread</el-tag>-->
+      </div>
+      <div class="message-content">
+        <div class="avatar">
+          <img :src="message.myAvatar" alt="avatar">
+        </div>
+        <div class="right">
+          <div class="message-text">
+            {{ message.text }}
+          </div>
+          <div class="date">
+            {{ formattedCreationTime }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.message-content {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  padding: 7px;
+  box-sizing: border-box;
+  border-radius: 5px;
+}
+
+.message_preview.unread .message-content {
+  background-color: #dbecf3;
+}
+
+.message-content img {
+  width: 61px;
+  height: 61px;
+}
+
+.avatar {
+  height: 61px;
+}
+
+.avatar img {
+  border-radius: 3px;
+}
+
+.el-link {
+  font-size: 16px;
+}
+
+.non-avatar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100px;
+}
+
+.message_preview {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  gap: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+  border-radius: 5px;
+}
+
+.message_preview.unread:hover {
+  background-color: #dbecf3;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.message_preview.read:hover {
+  background-color: #dbecf3;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-left: 7px;
+  width: 100%;
+  height: 61px;
+}
+
+.date {
+  width: 100%;
+  text-align: right;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+}
+</style>

@@ -37,7 +37,7 @@ const finishEditing = () => {
 <template>
   <div class="comment"v-if="!isEditing">
     <UserAvatarComponent 
-      :is-comment="true" 
+      avatar-size="80px"
       :avatar-url="comment.avatar" 
       :login="comment.authorLogin" 
       :label="comment.authorNickname"

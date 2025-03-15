@@ -24,7 +24,7 @@ defineProps<{
         :login="friend.login"
         :label="friend.label"
         :nickname="friend.nickname"
-        :is-comment="false"
+        avatar-size="100px"
         class="friend-avatar"
       />
       <div class="friend-nickname">{{ friend.nickname }}</div>

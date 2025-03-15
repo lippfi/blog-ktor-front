@@ -5,9 +5,9 @@
       <span class="date"> {{ formattedCreationTime }}</span>
     </div>
     <div class="columns">
-      <UserAvatarComponent 
-        :is-comment="false" 
-        :avatar-url="post.avatar" 
+      <UserAvatarComponent
+        avatar-size="100px"
+        :avatar-url="post.avatar"
         :login="post.authorLogin" 
         :label="post.authorNickname"
         :nickname="post.authorNickname"
