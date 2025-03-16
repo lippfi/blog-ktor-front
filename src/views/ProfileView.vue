@@ -5,7 +5,7 @@ import Friends from "@/components/profile/Friends.vue";
 import Achievements from "@/components/profile/Achievements.vue";
 
 const props = defineProps<{
-  login?: string;
+  login: string;
 }>();
 
 const text = `Привет, я детектив. Вот карточка с каким-то текстом и CSS, которая должна вас вдохновить создать что угодно свое.

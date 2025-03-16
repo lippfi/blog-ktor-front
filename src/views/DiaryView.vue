@@ -7,8 +7,8 @@ import { mapPostDtoToPost } from "@/models/posts/mapper.ts";
 import { ref, onMounted } from 'vue';
 
 const props = defineProps<{
-  login?: string;
-  page?: string;
+  login: string;
+  page: string;
 }>();
 
 const posts = ref<PostModel[]>([]);
