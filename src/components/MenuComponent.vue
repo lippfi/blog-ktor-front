@@ -11,13 +11,22 @@ import {
 } from "@element-plus/icons-vue";
 import {ref} from 'vue'
 import {useI18n} from "vue-i18n";
+import {useRouter} from 'vue-router';
+import {getCurrentUserLogin} from "@/api/userService.ts";
 
 const { t } = useI18n()
-
+const router = useRouter()
 const isVisible = ref(false)
 
 const toggleMenu = () => {
   isVisible.value = !isVisible.value
+}
+
+const currentUser = getCurrentUserLogin()
+
+const navigateTo = (path: string) => {
+  router.push(path)
+  isVisible.value = false
 }
 </script>
 
@@ -27,37 +36,37 @@ const toggleMenu = () => {
   </el-icon>
   <el-drawer v-model="isVisible" title="I am the title" :with-header="false" size="300px">
     <div class="menu-items">
-      <div class="menu-item">
+      <div class="menu-item" @click="navigateTo('/')">
         <el-icon size="20">
           <HomeFilled/>
         </el-icon>
         {{ t('menu.home') }}
       </div>
-      <div class="menu-item">
+      <div class="menu-item" @click="navigateTo(`/${currentUser}/profile`)">
         <el-icon size="20">
           <User/>
         </el-icon>
         {{ t('menu.profile') }}
       </div>
-      <div class="menu-item">
+      <div class="menu-item" @click="navigateTo(`/${currentUser}/diary`)">
         <el-icon size="20">
           <Memo/>
         </el-icon>
         {{ t('menu.diary') }}
       </div>
-      <div class="menu-item">
+      <div class="menu-item" @click="navigateTo('/messages')">
         <el-icon size="20">
           <Message/>
         </el-icon>
         {{ t('menu.messages') }}
       </div>
-      <div class="menu-item">
+      <div class="menu-item" @click="navigateTo('/search')">
         <el-icon size="20">
           <Search/>
         </el-icon>
         {{ t('menu.search') }}
       </div>
-      <div class="menu-item">
+      <div class="menu-item" @click="navigateTo('/settings')">
         <el-icon size="20">
           <Setting/>
         </el-icon>

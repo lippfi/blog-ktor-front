@@ -175,6 +175,7 @@ export default {
     post: {
         form: {
             title: 'New post:',
+            edit: 'Edit ',
             fields: {
                 title: {
                     label: 'Title:',
@@ -232,6 +233,9 @@ export default {
                         mention: {
                             placeholder: 'Search users...',
                         },
+                        quote: {
+                            tooltip: 'Quote selected'
+                        }
                     },
                 },
                 tags: {
@@ -254,7 +258,8 @@ export default {
                 },
             },
             button: {
-                send: 'publish'
+                send: 'publish',
+                cancel: 'cancel'
             }
         },
         view: {
@@ -273,6 +278,8 @@ export default {
         form: {
             button: {
                 send: 'add comment',
+                cancel: 'cancel',
+                apply: 'apply'
             },
         },
         view: {
@@ -366,5 +373,10 @@ export default {
         designOff: 'Turn off design',
         settings: 'Settings',
         logout: 'Logout',
+    },
+    feed: {
+        latest: 'Latest',
+        popular: 'Popular',
+        following: 'Following'
     }
 }

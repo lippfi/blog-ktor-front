@@ -2,19 +2,26 @@
 import { ref } from 'vue';
 import {useRouter} from "vue-router";
 import {
-  type CommentView,
-  deleteComment as deleteCommentApi,
-  deletePost as deletePostApi,
-  type PostView
-} from "@/api/postService.ts";
+  type Comment,
+  type Post
+} from "@/models/posts/post.ts";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {ChatLineRound, Delete, Edit, More, MoreFilled, Warning} from "@element-plus/icons-vue";
 import {getCurrentUserLogin} from "@/api/userService.ts";
 import {useI18n} from "vue-i18n";
+import PostClientMock from "@/api/postClient/postClientMock.ts";
 
 const { t } = useI18n()
 
 const router = useRouter();
+
+const emit = defineEmits(['startEdit']);
+
+const postClient = new PostClientMock()
+
+function startEdit() {
+  emit('startEdit', '');
+}
 
 const showHiddenButtons = ref(false);
 const toggleHiddenButtons = (value: boolean) => {
@@ -31,7 +38,7 @@ async function handleDelete() {
 
 async function deletePost() {
   try {
-    const result = await deletePostApi(props.post.id);
+    const result = await postClient.deletePost(props.post.id);
     if (result.type === 'ok') {
       if (props.redirectOnDelete) {
         await router.push(props.redirectOnDelete);
@@ -53,7 +60,7 @@ async function deletePost() {
 }
 
 async function deleteComment() {
-  const result = await deleteCommentApi(props.comment!!.id);
+  const result = await postClient.deleteComment(props.comment!!.id);
   if (result.type === 'ok') {
     router.go(0);
   } else {
@@ -65,8 +72,8 @@ async function deleteComment() {
 };
 
 const props = defineProps<{
-  post: PostView,
-  comment?: CommentView,
+  post: Post,
+  comment?: Comment,
   showCommentsCount?: boolean,
   redirectOnDelete?: string,
 }>();
@@ -86,7 +93,7 @@ const props = defineProps<{
         </svg>
       </el-icon>
       <el-icon v-if="showHiddenButtons && ((!comment && post.authorLogin === getCurrentUserLogin()) || (comment && comment.authorLogin == getCurrentUserLogin()))" size="20" class="edit">
-        <Edit/>
+        <Edit @click="startEdit"/>
       </el-icon>
       <div class="confirm-deletion">
         <el-popconfirm

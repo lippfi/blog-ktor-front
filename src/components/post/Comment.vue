@@ -1,30 +1,42 @@
 <script setup lang="ts">
 import UserAvatarComponent from "@/components/post/UserAvatarComponent.vue";
-import {type CommentView, type PostView} from "@/api/postService.ts";
-import {computed} from "vue";
-import {getDateTimeString} from "@/components/post/util.ts";
+import {type Comment, type Post} from "@/models/posts/post.ts";
+import {computed, ref} from "vue";
 import {backendURL} from "@/main.ts";
 import Reactions from "@/components/post/reaction/Reactions.vue";
-import { ref } from 'vue';
-import { deleteComment as deleteCommentApi } from "@/api/postService";
-import { ElMessage } from 'element-plus';
 import FooterButtons from "@/components/post/FooterButtons.vue";
+import CommentEdit from "@/components/post/CommentEdit.vue";
+import {getDateTimeString} from "@/components/post/util.ts";
 
 const emit = defineEmits(['commentDeleted']);
 
 const props = defineProps<{
-  comment: CommentView,
-  post: PostView,
+  comment: Comment,
+  post: Post,
   isReactable: boolean,
 }>();
 
 const formattedCreationTime = computed(() => {
   return getDateTimeString(props.comment.creationTime);
 });
+
+let isEditing = ref(false);
+
+const startEditing = () => {
+  isEditing.value = true;
+};
+
+const cancelEditing = () => {
+  isEditing.value = false;
+}
+
+const finishEditing = () => {
+  isEditing.value = false;
+};
 </script>
 
 <template>
-  <div class="comment">
+  <div class="comment"v-if="!isEditing">
     <UserAvatarComponent 
       avatar-size="80px"
       :avatar-url="comment.avatar" 
@@ -47,10 +59,11 @@ const formattedCreationTime = computed(() => {
             type="comment"
             :comment-id="comment.id"
         />
-        <FooterButtons :post="post" :comment="comment" :show-comments-count="false"/>
+        <FooterButtons :post="post" :comment="comment" :show-comments-count="false" @startEdit="startEditing"/>
       </div>
     </div>
   </div>
+  <CommentEdit :content="comment.text" :avatar="comment.avatar" :id="comment.id" @cancel-edit="cancelEditing" v-if="isEditing" />
 </template>
 
 <style scoped>

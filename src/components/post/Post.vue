@@ -1,5 +1,5 @@
 <template>
-  <div :class="'post ' + post.classes">
+  <div :class="'post ' + post.classes" v-if="!isEditing">
     <div class="top">
       <el-link :href="backendURL + '/' + post.authorLogin" type="primary">{{ post.authorNickname }}</el-link>
       <span class="date"> {{ formattedCreationTime }}</span>
@@ -33,16 +33,23 @@
               :post-uri="post.uri"
             />
           </div>
-          <FooterButtons :post="post" :show-comments-count="showCommentsCount"/>
+          <FooterButtons :post="post" :show-comments-count="showCommentsCount" @startEdit="startEditing"/>
         </div>
       </div>
     </div>
   </div>
+  <PostEdit v-if="isEditing"
+    :content="post.text"
+    :title="post.title"
+    :postID="post.id"
+    :tags="post.tags"
+    @cancelEdit="cancelEditing"
+  />
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type {PostView} from "@/api/postService.ts";
+import type { Post } from "@/models/posts/post.ts";
 import Reactions from "@/components/post/reaction/Reactions.vue";
 import {backendURL} from "@/main.ts";
 import {getCurrentUserLogin} from "@/api/userService.ts";
@@ -51,17 +58,30 @@ import {getDateTimeString} from "@/components/post/util.ts";
 import UserAvatarComponent from "@/components/post/UserAvatarComponent.vue";
 import FooterButtons from "@/components/post/FooterButtons.vue";
 import ProcessedText from "@/components/post/ProcessedText.vue";
+import PostEdit from "@/components/post/PostEdit.vue";
 
-const isEditing = ref(false);
+let isEditing = ref(false);
+
+const startEditing = () => {
+  isEditing.value = true;
+};
+
+const cancelEditing = () => {
+  isEditing.value = false;
+}
+
+const finishEditing = () => {
+  isEditing.value = false;
+};
 
 const props = defineProps<{
-  post: PostView,
+  post: Post,
   showCommentsCount: boolean,
   redirectOnDelete?: string,
 }>();
 
 const formattedCreationTime = computed(() => {
-  return getDateTimeString(props.post.creationTime);
+  return getDateTimeString(props.post.creationTime.toString());
 });
 </script>
 
@@ -77,10 +97,15 @@ const formattedCreationTime = computed(() => {
   font-size: 14px;
 }
 
+.post {
+  margin-bottom: 35px;
+}
+
 .post > .top {
   display: flex;
   justify-content: space-between;
   margin-bottom: 5px;
+
 }
 .icon-buttons {
   display: flex;
@@ -124,6 +149,10 @@ h1.title {
 
 .date {
   color: var(--comment);
+}
+
+.post-content {
+  width: 100%;
 }
 
 .el-divider--horizontal {

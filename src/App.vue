@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import MenuComponent from "@/views/MenuComponent.vue";
+import MenuComponent from "@/components/MenuComponent.vue";
 import {getCurrentUserLogin} from "@/api/userService.ts";
 </script>
 
