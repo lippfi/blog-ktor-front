@@ -17,7 +17,7 @@ export interface IPostClient {
     getDiaryPreface(diary: string): Promise<Result<PostDto>>;
     getPost(login: string, uri: string): Promise<Result<PostDto>>;
     searchPosts(params: SearchPostsParamsDto): Promise<Result<PostSearchResult>>;
-    getAllPosts(page?: number, count?: number): Promise<Result<PostSearchResult>>;
+    getLatestPosts(page?: number): Promise<Result<PostSearchResult>>;
     getDiscussedPosts(page?: number, size?: number): Promise<Result<PostSearchResult>>;
     getFollowedPosts(page?: number, size?: number): Promise<Result<PostSearchResult>>;
     getPostForEditing(id: string): Promise<Result<PostEditDto>>;
@@ -151,9 +151,9 @@ class PostClientImpl implements IPostClient {
         }
     }
 
-    public async getAllPosts(offset = 0, count = 10): Promise<Result<PostSearchResult>> {
+    public async getLatestPosts(page = 0): Promise<Result<PostSearchResult>> {
         try {
-            const response = await fetch(`${backendURL}/posts`);
+            const response = await fetch(`${backendURL}/posts/latest`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };

@@ -89,6 +89,52 @@ class PostClientMock implements IPostClient {
         commentReactionGroupId: 'comment-reactions-group-1'
     };
 
+    stubPost2: Post = {
+        id: '2',
+        uri: 'test-post',
+        avatar: 'https://i.pinimg.com/736x/95/e3/c6/95e3c6d76a09ddda2d524771394110ba.jpg',
+        authorLogin: 'monkey1',
+        authorNickname: 'впечатляющая обезьяна',
+        title: '2283',
+        text: "Ахуеть какой пиздец, я сегодня видел обезьяну, которая сосала хуй",
+        creationTime: subtractDays(new Date(), 5),
+        isPreface: false,
+        isEncrypted: false,
+        classes: 'test-post',
+        tags: ['test', 'example'],
+        isReactable: true,
+        reactions: [this.stubReaction, this.stubReaction2],
+        isCommentable: true,
+        comments: [this.stubComment],
+        readGroupId: 'read-group-1',
+        commentGroupId: 'comment-group-1',
+        reactionGroupId: 'reaction-group-1',
+        commentReactionGroupId: 'comment-reactions-group-1'
+    };
+
+    stubPost3: Post = {
+        id: '3',
+        uri: 'test-post',
+        avatar: 'https://sun1-30.userapi.com/impg/qAXkOlaHp_QsdlMRSnyPIjuxWGr6YwzJ1A6aDA/VG5LE2i0fuY.jpg?size=604x409&quality=96&sign=bf57c38d7f93884e1f832efd9da7d6eb&type=album',
+        authorLogin: 'makaka2',
+        authorNickname: 'Абалдуй',
+        title: 'пизда',
+        text: "да",
+        creationTime: subtractDays(new Date(), 3),
+        isPreface: false,
+        isEncrypted: false,
+        classes: 'test-post',
+        tags: ['test', 'example'],
+        isReactable: true,
+        reactions: [this.stubReaction, this.stubReaction2],
+        isCommentable: true,
+        comments: [this.stubComment, this.stubComment2],
+        readGroupId: 'read-group-1',
+        commentGroupId: 'comment-group-1',
+        reactionGroupId: 'reaction-group-1',
+        commentReactionGroupId: 'comment-reactions-group-1'
+    };
+
     stubPosts: Post[] = [ this.stubPost ]
 
 
@@ -163,16 +209,16 @@ class PostClientMock implements IPostClient {
         }
     }
 
-    public async getAllPosts(offset = 0, count = 10): Promise<Result<PostSearchResult>> {
+    public async getLatestPosts(offset = 0): Promise<Result<PostSearchResult>> {
         try {
-            const response = await fetch(`${backendURL}/posts`);
-            if (response.ok) {
-                const data = await response.json();
-                return { type: 'ok', data };
-            } else {
-                const message = await response.text();
-                return { type: 'error', message };
-            }
+            const latestPosts = [this.stubPost, this.stubPost2, this.stubPost3];
+            const postRes: PostDto[] = latestPosts.map((c) => mapPostToDto(c))
+            const searchResult: PostSearchResult = {
+                result: postRes,
+                totalPageCount: 10
+            } as PostSearchResult;
+
+            return { type: 'ok', data: searchResult};
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
         }
@@ -300,6 +346,12 @@ class PostClientMock implements IPostClient {
         }
         return result;
     }
+}
+
+function subtractDays(date: Date, days: number): Date {
+    const result = new Date(date);
+    result.setDate(result.getDate() - days);
+    return result;
 }
 
 export default PostClientMock;
