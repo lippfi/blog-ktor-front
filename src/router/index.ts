@@ -6,6 +6,7 @@ import DiaryView from "@/views/DiaryView.vue";
 import type {Comment, Post, Reaction} from "@/models/posts/post.ts";
 import PostView from "@/views/PostView.vue";
 import DialogsView from "@/views/DialogsView.vue";
+import ProfileView from "@/views/ProfileView.vue";
 
 export const profileStub = {
   text: "Hi there! Welcome to my webpage.\n" +
@@ -188,7 +189,14 @@ const router = createRouter({
       component: LoginView,
     },
     {
-      path: "/diary/:diaryId/:page",
+      path: '/:login/diary',
+      redirect: to => {
+        const {login} = to.params;
+        return `${login}/diary/1`;
+      }
+    },
+    {
+      path: "/:login/diary/:page",
       name: "diary",
       component: DiaryView,
       props: true
@@ -202,9 +210,10 @@ const router = createRouter({
       }
     },
     {
-      path: "/profile",
+      path: "/:login/profile",
       name: "profile",
-      component: () => import('../views/ProfileView.vue'),
+      component: ProfileView,
+      props: true
     },
     {
       path: "/messages",

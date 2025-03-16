@@ -7,7 +7,7 @@ import { mapPostDtoToPost } from "@/models/posts/mapper.ts";
 import { ref, onMounted } from 'vue';
 
 const props = defineProps<{
-  diaryId?: string;
+  login?: string;
   page?: string;
 }>();
 
@@ -19,9 +19,9 @@ onMounted(async () => {
   if (props.page) {
     page = parseInt(props.page);
   }
-  if (!props.diaryId) return;
+  if (!props.login) return;
 
-  const searchResult = await postsClient.getDiaryPosts(props.diaryId, page);
+  const searchResult = await postsClient.getDiaryPosts(props.login, page);
   if (searchResult.type === 'ok') {
     posts.value = searchResult.data.result.map((c) => mapPostDtoToPost(c));
   }
