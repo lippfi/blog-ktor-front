@@ -240,6 +240,42 @@ const wrapSelectedText = (prefix: string, suffix: string) => {
   }
 }
 
+const wrapSelectedTextFromPage = (prefix: string, suffix: string) => {
+  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement;
+  if (!textarea) return;
+
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) return;
+
+  const range = selection.getRangeAt(0);
+  const selectedText = range.toString();
+
+  if (selectedText) {
+    const cursorPos = textarea.selectionStart;
+    const wrappedText = prefix + selectedText + suffix;
+
+    textarea.focus();
+
+    try {
+      document.execCommand('insertText', false, wrappedText);
+
+      const newPosition = cursorPos + wrappedText.length;
+      textarea.setSelectionRange(newPosition, newPosition);
+
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    } catch (e) {
+      const beforeText = textarea.value.substring(0, cursorPos);
+      const afterText = textarea.value.substring(cursorPos);
+      textarea.value = beforeText + wrappedText + afterText;
+
+      const newPosition = cursorPos + wrappedText.length;
+      textarea.setSelectionRange(newPosition, newPosition);
+
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }
+};
+
 const wrapWithClasses = () => {
   const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
   if (!textarea) return
@@ -794,6 +830,9 @@ const handleMentionSelect = (option: MentionOption) => {
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.expandable.tooltip')" :show-after="tooltipDelay" placement="top">
         <el-button @click="wrapWithExpandable" class="format-btn">⤵</el-button>
+      </el-tooltip>
+      <el-tooltip :content="$t('post.form.fields.textarea.buttons.quote.tooltip')" :show-after="tooltipDelay" placement="top">
+        <el-button @click="wrapSelectedTextFromPage('[quote]', '[/quote]')" class="format-btn">‟</el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.link.tooltip')" :show-after="tooltipDelay" placement="top">
         <el-button @click="wrapWithLink" class="format-btn">

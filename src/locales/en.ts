@@ -233,6 +233,9 @@ export default {
                         mention: {
                             placeholder: 'Search users...',
                         },
+                        quote: {
+                            tooltip: 'Quote selected'
+                        }
                     },
                 },
                 tags: {
