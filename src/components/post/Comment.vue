@@ -6,6 +6,7 @@ import {backendURL} from "@/main.ts";
 import Reactions from "@/components/post/reaction/Reactions.vue";
 import FooterButtons from "@/components/post/FooterButtons.vue";
 import CommentEdit from "@/components/post/CommentEdit.vue";
+import {getDateTimeString} from "@/components/post/util.ts";
 
 const emit = defineEmits(['commentDeleted']);
 
@@ -16,7 +17,7 @@ const props = defineProps<{
 }>();
 
 const formattedCreationTime = computed(() => {
-  return props.comment.creationTime;
+  return getDateTimeString(props.comment.creationTime);
 });
 
 let isEditing = ref(false);
@@ -62,7 +63,7 @@ const finishEditing = () => {
       </div>
     </div>
   </div>
-  <CommentEdit v-if="isEditing" :content="comment.text" :avatar="comment.avatar" :id="comment.id" @cancel-edit="cancelEditing"/>
+  <CommentEdit :content="comment.text" :avatar="comment.avatar" :id="comment.id" @cancel-edit="cancelEditing" v-if="isEditing" />
 </template>
 
 <style scoped>

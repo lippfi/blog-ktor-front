@@ -32,7 +32,7 @@ function cancelEdit() {
 }
 
 function isEdit(){
-  return localId
+  return localId.value
 }
 
 </script>
@@ -44,8 +44,9 @@ function isEdit(){
       <div class="right">
         <SmartTextArea :content="localContent"/>
         <div class="footer">
-          <el-button type="primary">{{ $t('comment.form.button.send') }}</el-button>
-          <el-button v-if="isEdit()" type="primary" @click="cancelEdit">{{ $t('comment.form.button.cancel') }}</el-button>
+          <el-button type="primary" v-if="!isEdit()">{{ $t('comment.form.button.send') }}</el-button>
+          <el-button type="primary" v-if="isEdit()" >{{ $t('comment.form.button.apply') }}</el-button>
+          <el-button type="info" @click="cancelEdit" v-if="isEdit()" >{{ $t('comment.form.button.cancel') }}</el-button>
         </div>
       </div>
     </div>
@@ -89,5 +90,9 @@ function isEdit(){
 .footer > button {
   font-size: 14px;
   min-width: 150px;
+}
+
+.el-button {
+  margin-left: 5px
 }
 </style>

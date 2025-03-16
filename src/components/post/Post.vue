@@ -81,7 +81,7 @@ const props = defineProps<{
 }>();
 
 const formattedCreationTime = computed(() => {
-  return props.post.creationTime;
+  return getDateTimeString(props.post.creationTime.toString());
 });
 </script>
 
@@ -97,10 +97,15 @@ const formattedCreationTime = computed(() => {
   font-size: 14px;
 }
 
+.post {
+  margin-bottom: 35px;
+}
+
 .post > .top {
   display: flex;
   justify-content: space-between;
   margin-bottom: 5px;
+
 }
 .icon-buttons {
   display: flex;
@@ -144,6 +149,10 @@ h1.title {
 
 .date {
   color: var(--comment);
+}
+
+.post-content {
+  width: 100%;
 }
 
 .el-divider--horizontal {

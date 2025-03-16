@@ -41,7 +41,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits(['update:selectedAvatar']) // Добавляем emit
+const emit = defineEmits(['update:selectedAvatar'])
 
 const avatars = ref<string[]>([])
 const isLoaded = ref(false)
@@ -147,7 +147,7 @@ const fetchAvatars = async () => {
 const handleAvatarChange = () => {
   const selectedAvatar = getSelectedAvatar()
   if (selectedAvatar !== null) {
-    emit('update:selectedAvatar', selectedAvatar) // Отправляем выбранный аватар родителю
+    emit('update:selectedAvatar', selectedAvatar)
   }
 }
 

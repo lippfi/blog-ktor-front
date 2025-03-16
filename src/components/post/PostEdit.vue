@@ -1,3 +1,65 @@
+<template>
+  <div class="post-edit">
+    <h3 v-if="isEditing()">{{ $t('post.form.edit') }}</h3>
+    <h3 v-if="!isEditing()">{{ $t('post.form.title') }}{{localTitle}}</h3>
+
+    <div class="form">
+      <AvatarChooser :avatar-size="100" :outline-size="3" :show-buttons="true" :is-vertical="true" :selected-avatar="localAvatar"/>
+      <div class="fields">
+        <div class="title-row">
+          <span>{{ $t('post.form.fields.title.label') }}</span>
+          <el-input v-model="localTitle"/>
+        </div>
+        <SmartTextArea draggable="true" :content="localContent"/>
+        <div class="tags-row">
+          <span>{{ $t('post.form.fields.tags.label')}}</span>
+          <el-input-tag draggable v-model="localTags"/>
+        </div>
+        <div class="classes" v-if="showAdvancedOptions">
+          <span style="white-space: nowrap">{{ $t('post.form.fields.classes.label') }}</span>
+          <el-input/>
+        </div>
+        <div v-if="showAdvancedOptions" class="groups-row">
+          <div class="groups">
+            <div class="read">
+              <span>{{ $t('post.form.fields.read.label') }}</span>
+              <el-select v-model="localReadGroup">
+                <el-option>everyone</el-option>
+                <el-option>registered</el-option>
+                <el-option>nobody</el-option>
+              </el-select>
+            </div>
+            <div class="react">
+              <span>{{ $t('post.form.fields.react.label') }}</span>
+              <el-select v-model="localReactionGroup">
+                <el-option>everyone</el-option>
+                <el-option>registered</el-option>
+                <el-option>nobody</el-option>
+              </el-select>
+            </div>
+            <div class="comment">
+              <span>{{ $t('post.form.fields.comment.label') }}</span>
+              <el-select v-model="localCommentGroup">
+                <el-option>everyone</el-option>
+                <el-option>registered</el-option>
+                <el-option>nobody</el-option>
+              </el-select>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <div class="advanced-options">
+            <span>{{ $t('post.form.fields.advanced.label') }}</span>
+            <el-switch v-model="showAdvancedOptions"/>
+          </div>
+          <el-button type="primary" @click="handleSave">{{ $t('post.form.button.send')}}</el-button>
+          <el-button v-if="isEditing()" type="info" @click="cancelEdit">{{$t('post.form.button.cancel')}}</el-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import {ref, watchEffect, defineEmits} from 'vue'
 import {useI18n} from "vue-i18n";
@@ -116,10 +178,10 @@ async function createPost() {
 
   const res = await client.addPost(mapPostToDto(newPost))
   if (res.type == 'ok') {
-    console.log("ок")
+    console.log("ok post add")
     return
   } else {
-    console.log("ГАВНО")
+    console.log("add post error")
   }
 }
 
@@ -156,76 +218,14 @@ async function updatePost() {
 
   const res = await client.updatePost(mapPostEditToPostEditDto(postEdit))
   if (res.type == 'ok') {
-    console.log("ок")
+    console.log("ok post update")
     return
   } else {
-    console.log("ГАВНО")
+    console.log("update error")
   }
 }
 
 </script>
-
-<template>
-  <div class="post-edit">
-    <h3 v-if="isEditing()">{{ $t('post.form.edit') }}{{localTitle}}</h3>
-    <h3 v-if="!isEditing()">{{ $t('post.form.title') }}{{localTitle}}</h3>
-
-    <div class="form">
-      <AvatarChooser :avatar-size="100" :outline-size="3" :show-buttons="true" :is-vertical="true" :selected-avatar="localAvatar"/>
-      <div class="fields">
-        <div class="title-row">
-          <span>{{ $t('post.form.fields.title.label') }}</span>
-          <el-input v-model="localTitle"/>
-        </div>
-        <SmartTextArea draggable="true" :content="localContent"/>
-        <div class="tags-row">
-          <span>{{ $t('post.form.fields.tags.label')}}</span>
-          <el-input-tag draggable v-model="localTags"/>
-        </div>
-        <div class="classes" v-if="showAdvancedOptions">
-          <span style="white-space: nowrap">{{ $t('post.form.fields.classes.label') }}</span>
-          <el-input/>
-        </div>
-        <div v-if="showAdvancedOptions" class="groups-row">
-          <div class="groups">
-            <div class="read">
-              <span>{{ $t('post.form.fields.read.label') }}</span>
-              <el-select v-model="localReadGroup">
-                <el-option>everyone</el-option>
-                <el-option>registered</el-option>
-                <el-option>nobody</el-option>
-              </el-select>
-            </div>
-            <div class="react">
-              <span>{{ $t('post.form.fields.react.label') }}</span>
-              <el-select v-model="localReactionGroup">
-                <el-option>everyone</el-option>
-                <el-option>registered</el-option>
-                <el-option>nobody</el-option>
-              </el-select>
-            </div>
-            <div class="comment">
-              <span>{{ $t('post.form.fields.comment.label') }}</span>
-              <el-select v-model="localCommentGroup">
-                <el-option>everyone</el-option>
-                <el-option>registered</el-option>
-                <el-option>nobody</el-option>
-              </el-select>
-            </div>
-          </div>
-        </div>
-        <div class="footer">
-          <div class="advanced-options">
-            <span>{{ $t('post.form.fields.advanced.label') }}</span>
-            <el-switch v-model="showAdvancedOptions"/>
-          </div>
-          <el-button type="primary" @click="handleSave">{{ $t('post.form.button.send')}}</el-button>
-          <el-button v-if="isEditing()" type="primary" @click="cancelEdit">{{$t('post.form.button.cancel')}}</el-button>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .post-edit > h3 {
