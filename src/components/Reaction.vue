@@ -145,7 +145,6 @@ async function toggleReaction() {
 
 .reaction-info > img {
   width: 48px;
-  height: 48px;
   padding: 5px 15px 5px 0;
 }
 
