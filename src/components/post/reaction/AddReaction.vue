@@ -21,13 +21,22 @@
 <script setup lang="ts">
 import ReactionList from "./ReactionList.vue";
 import type { BasicReactionResponse } from "@/api/reactionService.ts";
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
+import { reactionClient } from "@/api/postClient/reactionClient.ts";
 
-// Stub reactions for testing
-const basicReactions: ReactionPackDto[]
+const basicReactions = ref<ReactionPackDto[]>([]);
 
-const recentReactions = ref<BasicReactionResponse[]>([basicReactions[0], basicReactions[1]]);
+onMounted(async () => {
+  const result = await reactionClient.getBasicReactions();
+  if (result.type === 'ok') {
+    basicReactions.value = Array.isArray(result.data) ? result.data : [result.data];
+  } else {
+    console.error('Failed to load basic reactions:', result.message);
+  }
+});
+
+const recentReactions = ref<BasicReactionResponse[]>([]);
 const searchResults = ref<BasicReactionResponse[]>([]);
 const isSearching = ref(false);
 const searchError = ref<string | null>(null);
@@ -41,9 +50,9 @@ watch(searchQuery, (newQuery) => {
   }
 
   // Simple client-side search for testing
-  searchResults.value = basicReactions.filter(reaction => 
-    reaction.name.toLowerCase().includes(newQuery.toLowerCase())
-  );
+  // searchResults.value = basicReactions.value.filter(reaction =>
+  //   reaction.name.toLowerCase().includes(newQuery.toLowerCase())
+  // );
 });
 
 const emit = defineEmits<{

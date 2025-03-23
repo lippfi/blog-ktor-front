@@ -70,16 +70,15 @@ const props = defineProps<{
 const searchQuery = ref('')
 const searchResults = ref<BasicReactionResponse[]>([])
 
-// Simple client-side search
 watch(searchQuery, (newQuery) => {
   if (!newQuery.trim()) {
     searchResults.value = []
     return
   }
 
-  searchResults.value = props.basicReactions.filter(reaction => 
-    reaction.name.toLowerCase().includes(newQuery.toLowerCase())
-  )
+  // searchResults.value = props.basicReactions.filter(reaction =>
+  //   reaction.name.toLowerCase().includes(newQuery.toLowerCase())
+  // )
 })
 
 const emit = defineEmits<{

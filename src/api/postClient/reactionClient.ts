@@ -9,7 +9,7 @@ export interface IReactionClient {
     getBasicReactions(): Promise<Result<ReactionPackDto>>
 }
 
-class ReactionClientImpl implements IReactionClient {
+export class ReactionClientImpl implements IReactionClient {
     public async getBasicReactions(): Promise<Result<ReactionPackDto>> {
         try {
             const response = await fetch(`${backendURL}/reactions/basic`);
@@ -25,3 +25,6 @@ class ReactionClientImpl implements IReactionClient {
         }
     }
 }
+
+// Export a singleton instance
+export const reactionClient = new ReactionClientImpl();
