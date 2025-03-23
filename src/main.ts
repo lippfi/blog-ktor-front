@@ -14,7 +14,7 @@ import ru from "@/locales/ru.ts";
 import kk from "@/locales/kk.ts";
 import kk_latin from "@/locales/kk_latin.ts";
 
-export const backendURL = "http://127.0.0.1:80"
+export const backendURL = "http://0.0.0.0:8080"
 
 export const i18n = createI18n({
     legacy: false,

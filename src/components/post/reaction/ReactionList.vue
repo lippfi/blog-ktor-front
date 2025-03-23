@@ -40,25 +40,36 @@
 
       <div class="section">
         <h3>{{ $t('reactions.add_reaction.basic') }}</h3>
-        <div class="reaction-grid">
-          <button v-for="reaction in basicReactions" 
-                  :key="reaction.id" 
-                  class="reaction-button"
-                  @click="handleReactionSelect(reaction)">
-            <img :src="reaction.iconUrl" :alt="reaction.name" />
-          </button>
-        </div>
+        <el-tabs v-model="activeTab" class="reaction-tabs">
+          <el-tab-pane 
+            v-for="(pack, index) in basicReactions" 
+            :key="index" 
+            :name="String(index)"
+          >
+            <template #label>
+              <img :src="String(pack.iconUri)" class="tab-icon" :alt="'Pack ' + index" />
+            </template>
+            <div class="reaction-grid">
+              <button v-for="reaction in pack.reactions" 
+                      :key="reaction.name" 
+                      class="reaction-button"
+                      @click="handleReactionSelectFromPack(reaction)">
+                <img :src="reaction.iconUri" :alt="reaction.name" />
+              </button>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
       </div>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import type { BasicReactionResponse } from '@/api/reactionService.ts'
 import {useI18n} from "vue-i18n";
 import { Search } from '@element-plus/icons-vue';
-import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
+import type {ReactionPackDto, ReactionViewDto} from "@/api/dto/reactionServiceDto.ts";
 
 const { t } = useI18n()
 
@@ -67,8 +78,29 @@ const props = defineProps<{
   recentReactions: BasicReactionResponse[]
 }>()
 
+const activeTab = ref('0')
 const searchQuery = ref('')
 const searchResults = ref<BasicReactionResponse[]>([])
+
+// Convert ReactionViewDto to BasicReactionResponse
+const convertToBasicReactionResponse = (reaction: ReactionViewDto, index: number): BasicReactionResponse => {
+  return {
+    id: `${index}`, // Generate a unique ID
+    name: reaction.name,
+    iconUrl: String(reaction.iconUri)
+  }
+}
+
+// Flatten all reactions from all packs for search
+const allReactions = computed(() => {
+  const result: BasicReactionResponse[] = []
+  props.basicReactions.forEach((pack, packIndex) => {
+    pack.reactions.forEach((reaction, reactionIndex) => {
+      result.push(convertToBasicReactionResponse(reaction, packIndex * 1000 + reactionIndex))
+    })
+  })
+  return result
+})
 
 watch(searchQuery, (newQuery) => {
   if (!newQuery.trim()) {
@@ -76,9 +108,9 @@ watch(searchQuery, (newQuery) => {
     return
   }
 
-  // searchResults.value = props.basicReactions.filter(reaction =>
-  //   reaction.name.toLowerCase().includes(newQuery.toLowerCase())
-  // )
+  searchResults.value = allReactions.value.filter(reaction =>
+    reaction.name.toLowerCase().includes(newQuery.toLowerCase())
+  )
 })
 
 const emit = defineEmits<{
@@ -88,6 +120,17 @@ const emit = defineEmits<{
 const handleReactionSelect = (reaction: BasicReactionResponse) => {
   searchQuery.value = '';
   emit('select-reaction', reaction);
+}
+
+const handleReactionSelectFromPack = (reaction: ReactionViewDto) => {
+  searchQuery.value = '';
+  // Convert ReactionViewDto to BasicReactionResponse before emitting
+  const basicReaction: BasicReactionResponse = {
+    id: reaction.name, // Using name as ID since ReactionViewDto doesn't have an ID
+    name: reaction.name,
+    iconUrl: String(reaction.iconUri)
+  }
+  emit('select-reaction', basicReaction);
 }
 </script>
 
@@ -122,10 +165,29 @@ const handleReactionSelect = (reaction: BasicReactionResponse) => {
   color: #606266;
 }
 
+.reaction-tabs {
+  width: 100%;
+}
+
+.tab-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+:deep(.el-tabs__item) {
+  padding: 0 10px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .reaction-grid {
   display: grid;
   grid-template-columns: repeat(7, 36px);
   gap: 0;
+  margin-top: 8px;
 }
 
 .reaction-button {
