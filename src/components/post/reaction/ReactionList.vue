@@ -58,11 +58,12 @@ import { ref, watch } from 'vue'
 import type { BasicReactionResponse } from '@/api/reactionService.ts'
 import {useI18n} from "vue-i18n";
 import { Search } from '@element-plus/icons-vue';
+import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 
 const { t } = useI18n()
 
 const props = defineProps<{
-  basicReactions: BasicReactionResponse[],
+  basicReactions: ReactionPackDto[],
   recentReactions: BasicReactionResponse[]
 }>()
 

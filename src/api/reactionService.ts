@@ -152,10 +152,10 @@ export async function getRecentReactions(limit?: number): Promise<Result<RecentR
     }
 }
 
-export async function addPostReaction(login: string, uri: string, id: string): Promise<void> {
+export async function addPostReaction(login: string, uri: string, reactionName: string): Promise<void> {
     try {
         const response = await fetch(
-            `${backendURL}/reactions/post-reaction?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}&id=${encodeURIComponent(id)}`,
+            `${backendURL}/reactions/post-reaction?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}&reactionName=${encodeURIComponent(reactionName)}`,
             {
                 method: 'POST',
                 headers: localStorage.getItem('jwt') 
@@ -176,10 +176,10 @@ export async function addPostReaction(login: string, uri: string, id: string): P
     }
 }
 
-export async function removePostReaction(login: string, uri: string, id: string): Promise<void> {
+export async function removePostReaction(login: string, uri: string, reactionName: string): Promise<void> {
     try {
         const response = await fetch(
-            `${backendURL}/reactions/post-reaction?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}&id=${encodeURIComponent(id)}`,
+            `${backendURL}/reactions/post-reaction?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}&reactionName=${encodeURIComponent(reactionName)}`,
             {
                 method: 'DELETE',
                 headers: localStorage.getItem('jwt') 

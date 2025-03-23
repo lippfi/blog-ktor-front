@@ -24,7 +24,7 @@ watch(() => props.reactions, (newReactions) => {
 })
 
 function handleReactionRemove(reactionToRemove: ReactionModel) {
-  const index = localReactions.value.findIndex(r => r.id === reactionToRemove.id)
+  const index = localReactions.value.findIndex(r => r.name === reactionToRemove.name)
   if (index !== -1) {
     localReactions.value.splice(index, 1)
   }
@@ -51,12 +51,12 @@ function handleReactionSelect(reaction: BasicReactionResponse) {
         if (!props.postLogin || !props.postUri) {
           throw new Error('Post login and URI are required for post reactions')
         }
-        addPostReaction(props.postLogin, props.postUri, existingReaction.id)
+        addPostReaction(props.postLogin, props.postUri, existingReaction.name)
       } else {
         if (!props.commentId) {
           throw new Error('Comment ID is required for comment reactions')
         }
-        addCommentReaction(props.commentId, existingReaction.id)
+        addCommentReaction(props.commentId, existingReaction.name)
       }
     } catch (error) {
       console.error('Error sending reaction update:', error)
@@ -76,7 +76,6 @@ function handleReactionSelect(reaction: BasicReactionResponse) {
     anonymousCount: 0,
     userNicknames: [getCurrentUserNickname()],
     userReacted: true,
-    id: reaction.id
   }
 
   // Add to local reactions and send request in background

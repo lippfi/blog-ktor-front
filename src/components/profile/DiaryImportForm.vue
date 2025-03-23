@@ -168,7 +168,7 @@ const skip = () => {
         </el-select>
       </el-form-item>
       <el-form-item v-if="diaryInfoForm.website == 'beon.fun'" prop="username">
-        <el-input v-model="diaryInfoForm.name" :placeholder="t('diaryImport.form.fields.login.label')" />
+        <el-input v-model="diaryInfoForm.name" type="password" :placeholder="t('diaryImport.form.fields.login.label')" />
       </el-form-item>
     </el-space>
     <el-form-item v-if="diaryInfoForm.website == 'beon.fun'"prop="password">

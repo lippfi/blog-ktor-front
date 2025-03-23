@@ -22,30 +22,10 @@
 import ReactionList from "./ReactionList.vue";
 import type { BasicReactionResponse } from "@/api/reactionService.ts";
 import { ref, watch } from 'vue';
+import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 
 // Stub reactions for testing
-const basicReactions: BasicReactionResponse[] = [
-  {
-    id: 'like',
-    name: 'like',
-    iconUrl: 'https://a.slack-edge.com/production-standard-emoji-assets/14.0/google-small/1f44d@2x.png'
-  },
-  {
-    id: 'heart',
-    name: 'heart',
-    iconUrl: 'https://a.slack-edge.com/production-standard-emoji-assets/14.0/google-small/2764-fe0f@2x.png'
-  },
-  {
-    id: 'sad_cat',
-    name: 'sad_cat',
-    iconUrl: 'https://emoji.slack-edge.com/T0288D531/sad_cat/4253f3b1013d6920.png'
-  },
-  {
-    id: 'begemot',
-    name: 'begemot',
-    iconUrl: 'src/assets/icons/begemot.png'
-  }
-];
+const basicReactions: ReactionPackDto[]
 
 const recentReactions = ref<BasicReactionResponse[]>([basicReactions[0], basicReactions[1]]);
 const searchResults = ref<BasicReactionResponse[]>([]);

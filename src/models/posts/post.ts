@@ -1,6 +1,5 @@
 type TagPolicy = 'UNION' | 'INTERSECTION';
 export interface Reaction {
-    id: string;
     name: string;
     iconUri: string;
     count: number;
