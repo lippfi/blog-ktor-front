@@ -41,6 +41,7 @@ function processText(text: string): string {
   result = replaceReadMore(result);
   result = replaceCode(result);
   result = processWhiteSpaces(result);
+  result = replaceQuote(result)
   return result;
 }
 
@@ -186,6 +187,14 @@ function replaceCode(text: string): string {
   }
   return result;
 }
+
+function replaceQuote(text: string): string {
+  let result = text;
+  const pattern = /\[quote\]([\s\S]*?)\[\/quote\]/g;
+  result = result.replace(pattern, '<blockquote class="custom-quote">$1</blockquote>');
+  return result;
+}
+
 </script>
 
 <style>
@@ -196,4 +205,13 @@ function replaceCode(text: string): string {
 .post-content-img {
   max-width: 100%;
 }
+
+.custom-quote {
+  border-left: 4px solid #ccc;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #f9f9f9;
+  font-style: italic;
+}
+
 </style>

@@ -4,6 +4,10 @@ import {profileStub} from "@/router";
 import Friends from "@/components/profile/Friends.vue";
 import Achievements from "@/components/profile/Achievements.vue";
 
+const props = defineProps<{
+  login: string;
+}>();
+
 const text = `Привет, я детектив. Вот карточка с каким-то текстом и CSS, которая должна вас вдохновить создать что угодно свое.
 Просто знайте, что сюда можно вставить [b]любую[/b] html [i]css[/i] штуку, которую вы захотите.
 То есть тут может быть [g]что угодно[/g], просто я не умею делать красиво.

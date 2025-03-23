@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ReactionView } from '@/api/postService'
+import type { ReactionView } from '@/api/postClient/postClient.ts'
 import { addPostReaction, removePostReaction, addCommentReaction, removeCommentReaction } from '@/api/reactionService'
 import { getCurrentUserNickname } from "@/api/userService.ts"
 import { ref, watch } from 'vue'
@@ -145,7 +145,6 @@ async function toggleReaction() {
 
 .reaction-info > img {
   width: 48px;
-  height: 48px;
   padding: 5px 15px 5px 0;
 }
 
