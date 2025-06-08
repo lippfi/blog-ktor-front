@@ -1,16 +1,5 @@
 <template>
   <div class="reaction-list">
-    <el-input 
-      v-model="searchQuery" 
-      class="reaction-search"
-      :placeholder="$t('reactions.add_reaction.search')"
-      clearable
-    >
-      <template #prefix>
-        <el-icon><Search /></el-icon>
-      </template>
-    </el-input>
-
     <template v-if="searchQuery">
       <div v-if="searchResults.length === 0" class="search-status">
         {{ $t('reactions.add_reaction.no_reactions') }}
@@ -39,26 +28,57 @@
       </div>
 
       <div class="section">
-        <h3>{{ $t('reactions.add_reaction.basic') }}</h3>
-        <el-tabs v-model="activeTab" class="reaction-tabs">
-          <el-tab-pane 
-            v-for="(pack, index) in basicReactions" 
-            :key="index" 
-            :name="String(index)"
+        <div class="tabs-container">
+          <el-input
+              v-model="searchQuery"
+              class="reaction-search"
+              :placeholder="$t('reactions.add_reaction.search')"
+              clearable
+              style="margin-bottom: 10px;"
           >
-            <template #label>
-              <img :src="String(pack.iconUri)" class="tab-icon" :alt="'Pack ' + index" />
+            <template #prefix>
+              <el-icon><Search /></el-icon>
             </template>
-            <div class="reaction-grid">
-              <button v-for="reaction in pack.reactions" 
-                      :key="reaction.name" 
-                      class="reaction-button"
-                      @click="handleReactionSelectFromPack(reaction)">
-                <img :src="reaction.iconUri" :alt="reaction.name" />
-              </button>
-            </div>
-          </el-tab-pane>
-        </el-tabs>
+          </el-input>
+          <el-tabs v-model="activeTab" class="reaction-tabs">
+            <el-tab-pane 
+              v-for="(pack, index) in basicReactions" 
+              :key="index" 
+              :name="String(index)"
+            >
+              <template #label>
+                <img v-if="index > 0"  :src="String(pack.iconUri)" class="tab-icon" :alt="'Pack ' + index" />
+                <el-icon v-if="index === 0" class="tab-icon" size="20" style="margin-top: 5px;">
+                  <svg fill="currentColor" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                       viewBox="0 0 330 330" xml:space="preserve">
+                <g id="XMLID_26_">
+                	<path id="XMLID_27_" d="M165,0C74.019,0,0,74.019,0,165s74.019,165,165,165s165-74.019,165-165S255.981,0,165,0z M165,300
+                		c-74.44,0-135-60.561-135-135S90.56,30,165,30s135,60.561,135,135S239.439,300,165,300z"/>
+                  <path id="XMLID_30_" d="M215.911,200.912H114.088c-6.067,0-11.537,3.654-13.858,9.26c-2.321,5.605-1.038,12.057,3.252,16.347
+                		C119.914,242.95,141.762,252,165,252c23.238,0,45.086-9.05,61.518-25.481c4.29-4.29,5.573-10.741,3.252-16.347
+                		C227.448,204.566,221.978,200.912,215.911,200.912z"/>
+                  <path id="XMLID_31_" d="M115.14,147.14c3.72-3.72,5.86-8.88,5.86-14.14c0-5.26-2.14-10.42-5.86-14.141
+                		C111.42,115.14,106.26,113,101,113c-5.27,0-10.42,2.14-14.14,5.859C83.13,122.58,81,127.74,81,133c0,5.26,2.13,10.42,5.86,14.14
+                		c3.72,3.72,8.88,5.86,14.14,5.86C106.26,153,111.42,150.859,115.14,147.14z"/>
+                  <path id="XMLID_71_" d="M229,113c-5.26,0-10.42,2.14-14.14,5.859c-3.72,3.721-5.86,8.87-5.86,14.141c0,5.26,2.14,10.42,5.86,14.14
+                		c3.72,3.72,8.88,5.86,14.14,5.86c5.26,0,10.42-2.141,14.14-5.86c3.73-3.72,5.86-8.88,5.86-14.14c0-5.26-2.13-10.42-5.86-14.141
+                		C239.42,115.14,234.27,113,229,113z"/>
+                </g>
+              </svg>
+                </el-icon>
+              </template>
+              <div class="reaction-grid">
+                <button v-for="reaction in pack.reactions" 
+                        :key="reaction.name" 
+                        class="reaction-button"
+                        @click="handleReactionSelectFromPack(reaction)">
+                  <img :src="reaction.iconUri" :alt="reaction.name" />
+                </button>
+              </div>
+            </el-tab-pane>
+          </el-tabs>
+
+        </div>
       </div>
     </template>
   </div>
@@ -140,6 +160,7 @@ const handleReactionSelectFromPack = (reaction: ReactionViewDto) => {
 }
 
 .reaction-search {
+  margin-top: 16px;
   margin-bottom: 16px;
 
   :deep(.el-input__wrapper) {
@@ -165,6 +186,10 @@ const handleReactionSelectFromPack = (reaction: ReactionViewDto) => {
   color: #606266;
 }
 
+.tabs-container {
+  position: relative;
+}
+
 .reaction-tabs {
   width: 100%;
 }
@@ -183,11 +208,23 @@ const handleReactionSelectFromPack = (reaction: ReactionViewDto) => {
   justify-content: center;
 }
 
+:deep(.el-tabs__header) {
+  margin-bottom: 0;
+}
+
+:deep(.el-tabs__content) {
+  padding-top: 16px;
+}
+
+.reaction-search {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
 .reaction-grid {
   display: grid;
   grid-template-columns: repeat(7, 36px);
   gap: 0;
-  margin-top: 8px;
 }
 
 .reaction-button {

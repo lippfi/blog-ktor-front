@@ -2,7 +2,6 @@ import { backendURL } from "@/main";
 
 // Types
 export interface ReactionResponse {
-    id: string;
     name: string;
     iconUrl: string;
     createdBy: string;
@@ -10,13 +9,11 @@ export interface ReactionResponse {
 }
 
 export interface BasicReactionResponse {
-    id: string;
     name: string;
-    iconUrl: string;
+    iconUri: string;
 }
 
 export interface RecentReactionResponse {
-    id: string;
     name: string;
     iconUrl: string;
     usedAt: string;
@@ -239,6 +236,22 @@ export async function removeCommentReaction(commentId: string, reactionId: strin
         if (response.ok) {
             const message = await response.text();
             return { type: 'ok', data: message };
+        } else {
+            const message = await response.text();
+            return { type: 'error', message };
+        }
+    } catch (error) {
+        return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+    }
+}
+
+export async function getReactions(names: string[]): Promise<Result<BasicReactionResponse[]>> {
+    try {
+        const url = `${backendURL}/reactions/search-names?names=${encodeURIComponent(names.join(','))}`;
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            return { type: 'ok', data };
         } else {
             const message = await response.text();
             return { type: 'error', message };

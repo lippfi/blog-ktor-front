@@ -20,7 +20,6 @@ type Result<T> =
 class PostClientMock implements IPostClient {
 
     stubReaction: Reaction = {
-        id: 'tastatarstn',
         name: 'sad_cat',
         iconUri: 'https://emoji.slack-edge.com/T0288D531/sad_cat/4253f3b1013d6920.png',
         count: 3,
@@ -28,17 +27,6 @@ class PostClientMock implements IPostClient {
         userNicknames: ['детектив шимпански', 'птица не спит', 'саша белый'],
         userReacted: true
     };
-
-    stubReaction2: Reaction = {
-        id: 'taintaiestnai',
-        name: 'begemot',
-        iconUri: 'src/assets/icons/begemot.png',
-        count: 2,
-        anonymousCount: 0,
-        userNicknames: ['bikechan', 'Фауст'],
-        userReacted: false
-    };
-
 
     stubComment: Comment = {
         id: '1',
@@ -71,7 +59,7 @@ class PostClientMock implements IPostClient {
         authorLogin: 'shimpansky',
         authorNickname: 'детектив шимпански',
         title: '7942',
-        text: "I'm a little late, but here are the month's totals:\nI finally made an appointment with my ENT and had nose surgery in the middle of the month. I haven't fully recovered yet, but I have this feeling that breathing is... cool?\nI've tried hiking, but it was too hard for me. I became exhausted after gaining only 300m of elevation. I'll definitely go again, but I'll practice with easier hikes first.\nThe scenery was very beautiful. Here are some photos:\n[slider]\n[slide][image link=\"https://lipp.fi/static/images/62944b84-4126-4b48-9014-fac7471dc875.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/2306c07a-d67c-4144-8562-a7ca85a0976e.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/42be085e-5389-4b2c-99a4-242ef211b700.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/7732076f-74ab-4327-9991-3ebcc78f817f.jpg\" description=\"\"][/slide]\n[/slider]\n\n[expandable name=\"Read more..\"]\nThis month's recipe is baked artichokes. Although I failed to capture a sexy photo, the artichokes were delicious and definitely deserve a spot here.[slider]\n [slide][image link=\"https://lipp.fi/static/images/a88f8f43-971b-4297-8111-f4537bcba27b.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/b90484ee-5f29-40cc-a6e9-71f63ac98615.jpg\" description=\"\"][/slide]\n[/slider][/expandable]",
+        text: "I'm a little late, but here are the month's totals :smol-serious::\nI finally :heart: made an appointment :fire: with my ENT and had nose surgery in the middle of the month. I haven't fully recovered yet, but I have this feeling that breathing is... cool?\nI've tried hiking, but it was too hard for me. I became exhausted after gaining only 300m of elevation. I'll definitely go again, but I'll practice with easier hikes first.\nThe scenery was very beautiful. Here are some photos:\n[slider]\n[slide][image link=\"https://lipp.fi/static/images/62944b84-4126-4b48-9014-fac7471dc875.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/2306c07a-d67c-4144-8562-a7ca85a0976e.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/42be085e-5389-4b2c-99a4-242ef211b700.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/7732076f-74ab-4327-9991-3ebcc78f817f.jpg\" description=\"\"][/slide]\n[/slider]\n\n[expandable name=\"Read more..\"]\nThis month's recipe is baked artichokes. Although I failed to capture a sexy photo, the artichokes were delicious and definitely deserve a spot here.[slider]\n [slide][image link=\"https://lipp.fi/static/images/a88f8f43-971b-4297-8111-f4537bcba27b.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/b90484ee-5f29-40cc-a6e9-71f63ac98615.jpg\" description=\"\"][/slide]\n[/slider][/expandable]",
         // text: 'testtastn oariet narisoetnrsoietnrois entorie ntrosien tarosietn aroiten roisetn ras',
         // creationTime: '17:35 12.20.24',
         creationTime: new Date(),
@@ -80,7 +68,7 @@ class PostClientMock implements IPostClient {
         classes: 'test-post',
         tags: ['test', 'example'],
         isReactable: true,
-        reactions: [this.stubReaction, this.stubReaction2],
+        reactions: [this.stubReaction],
         isCommentable: true,
         comments: [this.stubComment, this.stubComment2],
         readGroupId: 'read-group-1',
@@ -103,7 +91,7 @@ class PostClientMock implements IPostClient {
         classes: 'test-post',
         tags: ['test', 'example'],
         isReactable: true,
-        reactions: [this.stubReaction, this.stubReaction2],
+        reactions: [this.stubReaction],
         isCommentable: true,
         comments: [this.stubComment],
         readGroupId: 'read-group-1',
@@ -126,7 +114,7 @@ class PostClientMock implements IPostClient {
         classes: 'test-post',
         tags: ['test', 'example'],
         isReactable: true,
-        reactions: [this.stubReaction, this.stubReaction2],
+        reactions: [this.stubReaction],
         isCommentable: true,
         comments: [this.stubComment, this.stubComment2],
         readGroupId: 'read-group-1',

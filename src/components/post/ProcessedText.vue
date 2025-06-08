@@ -5,18 +5,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import RuntimeTemplate from 'vue3-runtime-template';
+import { getReactions } from '@/api/reactionService';
 
 const props = defineProps<{
   text: string
 }>();
 
-const processedText = computed(() => {
-  return processText(props.text);
-});
+const processedText = ref('');
 
-function processText(text: string): string {
+async function processTextAsync(text: string): Promise<string> {
   let result = text;
   result = escapeBrackets(result);
   result = replacePatternWithTag(result, /\[b\]([\s\S]*?)\[\/b\]/, 'b', null, null);
@@ -41,9 +40,23 @@ function processText(text: string): string {
   result = replaceReadMore(result);
   result = replaceCode(result);
   result = processWhiteSpaces(result);
-  result = replaceQuote(result)
+  result = replaceQuote(result);
+
+  // Process reactions
+  result = await replaceReactions(result);
+
   return result;
 }
+
+// Update processedText when props.text changes
+onMounted(async () => {
+  processedText.value = await processTextAsync(props.text);
+});
+
+watch(() => props.text, async (newText) => {
+  processedText.value = await processTextAsync(newText);
+});
+
 
 function processWhiteSpaces(text: string): string {
   let result = text;
@@ -56,6 +69,56 @@ function escapeBrackets(text: string): string {
   let result = text;
   result = result.replace(/</g, "&lt;");
   result = result.replace(/>/g, "&gt;");
+  return result;
+}
+
+async function replaceReactions(text: string): Promise<string> {
+  let result = text;
+
+  // Extract all reactions with pattern :reaction-name:
+  const reactionPattern = /:([a-zA-Z0-9_-]+):/g;
+  const matches = [...result.matchAll(reactionPattern)];
+
+  if (matches.length === 0) {
+    return result;
+  }
+
+  // Collect all unique reaction names
+  const reactionNames = [...new Set(matches.map(match => match[1]))];
+
+  // Fetch URLs for these reactions
+  const reactionsResult = await getReactions(reactionNames);
+  console.log("reaction result")
+  console.log(reactionsResult);
+
+  if (reactionsResult.type === 'error') {
+    console.error('Failed to fetch reactions:', reactionsResult.message);
+    return result;
+  }
+
+  const reactions = reactionsResult.data;
+
+  // Create a map of reaction names to their URLs for easy lookup
+  const reactionMap = new Map<string, string>();
+  reactions.forEach(reaction => {
+    reactionMap.set(reaction.name, reaction.iconUri);
+  });
+
+  // Replace each reaction with an img tag if a URL was found
+  for (const match of matches) {
+    const fullMatch = match[0]; // :reaction-name:
+    const reactionName = match[1]; // reaction-name
+
+    if (reactionMap.has(reactionName)) {
+      const iconUrl = reactionMap.get(reactionName);
+      result = result.replace(
+        fullMatch, 
+        `<img src="${iconUrl}" alt=":${reactionName}:" class="reaction-icon" />`
+      );
+    }
+    // If no reaction is found for the name, do not replace it
+  }
+
   return result;
 }
 
@@ -212,6 +275,14 @@ function replaceQuote(text: string): string {
   margin: 10px 0;
   background-color: #f9f9f9;
   font-style: italic;
+}
+
+.reaction-icon {
+  display: inline-block;
+  height: 1.2em;
+  width: auto;
+  vertical-align: middle;
+  margin: 0 0.1em;
 }
 
 </style>
