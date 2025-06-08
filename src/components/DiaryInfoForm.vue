@@ -19,7 +19,7 @@
       <el-option :label="t('diaryInfo.form.fields.read_privacy.registered')" value="registered" />
       <el-option :label="t('diaryInfo.form.fields.read_privacy.everyone')" value="everyone" />
       <el-option :label="t('diaryInfo.form.fields.read_privacy.friends')" value="friends" />
-      <el-option :label="t('diaryInfo.form.fields.read_privacy.nobody')" value="nobody" />
+      <el-option :label="t('diaryInfo.form.fields.read_privacy.nobody')" value="private" />
     </el-select>
     </el-form-item>
     <el-form-item prop="comment">
@@ -27,8 +27,16 @@
       <el-option :label="t('diaryInfo.form.fields.comment_privacy.registered')" value="registered" />
       <el-option :label="t('diaryInfo.form.fields.comment_privacy.everyone')" value="everyone" />
       <el-option :label="t('diaryInfo.form.fields.comment_privacy.friends')" value="friends" />
-      <el-option :label="t('diaryInfo.form.fields.comment_privacy.nobody')" value="nobody" />
+      <el-option :label="t('diaryInfo.form.fields.comment_privacy.nobody')" value="private" />
     </el-select>
+    </el-form-item>
+    <el-form-item prop="react">
+      <el-select :placeholder="t('diaryInfo.form.fields.react_privacy.label')" v-model="diaryInfoForm.react">
+        <el-option :label="t('diaryInfo.form.fields.react_privacy.registered')" value="registered" />
+        <el-option :label="t('diaryInfo.form.fields.react_privacy.everyone')" value="everyone" />
+        <el-option :label="t('diaryInfo.form.fields.react_privacy.friends')" value="friends" />
+        <el-option :label="t('diaryInfo.form.fields.react_privacy.nobody')" value="private" />
+      </el-select>
     </el-form-item>
   </el-form>
   <el-alert v-if="error" type="error" :closable="false" style="margin: -10px 0 10px 0; width: 100%">
@@ -42,9 +50,11 @@
 <script setup lang="ts">
 import {onMounted, reactive, ref} from 'vue'
 import type {FormInstance, FormRules} from "element-plus";
-import {isEmailBusy, isLoginBusy, isNicknameBusy, signUp} from "@/api/userService.ts";
+import {getCurrentUserLogin, isEmailBusy, isLoginBusy, isNicknameBusy, signUp} from "@/api/userService.ts";
 import router from "@/router";
 import {useI18n} from "vue-i18n";
+import {getDefaultAccessGroups} from "@/api/accessGroupService.ts";
+import {updateDiaryInfo} from "@/api/diaryService.ts";
 
 const { t } = useI18n()
 
@@ -59,6 +69,7 @@ interface DiaryInfoForm {
   description: string,
   read: string,
   comment: string,
+  react: string,
 }
 const diaryInfoFormRef = ref<FormInstance>()
 const diaryInfoForm = reactive<DiaryInfoForm>({
@@ -66,18 +77,35 @@ const diaryInfoForm = reactive<DiaryInfoForm>({
   description: '',
   read: '',
   comment: '',
+  react: '',
 })
+const emit = defineEmits(['on-success']);
 
 const submitForm = (form: FormInstance | undefined) => {
   if (!form) return
   form.validate(async (valid) => {
     if (valid) {
-      // let registrationResult = await signUp(registrationForm.login, registrationForm.nickname, registrationForm.email, registrationForm.password, registrationForm.inviteCode)
-      // if (registrationResult.type === 'ok') {
-      //   await router.push({name: 'sign in'})
-      // } else {
-      //   error.value = getLocalizedError(registrationResult.message)
-      // }
+      const accessGroups = await getDefaultAccessGroups()
+      if (accessGroups.type === 'ok') {
+        const read = accessGroups.data.get(diaryInfoForm.read)!!
+        const comment = accessGroups.data.get(diaryInfoForm.comment)!!
+        const react = accessGroups.data.get(diaryInfoForm.react)!!
+        const diaryInfo = {
+          name: diaryInfoForm.name,
+          subtitle: diaryInfoForm.description,
+          defaultReadGroup: read,
+          defaultCommentGroup: comment,
+          defaultReactGroup: react,
+        }
+        const diaryInfoUpdate = await updateDiaryInfo(getCurrentUserLogin(), diaryInfo)
+        if (diaryInfoUpdate.type === 'ok') {
+          emit('on-success')
+        } else {
+          error.value = diaryInfoUpdate.message
+        }
+      } else {
+        error.value = accessGroups.message
+      }
     }
   })
 }

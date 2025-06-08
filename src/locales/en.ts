@@ -55,6 +55,24 @@ export default {
             },
         },
     },
+    email_confirmation: {
+        title: "Email confirmation",
+        form: {
+            header: "Email confirmation",
+            fields: {
+                code: {
+                    label: "confirmation code",
+                },
+                message: {
+                    line1: "Email confirmation code has been sent to your email.",
+                    line2: "Please enter the code to confirm your email.",
+                }
+            },
+            button: {
+                label: "confirm",
+            }
+        }
+    },
     login: {
         title: 'Login',
         form: {
@@ -115,7 +133,7 @@ export default {
             },
             buttons: {
                 send: {
-                    label: 'send',
+                    label: 'confirm',
                 },
                 skip: {
                     label: 'skip',
@@ -137,14 +155,21 @@ export default {
                     label: 'subtitle',
                 },
                 read_privacy: {
-                    label: 'allowed to read',
+                    label: 'default read privacy',
                     registered: 'registered users',
                     everyone: 'everyone',
                     friends: 'friends',
                     nobody: 'only me',
                 },
                 comment_privacy: {
-                    label: 'allowed to comment',
+                    label: 'default comment privacy',
+                    registered: 'registered users',
+                    everyone: 'everyone',
+                    friends: 'friends',
+                    nobody: 'only me',
+                },
+                react_privacy: {
+                    label: 'default reaction privacy',
                     registered: 'registered users',
                     everyone: 'everyone',
                     friends: 'friends',

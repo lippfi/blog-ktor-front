@@ -25,9 +25,9 @@
       </el-form-item>
       <el-form-item prop="language">
         <el-select :placeholder="t('additionalInfo.form.fields.language.label')" v-model="additionalInfoForm.language">
-          <el-option :label="t('additionalInfo.form.fields.language.en')" value="EN" />
           <el-option :label="t('additionalInfo.form.fields.language.kk')" value="KK" />
           <el-option :label="t('additionalInfo.form.fields.language.kk_cyrillic')" value="KK_CYRILLIC" />
+          <el-option :label="t('additionalInfo.form.fields.language.en')" value="EN" />
           <el-option :label="t('additionalInfo.form.fields.language.ru')" value="RU" />
         </el-select>
       </el-form-item>
@@ -56,7 +56,7 @@
     {{ error }}
   </el-alert>
   <div style="display: flex; justify-content: center; align-items: center;">
-<!--    <el-button type="primary" round @click="submitForm(additionalInfoFormRef)">{{ $t('additionalInfo.form.buttons.send.label')}}</el-button>-->
+    <el-button type="primary" round @click="submitForm(additionalInfoFormRef)">{{ $t('additionalInfo.form.buttons.send.label')}}</el-button>
     <!--        <el-button type="info" text @click="submitForm(additionalInfoFormRef)">{{ $t('additionalInfo.form.buttons.skip.label')}}</el-button>-->
   </div>
 </template>
@@ -78,7 +78,7 @@ onMounted(() => {
 const error = ref<string>('');
 
 interface AdditionalInfoForm {
-  birthday: string,
+  birthday: Date,
   timezone: string,
   sex: string,
   nsfw: string,
@@ -86,12 +86,13 @@ interface AdditionalInfoForm {
 }
 const additionalInfoFormRef = ref<FormInstance>()
 const additionalInfoForm = reactive<AdditionalInfoForm>({
-  birthday: '',
+  birthday: new Date("2000-01-01"),
   timezone: '',
   sex: '',
   nsfw: '',
   language: '',
 })
+const emit = defineEmits(['on-success']);
 
 const validateDate = (rule: any, value: string, callback: any) => {
   if (!value) {
@@ -140,10 +141,8 @@ const submitForm = (form: FormInstance | undefined) => {
   if (!form) return
   form.validate(async (valid) => {
     if (valid) {
-      const formatDate = (dateStr: string): string => {
-        if (!dateStr) return '';
-        const [day, month, year] = dateStr.split('.');
-        return `${year}-${month}-${day}`;
+      const formatDate = (date: Date): string => {
+        return date.toISOString().split('T')[0];
       };
 
       let userAdditionalInfo: UserAdditionalInfo = {
@@ -156,7 +155,7 @@ const submitForm = (form: FormInstance | undefined) => {
 
       let additionalInfoResult = await updateAdditionalInfo(userAdditionalInfo)
       if (additionalInfoResult.type === 'ok') {
-        router.push('/');
+        emit('on-success');
       } else {
         error.value = additionalInfoResult.message;
       }

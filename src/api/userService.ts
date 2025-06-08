@@ -5,6 +5,19 @@ export type Language = 'EN' | 'RU' | 'KK' | 'KK_CYRILLIC';
 export type Sex = 'MALE' | 'FEMALE' | 'UNDEFINED';
 export type NSFWPolicy = 'SHOW' | 'HIDE' | 'WARN';
 
+interface UserSessionInfo {
+    login: string;
+    nickname: string;
+    language: Language;
+    nsfw: NSFWPolicy;
+}
+
+function getCurrentSessionInfo(): UserSessionInfo {
+   localStorage.getItem('timeToSessionInfo');
+   // if it is missing, fetch it via authenticatedRequest to /user/session-info
+   // if there were more than 10 minutes since last fetch, update it
+}
+
 export function getCurrentUserLogin() {
     // TODO
     return "shimpansky"
@@ -143,8 +156,8 @@ export async function signUp(
     email: string,
     password: string,
     inviteCode: string,
+    language: string,
     timezone: string = Intl.DateTimeFormat().resolvedOptions().timeZone,
-    language: Language = 'EN'
 ): Promise<RegistrationResult> {
     const requestOptions: RequestInit = {
         method: 'POST',
@@ -171,6 +184,31 @@ export async function signUp(
     }
     return result;
 }
+
+type EmailConfirmationResult =
+    | { type: 'ok', jwt: string }
+    | { type: 'error'; message: string };
+
+export async function confirmEmail(
+    code: string,
+): Promise<EmailConfirmationResult> {
+    const requestOptions: RequestInit = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    };
+    const url = `${backendURL}/user/confirm-registration?code=${encodeURIComponent(code)}`
+    const response = await fetch(url, requestOptions);
+
+    let result: EmailConfirmationResult;
+    if (response.ok) {
+        result = { type : 'ok', jwt: await response.text() }
+    } else {
+        result = { type: 'error', message : await response.text() }
+    }
+    return result;
+}
+
+export async function getProfile(login: string): Promise<UserBase> {}
 
 export async function isLoginBusy(login: string): Promise<boolean> {
     const response = await fetch(`${backendURL}/user/is-login-busy?login=${encodeURIComponent(login)}`);

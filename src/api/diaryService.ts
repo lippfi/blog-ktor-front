@@ -6,6 +6,7 @@ export interface DiaryInfo {
     subtitle: string;
     defaultReadGroup: string;
     defaultCommentGroup: string;
+    defaultReactGroup: string;
 }
 
 type Result<T> = 

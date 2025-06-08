@@ -1,3 +1,34 @@
+<script lang="ts" setup>
+import { useI18n } from 'vue-i18n';
+import { onMounted, ref } from 'vue';
+import RegistrationForm from "@/components/RegistrationForm.vue";
+import AdditionalInfoForm from "@/components/AdditionalInfoForm.vue";
+import DiaryInfoForm from "@/components/DiaryInfoForm.vue";
+import LanguageChooser from '@/components/LanguageChooser.vue';
+import ConfirmEmailForm from "@/components/ConfirmEmailForm.vue";
+import {logOut} from "@/api/userService.ts";
+import {useRouter} from "vue-router";
+import {getDefaultAccessGroups} from "@/api/accessGroupService.ts";
+
+const { t } = useI18n();
+const router = useRouter();
+
+onMounted(() => {
+  document.title = t('registration.title');
+});
+
+const step = ref(3);
+
+const goToNextStep = () => {
+  step.value++;
+};
+
+const finishRegistration = () => {
+  logOut()
+  router.push(`/sign-in`);
+}
+
+</script>
 <template>
   <div class="container">
     <div/>
@@ -16,35 +47,17 @@
         </el-steps>
       <br>
       <div style="text-align: center;">
-        <RegistrationForm v-if="step === 0"/>
-        <AdditionalInfoForm v-if="step === 1"/>
-        <DiaryInfoForm v-if="step === 2"/>
-        <DiaryImportForm v-if="step === 3"/>
+        <RegistrationForm v-if="step === 0" @registration-success="goToNextStep"/>
+        <ConfirmEmailForm v-if="step === 1" @confirmation-success="goToNextStep"/>
+        <AdditionalInfoForm v-if="step === 2" @on-success="goToNextStep"/>
+        <DiaryInfoForm v-if="step === 3" @on-success="finishRegistration"/>
+<!--        <DiaryImportForm v-if="step.value === 3"/>-->
       </div>
     </div>
     <div/>
-    <LanguageChooser />
+    <LanguageChooser v-if="step === 0"/>
   </div>
 </template>
-
-<script lang="ts" setup>
-import { useI18n } from 'vue-i18n';
-import { onMounted } from 'vue';
-import RegistrationForm from "@/components/RegistrationForm.vue";
-import AdditionalInfoForm from "@/components/AdditionalInfoForm.vue";
-import DiaryInfoForm from "@/components/DiaryInfoForm.vue";
-import LanguageChooser from '@/components/LanguageChooser.vue';
-import AddReaction from "@/components/post/reaction/AddReaction.vue";
-import DiaryImportForm from "@/components/profile/DiaryImportForm.vue";
-
-const { t } = useI18n();
-
-onMounted(() => {
-  document.title = t('registration.title');
-});
-
-let step = 3;
-</script>
 
 <style scoped>
 @media (min-width: 800px) {

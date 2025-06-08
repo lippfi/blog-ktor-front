@@ -45,7 +45,8 @@ import {isEmailBusy, isLoginBusy, isNicknameBusy, signUp} from "@/api/userServic
 import router from "@/router";
 import {useI18n} from "vue-i18n";
 
-const { t } = useI18n()
+const { locale, t } = useI18n()
+const currentLocale = ref(locale.value)
 
 onMounted(() => {
   document.title = t('registration.title');
@@ -141,37 +142,20 @@ const rules = computed<FormRules<RegistrationForm>>(() => ({
   inviteCode: [{ required: true, message: t('registration.form.errors.invite_code_required'), trigger: 'blur' }],
 }))
 
+const emit = defineEmits(['registration-success']);
+
 const submitForm = (form: FormInstance | undefined) => {
   if (!form) return
   form.validate(async (valid) => {
     if (valid) {
-      let registrationResult = await signUp(registrationForm.login, registrationForm.nickname, registrationForm.email, registrationForm.password, registrationForm.inviteCode)
+      let registrationResult = await signUp(registrationForm.login, registrationForm.nickname, registrationForm.email, registrationForm.password, registrationForm.inviteCode, currentLocale.value)
       if (registrationResult.type === 'ok') {
-        await router.push({name: 'sign in'})
+        emit('registration-success');
       } else {
-        error.value = getLocalizedError(registrationResult.message)
+        error.value = registrationResult.message
       }
     }
   })
-}
-
-const getLocalizedError = (serverMessage: string) => {
-  const lowerMessage = serverMessage.toLowerCase()
-
-  if (lowerMessage.includes('email')) {
-    return t('registration.form.exceptions.email_exists')
-  }
-  if (lowerMessage.includes('login')) {
-    return t('registration.form.exceptions.login_exists')
-  }
-  if (lowerMessage.includes('nickname')) {
-    return t('registration.form.exceptions.nickname_exists')
-  }
-  if (lowerMessage.includes('invite')) {
-    return t('registration.form.exceptions.invalid_invite_code')
-  }
-
-  return t('registration.form.exceptions.unknown')
 }
 </script>
 

@@ -32,6 +32,22 @@ async function authenticatedRequest(
 }
 
 // API Methods
+export async function getDefaultAccessGroups(): Promise<Result<Map<string, string>>> {
+    try {
+        const response = await fetch(
+            `/access-groups/default`
+        );
+        if (response.ok) {
+            const data = await response.json();
+            return { type: 'ok', data };
+        } else {
+            const message = await response.text();
+            return { type: 'error', message };
+        }
+    } catch (error) {
+        return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+    }
+}
 
 export async function getAccessGroups(diary: string): Promise<Result<AccessGroup[]>> {
     try {
