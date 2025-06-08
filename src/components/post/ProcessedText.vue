@@ -75,7 +75,6 @@ function escapeBrackets(text: string): string {
 async function replaceReactions(text: string): Promise<string> {
   let result = text;
 
-  // Extract all reactions with pattern :reaction-name:
   const reactionPattern = /:([a-zA-Z0-9_-]+):/g;
   const matches = [...result.matchAll(reactionPattern)];
 
@@ -83,13 +82,9 @@ async function replaceReactions(text: string): Promise<string> {
     return result;
   }
 
-  // Collect all unique reaction names
   const reactionNames = [...new Set(matches.map(match => match[1]))];
 
-  // Fetch URLs for these reactions
   const reactionsResult = await getReactions(reactionNames);
-  console.log("reaction result")
-  console.log(reactionsResult);
 
   if (reactionsResult.type === 'error') {
     console.error('Failed to fetch reactions:', reactionsResult.message);
@@ -98,13 +93,11 @@ async function replaceReactions(text: string): Promise<string> {
 
   const reactions = reactionsResult.data;
 
-  // Create a map of reaction names to their URLs for easy lookup
   const reactionMap = new Map<string, string>();
   reactions.forEach(reaction => {
     reactionMap.set(reaction.name, reaction.iconUri);
   });
 
-  // Replace each reaction with an img tag if a URL was found
   for (const match of matches) {
     const fullMatch = match[0]; // :reaction-name:
     const reactionName = match[1]; // reaction-name
@@ -113,10 +106,9 @@ async function replaceReactions(text: string): Promise<string> {
       const iconUrl = reactionMap.get(reactionName);
       result = result.replace(
         fullMatch, 
-        `<img src="${iconUrl}" alt=":${reactionName}:" class="reaction-icon" />`
+        `<img src="${iconUrl}" alt="${reactionName}" class="reaction-icon" />`
       );
     }
-    // If no reaction is found for the name, do not replace it
   }
 
   return result;
