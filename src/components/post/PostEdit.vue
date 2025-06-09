@@ -10,7 +10,7 @@
           <span>{{ $t('post.form.fields.title.label') }}</span>
           <el-input v-model="localTitle"/>
         </div>
-        <SmartTextArea draggable="true" :content="localContent"/>
+        <SmartTextArea :content="localContent"/>
         <div class="tags-row">
           <span>{{ $t('post.form.fields.tags.label')}}</span>
           <el-input-tag draggable v-model="localTags"/>
