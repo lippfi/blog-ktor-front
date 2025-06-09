@@ -1,5 +1,9 @@
 import { backendURL } from "@/main";
 import {useI18n} from "vue-i18n";
+import mitt from 'mitt';
+
+// Create an event emitter
+export const authEvents = mitt();
 
 // Common types
 export type Language = 'EN' | 'RU' | 'KK' | 'KK_CYRILLIC';
@@ -177,6 +181,8 @@ export async function signIn(login: string, password: string): Promise<LoginResu
         localStorage.setItem('jwt', token);
         await getCurrentSessionInfo()
         result = { type: 'ok' };
+        // Emit auth-changed event
+        authEvents.emit('auth-changed', true);
     } else {
         const text = await response.text();
         result = { type: 'error', message: text };
@@ -276,6 +282,8 @@ export async function isEmailBusy(email: string): Promise<boolean> {
 export function logOut(): void {
     localStorage.removeItem('jwt');
     clearCurrentSessionInfo()
+    // Emit auth-changed event
+    authEvents.emit('auth-changed', false);
 }
 
 export async function createInviteCode(): Promise<string> {

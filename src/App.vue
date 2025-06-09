@@ -5,16 +5,39 @@
   <!-- Review login -->
   <!-- Review registration -->
   <!-- Store user in session -->
-  <MenuComponent v-if="isSignedIn() && $route.name !== 'register'"/>
+  <MenuComponent v-if="signedIn && $route.name !== 'register'"/>
   <router-view/>
 </template>
 
 <script setup lang="ts">
 import {RouterView, useRouter} from 'vue-router'
 import MenuComponent from "@/components/MenuComponent.vue";
-import {getCurrentUserLogin, isSignedIn} from "@/api/userService.ts";
+import {getCurrentUserLogin, isSignedIn, authEvents} from "@/api/userService.ts";
+import { ref, onMounted, watch, onUnmounted } from 'vue'
 
 const router = useRouter()
+const signedIn = ref(isSignedIn())
+
+// Update signedIn state when route changes
+watch(() => router.currentRoute.value, () => {
+  signedIn.value = isSignedIn()
+})
+
+// Listen for auth events
+const authChangedHandler = (isAuthenticated: boolean) => {
+  signedIn.value = isAuthenticated
+}
+authEvents.on('auth-changed', authChangedHandler)
+
+// Clean up event listener when component is unmounted
+onUnmounted(() => {
+  authEvents.off('auth-changed', authChangedHandler)
+})
+
+// Initialize signedIn state
+onMounted(() => {
+  signedIn.value = isSignedIn()
+})
 </script>
 
 <style>
