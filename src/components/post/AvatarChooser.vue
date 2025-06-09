@@ -38,16 +38,14 @@ interface Props {
   outlineSize: number
   showButtons: boolean
   isVertical: boolean
-  selectedAvatar?: string
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits(['update:selectedAvatar'])
+const selectedAvatarModel = defineModel<string>('selectedAvatar', { default: "" })
 
 const avatars = ref<string[]>([])
 const isLoaded = ref(false)
 const customAvatar = ref("")
-const selectedAvatarModel = ref<string>("")
 
 const grid_flow = computed(() => props.isVertical ? "row" : "column")
 const height = computed(() => props.isVertical ? (props.showButtons ? "calc(100% - 40px)" : "100%") : props.avatarSize + 5 + "px")
@@ -102,29 +100,17 @@ const fetchAvatars = async () => {
     avatars.value = response
     isLoaded.value = true
 
-    // If avatars array is not empty
-    if (avatars.value.length > 0) {
-      // If selectedAvatar is undefined or not found in the avatars list
-      if (props.selectedAvatar === undefined || !avatars.value.includes(props.selectedAvatar)) {
-        // Select the first avatar by default
-        selectedAvatarModel.value = avatars.value[0]
-        emit('update:selectedAvatar', avatars.value[0])
-      } else {
-        // If selectedAvatar is defined and found, select it
-        selectedAvatarModel.value = props.selectedAvatar
-      }
+    // If avatars array is not empty and no avatar is selected yet
+    if (avatars.value.length > 0 && !selectedAvatarModel.value) {
+      // Select the first avatar by default
+      selectedAvatarModel.value = avatars.value[0]
     }
   } catch (error) {
     console.error('Failed to fetch avatars:', error)
   }
 }
 
-// Watch for changes in the selectedAvatarModel
-watch(selectedAvatarModel, (newValue) => {
-  if (newValue) {
-    emit('update:selectedAvatar', newValue)
-  }
-})
+// Watch for changes in customAvatar and update selectedAvatarModel
 
 // Watch for changes in customAvatar
 watch(customAvatar, () => {

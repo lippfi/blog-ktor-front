@@ -1,48 +1,42 @@
 <template>
   <div class="post-edit">
     <h3 v-if="isEditing()">{{ $t('post.form.edit') }}</h3>
-    <h3 v-if="!isEditing()">{{ $t('post.form.title') }}{{localTitle}}</h3>
+    <h3 v-if="!isEditing()">{{ $t('post.form.title') }}</h3>
 
     <div class="form">
-      <AvatarChooser :avatar-size="100" :outline-size="3" :show-buttons="true" :is-vertical="true" :selected-avatar="localAvatar"/>
+      <AvatarChooser :avatar-size="100" :outline-size="3" :show-buttons="true" :is-vertical="true" v-model:selected-avatar="localAvatar"/>
       <div class="fields">
         <div class="title-row">
           <span>{{ $t('post.form.fields.title.label') }}</span>
           <el-input v-model="localTitle"/>
         </div>
-        <SmartTextArea :content="localContent"/>
+        <SmartTextArea v-model:content="localContent"/>
         <div class="tags-row">
           <span>{{ $t('post.form.fields.tags.label')}}</span>
-          <el-input-tag draggable v-model="localTags"/>
+          <el-input-tag :trigger="'Space'" v-model="localTags"/>
         </div>
         <div class="classes" v-if="showAdvancedOptions">
           <span style="white-space: nowrap">{{ $t('post.form.fields.classes.label') }}</span>
-          <el-input/>
+          <el-input v-model="localClasses"/>
         </div>
         <div v-if="showAdvancedOptions" class="groups-row">
           <div class="groups">
             <div class="read">
               <span>{{ $t('post.form.fields.read.label') }}</span>
               <el-select v-model="localReadGroup">
-                <el-option>everyone</el-option>
-                <el-option>registered</el-option>
-                <el-option>nobody</el-option>
+                <el-option v-for="[name, id] in accessGroups" :key="id" :label="name" :value="id"></el-option>
               </el-select>
             </div>
             <div class="react">
               <span>{{ $t('post.form.fields.react.label') }}</span>
               <el-select v-model="localReactionGroup">
-                <el-option>everyone</el-option>
-                <el-option>registered</el-option>
-                <el-option>nobody</el-option>
+                <el-option v-for="[name, id] in accessGroups" :key="id" :label="name" :value="id"></el-option>
               </el-select>
             </div>
             <div class="comment">
               <span>{{ $t('post.form.fields.comment.label') }}</span>
               <el-select v-model="localCommentGroup">
-                <el-option>everyone</el-option>
-                <el-option>registered</el-option>
-                <el-option>nobody</el-option>
+                <el-option v-for="[name, id] in accessGroups" :key="id" :label="name" :value="id"></el-option>
               </el-select>
             </div>
           </div>
@@ -61,67 +55,75 @@
 </template>
 
 <script setup lang="ts">
-import {ref, watchEffect, defineEmits} from 'vue'
+import {ref, onMounted} from 'vue'
 import {useI18n} from "vue-i18n";
 import SmartTextArea from "@/components/post/SmartTextArea.vue";
 import AvatarChooser from "@/components/post/AvatarChooser.vue";
-import PostClientMock from "@/api/postClient/postClientMock.ts";
-import type {Post, PostEdit} from "@/models/posts/post.ts";
-import {getCurrentUserLogin, getCurrentUserNickname} from "@/api/userService.ts";
-import {mapPostEditToPostEditDto, mapPostToDto} from "@/api/dto/mapper.ts";
+import type {PostEdit} from "@/models/posts/post.ts";
+import {getCurrentUserLogin} from "@/api/userService.ts";
+import {mapPostEditToPostEditDto} from "@/api/dto/mapper.ts";
+import PostClientImpl from "@/api/postClient/postClient.ts";
+import type {PostCreateDto} from "@/api/dto/postServiceDto.ts";
+import { getAccessGroups } from "@/api/accessGroupService.ts";
 
 const { t } = useI18n()
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   tags?: string[];
   content?: string;
   title?: string;
   postID?: string;
   avatar?: string;
+  classes?: string;
   reactionGroup?: string;
   commentGroup?: string;
   readGroup?: string;
-}>();
+}>(), {
+  tags: () => [],
+  content: '',
+  title: '',
+  classes: '',
+  avatar: ''
+});
 
 const emit = defineEmits(['cancelEdit']);
 
-const localTags = defineModel<string[]>('tags', { default: [] });
-const localContent = defineModel<string>('content', { required: true });
-const localTitle = defineModel<string>('title', { required: true });
-const localID = defineModel<string>('postID');
-const localAvatar = defineModel<string>('localAvatar')
-const localReactionGroup = defineModel<string>('localReactionGroup')
-const localCommentGroup = defineModel<string>('localCommentGroup')
-const localReadGroup = defineModel<string>('localReadGroup')
+// Use reactive local state
+const localTags = ref<string[]>(props.tags || []);
+const localContent = ref<string>(props.content || '');
+const localClasses = ref<string>(props.classes || '');
+const localTitle = ref<string>(props.title || '');
+const localID = ref<string | undefined>(props.postID);
+const localAvatar = ref<string | undefined>(props.avatar);
+const localReactionGroup = ref<string>(props.reactionGroup || '');
+const localCommentGroup = ref<string>(props.commentGroup || '');
+const localCommentReactionGroup = ref<string>(props.reactionGroup || '');
+const localReadGroup = ref<string>(props.readGroup || '');
 
-const client = new PostClientMock()
+const client = new PostClientImpl()
+const accessGroups = ref<Map<string, string>>(new Map())
 
-watchEffect(() => {
-  if (props.tags) {
-    localTags.value = props.tags;
+onMounted(async () => {
+  await fetchAccessGroups()
+})
+
+async function fetchAccessGroups() {
+  const userLogin = getCurrentUserLogin()
+  const result = await getAccessGroups(userLogin)
+  if (result.type === 'ok') {
+    accessGroups.value = new Map(Object.entries(result.data.content))
+
+    // Set default values if not already set
+    if (!props.readGroup && accessGroups.value.size > 0) {
+      const firstGroupId = Array.from(accessGroups.value.values())[0]
+      localReadGroup.value = localReadGroup.value || firstGroupId
+      localReactionGroup.value = localReactionGroup.value || firstGroupId
+      localCommentGroup.value = localCommentGroup.value || firstGroupId
+    }
+  } else {
+    console.error('Failed to fetch access groups:', result.message)
   }
-  if (props.content) {
-    localContent.value = props.content;
-  }
-  if (props.title) {
-    localTitle.value = props.title;
-  }
-  if (props.postID) {
-    localID.value = props.postID;
-  }
-  if (props.avatar) {
-    localAvatar.value = props.avatar
-  }
-  if (props.reactionGroup) {
-    localReactionGroup.value = props.reactionGroup
-  }
-  if (props.commentGroup) {
-    localCommentGroup.value = props.commentGroup
-  }
-  if (props.readGroup) {
-    localReadGroup.value = props.readGroup
-  }
-});
+}
 
 function cancelEdit() {
   emit('cancelEdit', '');
@@ -142,41 +144,23 @@ async function handleSave() {
 }
 
 async function createPost() {
-  const newPost: Post = {
-    authorLogin: getCurrentUserLogin(),
-    authorNickname: await getCurrentUserNickname(),
-    avatar: "",
-    classes: "",
-    commentGroupId: "",
-    commentReactionGroupId: "",
-    comments: [],
-    creationTime: new Date(),
-    isCommentable: false,
-    isEncrypted: false,
-    isPreface: false,
-    isReactable: false,
-    reactionGroupId: "",
-    reactions: [],
-    readGroupId: "",
-    tags: [],
-    text: localContent.value,
+  const newPost: PostCreateDto = {
+    uri: '',
+    avatar: localAvatar.value || '',
     title: localTitle.value,
-    uri: ""
+    text: localContent.value,
+    isPreface: false,
+    isEncrypted: false,
+    classes: localClasses.value,
+    tags: localTags.value,
+    readGroupId: localReadGroup.value,
+    commentGroupId: localCommentGroup.value,
+    reactionGroupId: localReactionGroup.value,
+    commentReactionGroupId: localReactionGroup.value,
   }
-  if (localAvatar.value) {
-    newPost.avatar = localAvatar.value
-  }
-  if (localCommentGroup.value) {
-    newPost.commentGroupId = localCommentGroup.value
-  }
-  if (localReadGroup.value) {
-    newPost.readGroupId = localReadGroup.value
-  }
-  if (localReactionGroup.value) {
-    newPost.reactionGroupId = localReactionGroup.value
-  }
+  console.log(newPost)
 
-  const res = await client.addPost(mapPostToDto(newPost))
+  const res = await client.addPost(newPost)
   if (res.type == 'ok') {
     console.log("ok post add")
     return
@@ -191,29 +175,18 @@ async function updatePost() {
   }
 
   const postEdit: PostEdit = {
-    avatar: localAvatar.value ?? "",
-    commentGroupId: localCommentGroup.value ?? "",
-    commentReactionGroupId: "",
+    avatar: localAvatar.value || "",
+    commentGroupId: localCommentGroup.value || "",
+    commentReactionGroupId: localCommentReactionGroup.value || "",
     id: localID.value,
     isEncrypted: false,
-    reactionGroupId: localReactionGroup.value ?? "",
-    readGroupId: localReadGroup.value ?? "",
-    tags: localTags.value ?? "",
-    text: localContent.value ?? "",
-    title: localTitle.value ?? "",
+    reactionGroupId: localReactionGroup.value || "",
+    readGroupId: localReadGroup.value || "",
+    tags: localTags.value || [],
+    classes: localClasses.value || "",
+    text: localContent.value || "",
+    title: localTitle.value || "",
     uri: ""
-  }
-  if (localAvatar.value) {
-    postEdit.avatar = localAvatar.value
-  }
-  if (localCommentGroup.value) {
-    postEdit.commentGroupId = localCommentGroup.value
-  }
-  if (localReadGroup.value) {
-    postEdit.readGroupId = localReadGroup.value
-  }
-  if (localReactionGroup.value) {
-    postEdit.reactionGroupId = localReactionGroup.value
   }
 
   const res = await client.updatePost(mapPostEditToPostEditDto(postEdit))

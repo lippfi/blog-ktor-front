@@ -5,6 +5,7 @@ import PostClientMock from "@/api/postClient/postClientMock.ts";
 import type { Post as PostModel} from "@/models/posts/post.ts";
 import { mapPostDtoToPost } from "@/models/posts/mapper.ts";
 import { ref, onMounted } from 'vue';
+import PostClientImpl from "@/api/postClient/postClient.ts";
 
 const props = defineProps<{
   login: string;
@@ -14,16 +15,16 @@ const props = defineProps<{
 const posts = ref<PostModel[]>([]);
 
 onMounted(async () => {
-  const postsClient = new PostClientMock();
+  const postsClient = new PostClientImpl();
   let page = 1;
   if (props.page) {
     page = parseInt(props.page);
   }
   if (!props.login) return;
 
-  const searchResult = await postsClient.getDiaryPosts(props.login, page);
+  const searchResult = await postsClient.getDiaryPosts(props.login, page - 1);
   if (searchResult.type === 'ok') {
-    posts.value = searchResult.data.result.map((c) => mapPostDtoToPost(c));
+    posts.value = searchResult.data.content.map((c) => mapPostDtoToPost(c));
   }
 });
 </script>

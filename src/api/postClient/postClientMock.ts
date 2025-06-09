@@ -3,13 +3,13 @@ import type {
     CommentCreateRequest,
     CommentDto,
     CommentUpdateRequest,
-    PostDto,
+    PostViewDto,
     PostEditDto, PostSearchResult,
     SearchPostsParamsDto
 } from "@/api/dto/postServiceDto.ts";
 import type {IPostClient} from "@/api/postClient/postClient.ts";
 import type {Comment, Post, Reaction} from "@/models/posts/post.ts";
-import {mapPostToDto} from "@/api/dto/mapper.ts";
+import {mapPostToViewDto} from "@/api/dto/mapper.ts";
 import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
 
 
@@ -128,7 +128,7 @@ class PostClientMock implements IPostClient {
 
     public async getDiaryPosts(diary: string, page: number): Promise<Result<PostSearchResult>> {
         try {
-            const postRes: PostDto[] = this.stubPosts.map((c) => mapPostToDto(c))
+            const postRes: PostViewDto[] = this.stubPosts.map((c) => mapPostToViewDto(c))
             const searchResult: PostSearchResult = {
                 result: postRes,
                 totalPageCount: 10
@@ -140,7 +140,7 @@ class PostClientMock implements IPostClient {
         }
     }
 
-    public async getDiaryPreface(diary: string): Promise<Result<PostDto>> {
+    public async getDiaryPreface(diary: string): Promise<Result<PostViewDto>> {
         try {
             const response = await fetch(`${backendURL}/posts/preface?diary=${encodeURIComponent(diary)}`);
             if (response.ok) {
@@ -155,7 +155,7 @@ class PostClientMock implements IPostClient {
         }
     }
 
-    public async getPost(login: string, uri: string): Promise<Result<PostDto>> {
+    public async getPost(login: string, uri: string): Promise<Result<PostViewDto>> {
         try {
             const response = await fetch(
                 `${backendURL}/posts?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}`
@@ -200,7 +200,7 @@ class PostClientMock implements IPostClient {
     public async getLatestPosts(offset = 0): Promise<Result<PostSearchResult>> {
         try {
             const latestPosts = [this.stubPost, this.stubPost2, this.stubPost3];
-            const postRes: PostDto[] = latestPosts.map((c) => mapPostToDto(c))
+            const postRes: PostViewDto[] = latestPosts.map((c) => mapPostToViewDto(c))
             const searchResult: PostSearchResult = {
                 result: postRes,
                 totalPageCount: 10
@@ -243,7 +243,7 @@ class PostClientMock implements IPostClient {
         }
     }
 
-    public async updatePost(post: PostEditDto): Promise<Result<PostDto>> {
+    public async updatePost(post: PostEditDto): Promise<Result<PostViewDto>> {
         try {
             this.stubPosts.forEach(x => {
                 if (x.id == post.id) {
@@ -253,7 +253,7 @@ class PostClientMock implements IPostClient {
                     x.tags = post.tags
                 }
             })
-            return { type: 'ok', data: ({} as any) as PostDto };
+            return { type: 'ok', data: ({} as any) as PostViewDto };
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
         }
@@ -314,7 +314,7 @@ class PostClientMock implements IPostClient {
         }
     }
 
-    public async addPost(post: PostDto): Promise<Result<PostDto>> {
+    public async addPost(post: PostViewDto): Promise<Result<PostViewDto>> {
         try {
             this.stubPosts.push(mapPostDtoToPost(post))
             return { type: 'ok', data: post };

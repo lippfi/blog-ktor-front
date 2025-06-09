@@ -1,4 +1,4 @@
-import type {CommentDto, PostDto, ReactionDto, PostEditDto, SearchPostsParamsDto} from "@/api/dto/postServiceDto.ts";
+import type {CommentDto, PostViewDto, ReactionDto, PostEditDto, SearchPostsParamsDto} from "@/api/dto/postServiceDto.ts";
 import type {Comment, Post, Reaction, PostEdit, SearchPostsParams} from "@/models/posts/post.ts";
 
 const mapReactionDtoToReaction = (dto: ReactionDto): Reaction => ({
@@ -23,7 +23,7 @@ const mapCommentDtoToComment = (dto: CommentDto): Comment => ({
     reactionGroupId: dto.reactionGroupId,
 });
 
-export const mapPostDtoToPost = (dto: PostDto): Post => ({
+export const mapPostDtoToPost = (dto: PostViewDto): Post => ({
     id: dto.id,
     uri: dto.uri,
     avatar: dto.avatar,

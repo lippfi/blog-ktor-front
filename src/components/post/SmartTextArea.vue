@@ -191,12 +191,6 @@ const observer = new MutationObserver((mutations) => {
 })
 const content = defineModel<string>('content', { default: ""})
 
-watchEffect(() => {
-  if (props.content) {
-    content.value = props.content;
-  }
-});
-
 const wrapSelectedText = (prefix: string, suffix: string) => {
   const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
   if (!textarea) return

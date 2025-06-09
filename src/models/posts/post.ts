@@ -21,7 +21,7 @@ export interface Comment {
 }
 
 export interface Post {
-    id?: string;
+    id: string;
     uri: string;
     avatar: string;
     authorLogin: string;

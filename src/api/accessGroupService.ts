@@ -31,12 +31,12 @@ async function authenticatedRequest(
     return fetch(`${backendURL}${endpoint}`, { ...options, headers });
 }
 
-interface DefaultAccessGroupsResponse {
+interface AccessGroupsMapResponse {
     content: Map<string, string>;
 }
 
 // API Methods
-export async function getDefaultAccessGroups(): Promise<Result<DefaultAccessGroupsResponse>> {
+export async function getDefaultAccessGroups(): Promise<Result<AccessGroupsMapResponse>> {
     try {
         const response = await fetch(
             `${backendURL}/access-groups/default`
@@ -53,7 +53,7 @@ export async function getDefaultAccessGroups(): Promise<Result<DefaultAccessGrou
     }
 }
 
-export async function getAccessGroups(diary: string): Promise<Result<AccessGroup[]>> {
+export async function getAccessGroups(diary: string): Promise<Result<AccessGroupsMapResponse>> {
     try {
         const response = await authenticatedRequest(
             `/access-groups?diary=${encodeURIComponent(diary)}`

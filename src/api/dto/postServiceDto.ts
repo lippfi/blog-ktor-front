@@ -1,7 +1,6 @@
 type TagPolicyDto = 'UNION' | 'INTERSECTION';
 
 export interface ReactionDto {
-    id: string;
     name: string;
     iconUri: string;
     count: number;
@@ -23,12 +22,28 @@ export interface CommentDto {
 }
 
 export interface PostSearchResult {
-    result: PostDto[]
-    totalPageCount: number;
+    content: PostViewDto[];
+    currentPage: number;
+    totalPages: number;
 }
 
-export interface PostDto {
-    id?: string;
+export interface PostCreateDto {
+    uri: string;
+    avatar: string;
+    title: string;
+    text: string;
+    isPreface: boolean;
+    isEncrypted: boolean;
+    classes: string;
+    tags: string[];
+    readGroupId: string;
+    commentGroupId: string;
+    reactionGroupId: string;
+    commentReactionGroupId: string;
+}
+
+export interface PostViewDto {
+    id: string;
     uri: string;
     avatar: string;
     authorLogin: string;

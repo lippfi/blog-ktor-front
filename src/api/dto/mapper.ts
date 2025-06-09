@@ -1,7 +1,24 @@
 import type {Post, Reaction, Comment, PostEdit} from "@/models/posts/post.ts";
-import type {CommentDto, PostDto, PostEditDto, ReactionDto} from "@/api/dto/postServiceDto.ts";
+import type {CommentDto, PostViewDto, PostEditDto, ReactionDto, PostCreateDto} from "@/api/dto/postServiceDto.ts";
 
-export function mapPostToDto(post: Post): PostDto {
+export function mapPostToCreateDto(post: Post): PostCreateDto {
+    return {
+        uri: post.uri,
+        avatar: post.avatar,
+        title: post.title,
+        text: post.text,
+        isPreface: post.isPreface,
+        isEncrypted: post.isEncrypted,
+        classes: post.classes,
+        tags: post.tags,
+        readGroupId: post.readGroupId,
+        commentGroupId: post.commentGroupId,
+        reactionGroupId: post.reactionGroupId,
+        commentReactionGroupId: post.commentReactionGroupId
+    };
+}
+
+export function mapPostToViewDto(post: Post): PostViewDto {
     return {
         id: post.id,
         uri: post.uri,
@@ -28,7 +45,6 @@ export function mapPostToDto(post: Post): PostDto {
 
 export function mapReactionToDto(reaction: Reaction): ReactionDto {
     return {
-        id: reaction.id,
         name: reaction.name,
         iconUri: reaction.iconUri,
         count: reaction.count,

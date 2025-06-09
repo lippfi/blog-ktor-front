@@ -2,11 +2,12 @@ import { backendURL } from "@/main.ts";
 import type {
     CommentCreateRequest,
     CommentDto,
-    CommentUpdateRequest,
-    PostDto,
+    CommentUpdateRequest, PostCreateDto,
+    PostViewDto,
     PostEditDto, PostSearchResult,
     SearchPostsParamsDto
 } from "@/api/dto/postServiceDto.ts";
+import {authenticatedRequest} from "@/api/userService.ts";
 
 type Result<T> =
     | { type: 'ok'; data: T }
@@ -14,22 +15,35 @@ type Result<T> =
 
 export interface IPostClient {
     getDiaryPosts(diary: string, page: number): Promise<Result<PostSearchResult>>;
-    getDiaryPreface(diary: string): Promise<Result<PostDto>>;
-    getPost(login: string, uri: string): Promise<Result<PostDto>>;
+    getDiaryPreface(diary: string): Promise<Result<PostViewDto>>;
+    getPost(login: string, uri: string): Promise<Result<PostViewDto>>;
     searchPosts(params: SearchPostsParamsDto): Promise<Result<PostSearchResult>>;
     getLatestPosts(page?: number): Promise<Result<PostSearchResult>>;
     getDiscussedPosts(page?: number, size?: number): Promise<Result<PostSearchResult>>;
     getFollowedPosts(page?: number, size?: number): Promise<Result<PostSearchResult>>;
     getPostForEditing(id: string): Promise<Result<PostEditDto>>;
-    updatePost(post: PostEditDto): Promise<Result<PostDto>>;
+    updatePost(post: PostEditDto): Promise<Result<PostViewDto>>;
     deletePost(postId: string): Promise<Result<string>>;
-    addPost(post: PostDto): Promise<Result<PostDto>>
+    addPost(post: PostViewDto): Promise<Result<PostViewDto>>
     addComment(comment: CommentCreateRequest): Promise<Result<CommentDto>>;
     updateComment(comment: CommentUpdateRequest): Promise<Result<CommentDto>>;
     deleteComment(commentId: string): Promise<Result<string>>;
 }
 
 class PostClientImpl implements IPostClient {
+    private static async optionalAuthenticatedRequest(endpoint: string, options: RequestInit = {}): Promise<Response> {
+        let headers = options.headers;
+        const token = localStorage.getItem('jwt');
+        if (token) {
+            headers = {
+                ...options.headers,
+                'Authorization': `Bearer ${token}`
+            };
+        }
+
+        return fetch(`${backendURL}${endpoint}`, { ...options, headers });
+    }
+
     private static async authenticatedRequest(endpoint: string, options: RequestInit = {}): Promise<Response> {
         const token = localStorage.getItem('jwt');
         if (!token) {
@@ -46,19 +60,7 @@ class PostClientImpl implements IPostClient {
 
     public async getDiaryPosts(diary: string, page: number): Promise<Result<PostSearchResult>> {
         try {
-            const searchRequest: SearchPostsParamsDto = {
-                diary: diary,
-                page: page
-            };
-
-            const response = await fetch(`${backendURL}/posts/search`, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(searchRequest)
-            });
+            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/search?diary=${encodeURIComponent(diary)}&page=${encodeURIComponent(page.toString())}`);
 
             if (response.ok) {
                 const data = await response.json();
@@ -72,7 +74,7 @@ class PostClientImpl implements IPostClient {
         }
     }
 
-    public async getDiaryPreface(diary: string): Promise<Result<PostDto>> {
+    public async getDiaryPreface(diary: string): Promise<Result<PostViewDto>> {
         try {
             const response = await fetch(`${backendURL}/posts/preface?diary=${encodeURIComponent(diary)}`);
             if (response.ok) {
@@ -87,7 +89,7 @@ class PostClientImpl implements IPostClient {
         }
     }
 
-    public async addPost(post: PostDto): Promise<Result<PostDto>> {
+    public async addPost(post: PostCreateDto): Promise<Result<PostViewDto>> {
         try {
             const response = await PostClientImpl.authenticatedRequest('/posts', {
                 method: 'POST',
@@ -109,7 +111,7 @@ class PostClientImpl implements IPostClient {
         }
     }
 
-    public async getPost(login: string, uri: string): Promise<Result<PostDto>> {
+    public async getPost(login: string, uri: string): Promise<Result<PostViewDto>> {
         try {
             const response = await fetch(
                 `${backendURL}/posts?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}`
@@ -211,7 +213,7 @@ class PostClientImpl implements IPostClient {
         }
     }
 
-    public async updatePost(post: PostEditDto): Promise<Result<PostDto>> {
+    public async updatePost(post: PostEditDto): Promise<Result<PostViewDto>> {
         try {
             const response = await PostClientImpl.authenticatedRequest('/posts', {
                 method: 'PUT',

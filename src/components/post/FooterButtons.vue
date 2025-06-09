@@ -10,6 +10,7 @@ import {ChatLineRound, Delete, Edit, More, MoreFilled, Warning} from "@element-p
 import {getCurrentUserLogin} from "@/api/userService.ts";
 import {useI18n} from "vue-i18n";
 import PostClientMock from "@/api/postClient/postClientMock.ts";
+import PostClientImpl from "@/api/postClient/postClient.ts";
 
 const { t } = useI18n()
 
@@ -17,7 +18,7 @@ const router = useRouter();
 
 const emit = defineEmits(['startEdit']);
 
-const postClient = new PostClientMock()
+const postClient = new PostClientImpl()
 
 function startEdit() {
   emit('startEdit', '');
