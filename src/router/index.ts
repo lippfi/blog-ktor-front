@@ -8,6 +8,7 @@ import PostView from "@/views/PostView.vue";
 import DialogsView from "@/views/DialogsView.vue";
 import ProfileView from "@/views/ProfileView.vue";
 import ResetPassword from "@/views/ResetPassword.vue";
+import AvatarComponent from "@/components/AvatarComponent.vue";
 
 export const profileStub = {
   text: "Hi there! Welcome to my webpage.\n" +
@@ -193,6 +194,11 @@ const router = createRouter({
       path: '/login',
       name: 'sign in',
       component: LoginView,
+    },
+    {
+      path: '/avatars',
+      name: 'avatars',
+      component: AvatarComponent,
     },
     {
       path: '/:login/diary',

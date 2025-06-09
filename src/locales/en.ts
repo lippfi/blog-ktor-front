@@ -474,5 +474,19 @@ export default {
         latest: 'Latest',
         popular: 'Popular',
         following: 'Following'
+    },
+    avatars: {
+        noAvatarsAvailable: 'No avatars available',
+        loading: 'Loading avatars...',
+        save: 'Save',
+        cancel: 'Cancel',
+        changesSaved: 'Avatar order saved successfully',
+        addAvatar: 'Add avatar',
+        uploadSuccess: 'Avatar(s) uploaded successfully'
+    },
+    errors: {
+        failedToLoadAvatars: 'Failed to load avatars',
+        failedToReorderAvatars: 'Failed to reorder avatars',
+        failedToUploadAvatars: 'Failed to upload avatars'
     }
 }

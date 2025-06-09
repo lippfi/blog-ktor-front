@@ -144,8 +144,8 @@ interface FriendRequestData {
     label: string;
 }
 
-type Result =
-    | { type: 'ok' }
+type Result<T = void> =
+    | { type: 'ok'; data?: T }
     | { type: 'error'; message: string };
 
 type LoginResult = Result;
@@ -347,10 +347,11 @@ export async function getAvatars(): Promise<string[]> {
 }
 
 export async function reorderAvatars(avatarIds: string[]): Promise<Result> {
+    const uuids = avatarIds.map(id => extractUUID(id));
     const response = await authenticatedRequest('/user/reorder-avatars', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(avatarIds)
+        body: JSON.stringify(uuids)
     });
 
     return response.ok 
@@ -358,18 +359,30 @@ export async function reorderAvatars(avatarIds: string[]): Promise<Result> {
         : { type: 'error', message: await response.text() };
 }
 
-export async function addAvatar(file: File): Promise<Result> {
+function extractUUID(url: string): string {
+    const parts = url.split('/');
+    const fileName = parts[parts.length - 1];
+    return fileName.split('.')[0];
+}
+
+export async function addAvatars(files: File[]): Promise<Result<string[]>> {
     const formData = new FormData();
-    formData.append('file', file);
+    for (const file of files) {
+        formData.append('file', file);
+    }
 
     const response = await authenticatedRequest('/user/add-avatar', {
         method: 'POST',
         body: formData
     });
 
-    return response.ok 
-        ? { type: 'ok' }
-        : { type: 'error', message: await response.text() };
+    if (!response.ok) {
+        return { type: 'error', message: await response.text() };
+    }
+
+    // Parse the response to get the URLs of the uploaded avatars
+    const uploadedUrls: string[] = await response.json();
+    return { type: 'ok', data: uploadedUrls };
 }
 
 export async function deleteAvatar(uri: string): Promise<Result> {
