@@ -24,7 +24,7 @@
         </el-select>
       </el-form-item>
       <el-form-item prop="language">
-        <el-select :placeholder="t('additionalInfo.form.fields.language.label')" v-model="additionalInfoForm.language">
+        <el-select :placeholder="t('additionalInfo.form.fields.language.label')" v-model="additionalInfoForm.language" @change="handleLocaleChange">
           <el-option :label="t('additionalInfo.form.fields.language.kk')" value="KK" />
           <el-option :label="t('additionalInfo.form.fields.language.kk_cyrillic')" value="KK_CYRILLIC" />
           <el-option :label="t('additionalInfo.form.fields.language.en')" value="EN" />
@@ -69,19 +69,23 @@ import {
   type NSFWPolicy,
   type Language,
   type UserAdditionalInfo,
-  updateCurrentSessionInfo
+  updateCurrentSessionInfo,
 } from "@/api/userService.ts";
 import { updateAdditionalInfo } from "@/api/userService.ts";
 import router from "@/router";
 import {useI18n} from "vue-i18n";
 
-const { t } = useI18n()
+const { locale, t } = useI18n()
 
 onMounted(() => {
   document.title = t('additionalInfo.title');
 })
 
 const error = ref<string>('');
+
+const handleLocaleChange = (value: string) => {
+  locale.value = value
+}
 
 interface AdditionalInfoForm {
   birthday: Date,

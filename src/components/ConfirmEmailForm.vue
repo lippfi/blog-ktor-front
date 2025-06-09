@@ -24,7 +24,7 @@ const submitForm = (form: FormInstance | undefined) => {
   if (!form) return
   form.validate(async (valid) => {
     if (valid) {
-      let registrationResult = await confirmEmail(confirmationForm.code)
+      let registrationResult = await confirmEmail(confirmationForm.code.trim())
       if (registrationResult.type === 'ok') {
         localStorage.setItem('jwt', registrationResult.jwt)
         await updateCurrentSessionInfo()

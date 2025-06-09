@@ -95,6 +95,44 @@ export default {
             exceptions: {
                 invalid_credentials: 'Invalid credentials',
             },
+            forgot_password: {
+                label: 'forgot password',
+            }
+        },
+    },
+    reset: {
+        title: 'Reset password',
+        form: {
+            header: 'Reset password',
+            fields: {
+                identifier: {
+                    label: 'email or login',
+                },
+                code: {
+                    label: 'confirmation code',
+                },
+                password: {
+                    label: 'password',
+                },
+                password_confirmation: {
+                    label: 'password confirmation',
+                },
+            },
+            description: {
+                line1: 'Confirmation code has been sent to your email.',
+            },
+            errors: {
+                field_required: 'Field is required',
+                password_required: 'Password is required',
+                password_confirmation_required: 'Password confirmation is required',
+                passwords_mismatch: 'Passwords mismatch',
+            },
+            button: {
+                label: 'next',
+            },
+            button2: {
+                label: 'confirm',
+            },
         },
     },
     additionalInfo: {

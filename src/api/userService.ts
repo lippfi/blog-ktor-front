@@ -1,4 +1,5 @@
 import { backendURL } from "@/main";
+import {useI18n} from "vue-i18n";
 
 // Common types
 export type Language = 'EN' | 'RU' | 'KK' | 'KK_CYRILLIC';
@@ -174,12 +175,12 @@ export async function signIn(login: string, password: string): Promise<LoginResu
     if (response.ok) {
         const token = await response.text();
         localStorage.setItem('jwt', token);
+        await getCurrentSessionInfo()
         result = { type: 'ok' };
     } else {
         const text = await response.text();
         result = { type: 'error', message: text };
     }
-    await getCurrentSessionInfo()
     return result;
 }
 
@@ -308,10 +309,10 @@ export async function updateAdditionalInfo(info: UserAdditionalInfo): Promise<Re
 }
 
 export async function sendPasswordResetEmail(userIdentifier: string): Promise<Result> {
-    const response = await authenticatedRequest('/user/send-password-reset-email', {
+    const response = await fetch(`${backendURL}/user/send-password-reset-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userIdentifier)
+        body: userIdentifier
     });
 
     return response.ok 
@@ -320,10 +321,10 @@ export async function sendPasswordResetEmail(userIdentifier: string): Promise<Re
 }
 
 export async function resetPassword(code: string, newPassword: string): Promise<Result> {
-    const response = await authenticatedRequest(`/user/reset-password?code=${encodeURIComponent(code)}`, {
+    const response = await fetch(`${backendURL}/user/reset-password?code=${encodeURIComponent(code)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newPassword)
+        body: newPassword
     });
 
     return response.ok 

@@ -16,8 +16,9 @@
         <el-alert v-if="error" type="error" :closable="false" style="margin: -10px 0 10px 0; width: 100%">
           {{ error }}
         </el-alert>
-      <div style="text-align: center;">
+      <div style="text-align: center; display: flex; justify-content: space-around">
         <el-button type="primary" round @click="submitForm(loginFormRef)">{{ $t('login.form.button.label') }}</el-button>
+        <el-link @click="router.push('/reset-password')">{{ t('login.form.forgot_password.label') }}</el-link>
       </div>
     </div>
     <div/>
@@ -28,12 +29,12 @@
 <script lang="ts" setup>
 import {computed, onMounted, reactive, ref} from 'vue'
 import type {FormInstance, FormRules} from "element-plus";
-import {isEmailBusy, isLoginBusy, isNicknameBusy, signIn, signUp} from "@/api/userService.ts";
+import {getCurrentSessionInfo, isEmailBusy, isLoginBusy, isNicknameBusy, signIn, signUp} from "@/api/userService.ts";
 import router from "@/router";
 import {useI18n} from "vue-i18n";
 import LanguageChooser from '@/components/LanguageChooser.vue';
 
-const { t } = useI18n()
+const { locale, t } = useI18n()
 
 onMounted(() => {
   document.title = t('login.title');
@@ -56,12 +57,18 @@ const rules = computed<FormRules<LoginForm>>(() => ({
   password: [{ required: true, message: t('login.form.errors.password_required'), trigger: 'blur'}],
 }))
 
+const handleLocaleChange = (value: string) => {
+  locale.value = value
+}
+
 const submitForm = (form: FormInstance | undefined) => {
   if (!form) return
   form.validate(async (valid) => {
     if (valid) {
       let loginResult = await signIn(loginForm.login, loginForm.password)
       if (loginResult.type === 'ok') {
+        const sessionInfo = await getCurrentSessionInfo()
+        handleLocaleChange(sessionInfo.language)
         await router.push({name: 'diary', params: {login: loginForm.login}})
       } else {
         error.value = loginResult.message

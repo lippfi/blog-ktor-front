@@ -7,6 +7,7 @@ import type {Comment, Post, Reaction} from "@/models/posts/post.ts";
 import PostView from "@/views/PostView.vue";
 import DialogsView from "@/views/DialogsView.vue";
 import ProfileView from "@/views/ProfileView.vue";
+import ResetPassword from "@/views/ResetPassword.vue";
 
 export const profileStub = {
   text: "Hi there! Welcome to my webpage.\n" +
@@ -182,6 +183,11 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: RegistrationView,
+    },
+    {
+      path: '/reset-password',
+      name: 'password reset',
+      component: ResetPassword,
     },
     {
       path: '/login',
