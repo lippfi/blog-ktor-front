@@ -29,15 +29,20 @@
 <script lang="ts" setup>
 import {computed, onMounted, reactive, ref} from 'vue'
 import type {FormInstance, FormRules} from "element-plus";
-import {getCurrentSessionInfo, isEmailBusy, isLoginBusy, isNicknameBusy, signIn, signUp} from "@/api/userService.ts";
+import {getCurrentSessionInfo, isEmailBusy, isLoginBusy, isNicknameBusy, signIn, signUp, isSignedIn, getCurrentUserLogin} from "@/api/userService.ts";
 import router from "@/router";
 import {useI18n} from "vue-i18n";
 import LanguageChooser from '@/components/LanguageChooser.vue';
 
 const { locale, t } = useI18n()
 
-onMounted(() => {
+onMounted(async () => {
   document.title = t('login.title');
+
+  if (isSignedIn()) {
+    const login = getCurrentUserLogin();
+    await router.push({name: 'diary', params: {login}});
+  }
 })
 
 const error = ref<string>('');

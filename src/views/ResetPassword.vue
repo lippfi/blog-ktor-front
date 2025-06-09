@@ -2,7 +2,14 @@
 import {computed, onMounted, reactive, ref} from "vue";
 import type {FormInstance, FormRules} from "element-plus";
 import {useI18n} from "vue-i18n";
-import {getCurrentSessionInfo, resetPassword, sendPasswordResetEmail, signIn} from "@/api/userService.ts";
+import {
+  getCurrentSessionInfo,
+  getCurrentUserLogin,
+  isSignedIn,
+  resetPassword,
+  sendPasswordResetEmail,
+  signIn
+} from "@/api/userService.ts";
 import router from "@/router";
 
 const { locale, t } = useI18n()
@@ -10,8 +17,13 @@ const { locale, t } = useI18n()
 const step = ref(0);
 const error = ref('');
 
-onMounted(() => {
+onMounted(async () => {
   document.title = t('reset.title');
+
+  if (isSignedIn()) {
+    const login = getCurrentUserLogin();
+    await router.push({name: 'diary', params: {login}});
+  }
 })
 
 interface ResetForm {

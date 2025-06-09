@@ -6,15 +6,20 @@ import AdditionalInfoForm from "@/components/AdditionalInfoForm.vue";
 import DiaryInfoForm from "@/components/DiaryInfoForm.vue";
 import LanguageChooser from '@/components/LanguageChooser.vue';
 import ConfirmEmailForm from "@/components/ConfirmEmailForm.vue";
-import {logOut} from "@/api/userService.ts";
+import {getCurrentUserLogin, isSignedIn, logOut} from "@/api/userService.ts";
 import {useRouter} from "vue-router";
 import {getDefaultAccessGroups} from "@/api/accessGroupService.ts";
 
 const { t } = useI18n();
 const router = useRouter();
 
-onMounted(() => {
+onMounted(async () => {
   document.title = t('registration.title');
+
+  if (isSignedIn()) {
+    const login = getCurrentUserLogin();
+    await router.push({name: 'diary', params: {login}});
+  }
 });
 
 const step = ref(0);

@@ -12,7 +12,7 @@ import {
 import {ref} from 'vue'
 import {useI18n} from "vue-i18n";
 import {useRouter} from 'vue-router';
-import {getCurrentUserLogin} from "@/api/userService.ts";
+import {getCurrentUserLogin, logOut} from "@/api/userService.ts";
 
 const { t } = useI18n()
 const router = useRouter()
@@ -27,6 +27,11 @@ const currentUser = getCurrentUserLogin()
 const navigateTo = (path: string) => {
   router.push(path)
   isVisible.value = false
+}
+
+function signOut() {
+  logOut()
+  router.push('/login')
 }
 </script>
 
@@ -78,7 +83,7 @@ const navigateTo = (path: string) => {
         </el-icon>
         {{ t('menu.designOff') }}
       </div>
-      <div class="menu-item">
+      <div class="menu-item" @click="signOut">
         <el-icon size="20">
           <SwitchButton/>
         </el-icon>
