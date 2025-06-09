@@ -144,7 +144,7 @@ async function handleSave() {
 async function createPost() {
   const newPost: Post = {
     authorLogin: getCurrentUserLogin(),
-    authorNickname: getCurrentUserNickname(),
+    authorNickname: await getCurrentUserNickname(),
     avatar: "",
     classes: "",
     commentGroupId: "",

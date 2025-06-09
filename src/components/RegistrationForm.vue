@@ -34,7 +34,7 @@
     {{ error }}
   </el-alert>
   <div style="text-align: center;">
-    <el-button type="primary" round @click="submitForm(registrationFormRef)">{{ $t('registration.form.button.label')}}</el-button>
+    <el-button type="primary" round :loading="loading" @click="submitForm(registrationFormRef)">{{ $t('registration.form.button.label')}}</el-button>
   </div>
 </template>
 
@@ -53,6 +53,7 @@ onMounted(() => {
 })
 
 const error = ref<string>('');
+const loading = ref<boolean>(false);
 
 interface RegistrationForm {
   login: string,
@@ -148,11 +149,16 @@ const submitForm = (form: FormInstance | undefined) => {
   if (!form) return
   form.validate(async (valid) => {
     if (valid) {
-      let registrationResult = await signUp(registrationForm.login, registrationForm.nickname, registrationForm.email, registrationForm.password, registrationForm.inviteCode, currentLocale.value)
-      if (registrationResult.type === 'ok') {
-        emit('registration-success');
-      } else {
-        error.value = registrationResult.message
+      loading.value = true
+      try {
+        let registrationResult = await signUp(registrationForm.login, registrationForm.nickname, registrationForm.email, registrationForm.password, registrationForm.inviteCode, currentLocale.value)
+        if (registrationResult.type === 'ok') {
+          emit('registration-success');
+        } else {
+          error.value = registrationResult.message
+        }
+      } finally {
+        loading.value = false
       }
     }
   })

@@ -30,7 +30,7 @@ function handleReactionRemove(reactionToRemove: ReactionModel) {
   }
 }
 
-function handleReactionSelect(reaction: BasicReactionResponse) {
+async function handleReactionSelect(reaction: BasicReactionResponse) {
   // Check if reaction already exists
   const existingReaction = localReactions.value.find(r => r.name === reaction.name)
 
@@ -42,7 +42,7 @@ function handleReactionSelect(reaction: BasicReactionResponse) {
 
     // Update existing reaction
     existingReaction.userReacted = true
-    existingReaction.userNicknames.push(getCurrentUserNickname())
+    existingReaction.userNicknames.push(await getCurrentUserNickname())
     existingReaction.count++
 
     // Send request in background
@@ -71,10 +71,10 @@ function handleReactionSelect(reaction: BasicReactionResponse) {
   // Create new reaction if it doesn't exist
   const newReaction: ReactionModel = {
     name: reaction.name,
-    iconUri: reaction.iconUrl,
+    iconUri: reaction.iconUri,
     count: 1,
     anonymousCount: 0,
-    userNicknames: [getCurrentUserNickname()],
+    userNicknames: [await getCurrentUserNickname()],
     userReacted: true,
   }
 
@@ -85,12 +85,12 @@ function handleReactionSelect(reaction: BasicReactionResponse) {
       if (!props.postLogin || !props.postUri) {
         throw new Error('Post login and URI are required for post reactions')
       }
-      addPostReaction(props.postLogin, props.postUri, newReaction.id)
+      addPostReaction(props.postLogin, props.postUri, newReaction.name)
     } else {
       if (!props.commentId) {
         throw new Error('Comment ID is required for comment reactions')
       }
-      addCommentReaction(props.commentId, newReaction.id)
+      addCommentReaction(props.commentId, newReaction.name)
     }
   } catch (error) {
     console.error('Error sending reaction update:', error)

@@ -50,7 +50,14 @@
 <script setup lang="ts">
 import {onMounted, reactive, ref} from 'vue'
 import type {FormInstance, FormRules} from "element-plus";
-import {getCurrentUserLogin, isEmailBusy, isLoginBusy, isNicknameBusy, signUp} from "@/api/userService.ts";
+import {
+  getCurrentUserLogin,
+  isEmailBusy,
+  isLoginBusy,
+  isNicknameBusy,
+  signUp,
+  updateCurrentSessionInfo
+} from "@/api/userService.ts";
 import router from "@/router";
 import {useI18n} from "vue-i18n";
 import {getDefaultAccessGroups} from "@/api/accessGroupService.ts";
@@ -87,9 +94,10 @@ const submitForm = (form: FormInstance | undefined) => {
     if (valid) {
       const accessGroups = await getDefaultAccessGroups()
       if (accessGroups.type === 'ok') {
-        const read = accessGroups.data.get(diaryInfoForm.read)!!
-        const comment = accessGroups.data.get(diaryInfoForm.comment)!!
-        const react = accessGroups.data.get(diaryInfoForm.react)!!
+        const dictionary = accessGroups.data.content
+        const read = dictionary[diaryInfoForm.read]!!
+        const comment = dictionary[diaryInfoForm.comment]!!
+        const react = dictionary[diaryInfoForm.react]!!
         const diaryInfo = {
           name: diaryInfoForm.name,
           subtitle: diaryInfoForm.description,
@@ -99,6 +107,7 @@ const submitForm = (form: FormInstance | undefined) => {
         }
         const diaryInfoUpdate = await updateDiaryInfo(getCurrentUserLogin(), diaryInfo)
         if (diaryInfoUpdate.type === 'ok') {
+          await updateCurrentSessionInfo()
           emit('on-success')
         } else {
           error.value = diaryInfoUpdate.message

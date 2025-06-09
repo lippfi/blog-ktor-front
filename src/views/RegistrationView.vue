@@ -17,7 +17,7 @@ onMounted(() => {
   document.title = t('registration.title');
 });
 
-const step = ref(3);
+const step = ref(0);
 
 const goToNextStep = () => {
   step.value++;
@@ -25,7 +25,7 @@ const goToNextStep = () => {
 
 const finishRegistration = () => {
   logOut()
-  router.push(`/sign-in`);
+  router.push(`/login`);
 }
 
 </script>

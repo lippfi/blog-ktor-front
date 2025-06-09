@@ -64,7 +64,7 @@ const submitForm = (form: FormInstance | undefined) => {
       if (loginResult.type === 'ok') {
         await router.push({name: 'diary', params: {login: loginForm.login}})
       } else {
-        error.value = t('login.form.exceptions.invalid_credentials')
+        error.value = loginResult.message
       }
     }
   })

@@ -1,4 +1,5 @@
 import { backendURL } from "@/main";
+import {authenticatedRequest} from "@/api/userService.ts";
 
 // Types
 export interface DiaryInfo {
@@ -12,24 +13,6 @@ export interface DiaryInfo {
 type Result<T> = 
     | { type: 'ok'; data: T }
     | { type: 'error'; message: string };
-
-// Helper function for authenticated requests
-async function authenticatedRequest(
-    endpoint: string,
-    options: RequestInit = {}
-): Promise<Response> {
-    const token = localStorage.getItem('jwt');
-    if (!token) {
-        throw new Error('No authentication token found');
-    }
-
-    const headers = {
-        ...options.headers,
-        'Authorization': `Bearer ${token}`
-    };
-
-    return fetch(`${backendURL}${endpoint}`, { ...options, headers });
-}
 
 // API Methods
 

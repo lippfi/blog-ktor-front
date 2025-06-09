@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {onMounted, reactive, ref} from 'vue'
 import type {FormInstance} from "element-plus";
-import {confirmEmail} from "@/api/userService.ts";
+import {confirmEmail, updateCurrentSessionInfo} from "@/api/userService.ts";
 import {useI18n} from "vue-i18n";
 
 const { t } = useI18n()
@@ -27,6 +27,7 @@ const submitForm = (form: FormInstance | undefined) => {
       let registrationResult = await confirmEmail(confirmationForm.code)
       if (registrationResult.type === 'ok') {
         localStorage.setItem('jwt', registrationResult.jwt)
+        await updateCurrentSessionInfo()
         emit('confirmation-success');
       } else {
         error.value = registrationResult.message

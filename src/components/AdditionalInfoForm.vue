@@ -64,7 +64,13 @@
 <script setup lang="ts">
 import {computed, onMounted, reactive, ref} from 'vue'
 import type {FormInstance, FormRules} from "element-plus";
-import type { Sex, NSFWPolicy, Language, UserAdditionalInfo } from "@/api/userService.ts";
+import {
+  type Sex,
+  type NSFWPolicy,
+  type Language,
+  type UserAdditionalInfo,
+  updateCurrentSessionInfo
+} from "@/api/userService.ts";
 import { updateAdditionalInfo } from "@/api/userService.ts";
 import router from "@/router";
 import {useI18n} from "vue-i18n";
@@ -132,7 +138,6 @@ const rules = computed<FormRules>(() => ({
 const timezones = ref<string[]>([]);
 
 onMounted(() => {
-  // Populate the timezones array with all valid time zones
   timezones.value = Intl.supportedValuesOf('timeZone');
   additionalInfoForm.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 });
@@ -155,6 +160,7 @@ const submitForm = (form: FormInstance | undefined) => {
 
       let additionalInfoResult = await updateAdditionalInfo(userAdditionalInfo)
       if (additionalInfoResult.type === 'ok') {
+        await updateCurrentSessionInfo()
         emit('on-success');
       } else {
         error.value = additionalInfoResult.message;

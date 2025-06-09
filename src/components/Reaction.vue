@@ -38,7 +38,7 @@ async function toggleReaction() {
   localReaction.value.userReacted = !localReaction.value.userReacted
 
   // Update userNicknames list
-  const userNickname = getCurrentUserNickname()
+  const userNickname = await getCurrentUserNickname()
   const index = localReaction.value.userNicknames.indexOf(userNickname)
   if (localReaction.value.userReacted && index === -1) {
     localReaction.value.userNicknames.push(userNickname)

@@ -196,7 +196,7 @@ const router = createRouter({
       }
     },
     {
-      path: "/:login/diary/:page",
+      path: "/:login/diary/:page?",
       name: "diary",
       component: DiaryView,
       props: true

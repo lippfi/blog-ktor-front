@@ -12,19 +12,62 @@ interface UserSessionInfo {
     nsfw: NSFWPolicy;
 }
 
-function getCurrentSessionInfo(): UserSessionInfo {
-   localStorage.getItem('timeToSessionInfo');
-   // if it is missing, fetch it via authenticatedRequest to /user/session-info
-   // if there were more than 10 minutes since last fetch, update it
+export async function updateCurrentSessionInfo(): Promise<UserSessionInfo> {
+    const response = await authenticatedRequest('/user/session-info');
+
+    if (!response.ok) {
+        throw new Error(await response.text());
+    }
+
+    const sessionInfo: UserSessionInfo = await response.json();
+
+    localStorage.setItem('sessionInfo', JSON.stringify(sessionInfo));
+    localStorage.setItem('timeToSessionInfo', Date.now().toString());
+    return sessionInfo;
 }
 
-export function getCurrentUserLogin() {
-    // TODO
-    return "shimpansky"
+export async function getCurrentSessionInfo(): Promise<UserSessionInfo> {
+    const sessionInfoStr = localStorage.getItem('sessionInfo');
+    const lastFetchTimeStr = localStorage.getItem('timeToSessionInfo');
+
+    // Check if we need to fetch new data
+    const needsFetch = !sessionInfoStr || !lastFetchTimeStr || 
+        (Date.now() - parseInt(lastFetchTimeStr) > 10 * 60 * 1000); // 10 minutes in milliseconds
+
+    if (needsFetch) {
+        try {
+            return updateCurrentSessionInfo()
+        } catch (error) {
+            console.error('Failed to fetch session info:', error);
+
+            // If we have cached data, return it as fallback
+            if (sessionInfoStr) {
+                return JSON.parse(sessionInfoStr);
+            }
+
+            // Otherwise, throw the error
+            throw error;
+        }
+    }
+
+    return JSON.parse(sessionInfoStr!);
 }
-export function getCurrentUserNickname() {
-    // TODO
-    return "детектив шимпански"
+
+export function isSignedIn(): boolean {
+    return !(localStorage.getItem('jwt') === null);
+}
+
+export function clearCurrentSessionInfo(): void {
+    localStorage.removeItem('sessionInfo');
+    localStorage.removeItem('timeToSessionInfo');
+}
+
+export function getCurrentUserLogin(): string {
+    return JSON.parse(localStorage.getItem('sessionInfo')!!).login
+}
+
+export async function getCurrentUserNickname(): Promise<string> {
+    return (await getCurrentSessionInfo()).nickname
 }
 
 interface UserBase {
@@ -102,7 +145,7 @@ type Result =
 
 type LoginResult = Result;
 
-async function authenticatedRequest(
+export async function authenticatedRequest(
     endpoint: string,
     options: RequestInit = {}
 ): Promise<Response> {
@@ -136,6 +179,7 @@ export async function signIn(login: string, password: string): Promise<LoginResu
         const text = await response.text();
         result = { type: 'error', message: text };
     }
+    await getCurrentSessionInfo()
     return result;
 }
 
@@ -230,6 +274,7 @@ export async function isEmailBusy(email: string): Promise<boolean> {
 
 export function logOut(): void {
     localStorage.removeItem('jwt');
+    clearCurrentSessionInfo()
 }
 
 export async function createInviteCode(): Promise<string> {

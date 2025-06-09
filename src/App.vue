@@ -5,14 +5,16 @@
   <!-- Review login -->
   <!-- Review registration -->
   <!-- Store user in session -->
-  <MenuComponent v-if="getCurrentUserLogin()"/>
+  <MenuComponent v-if="isSignedIn() && $route.name !== 'register'"/>
   <router-view/>
 </template>
 
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import {RouterView, useRouter} from 'vue-router'
 import MenuComponent from "@/components/MenuComponent.vue";
-import {getCurrentUserLogin} from "@/api/userService.ts";
+import {getCurrentUserLogin, isSignedIn} from "@/api/userService.ts";
+
+const router = useRouter()
 </script>
 
 <style>
