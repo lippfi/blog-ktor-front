@@ -8,10 +8,10 @@
     </div>
     <div v-if="isLoaded" class="avatars">
       <template v-for="(avatar, index) in avatars" :key="avatar">
-        <input type="radio" name="avatar" :id="String(index)" :value="avatar">
+        <input type="radio" name="avatar" :id="String(index)" :value="avatar" v-model="selectedAvatarModel">
         <label :for="String(index)"><img class="avatar" :src="avatar" alt="avatar"></label>
       </template>
-      <input type="radio" name="avatar" :id="String(avatars.length)" :value="customAvatar">
+      <input type="radio" name="avatar" :id="String(avatars.length)" :value="customAvatar" v-model="selectedAvatarModel">
       <label :for="String(avatars.length)" class="one-time-avatar">
         <div class="avatar">
           <p style="margin: 5px; text-align: center;">One time avatar</p>
@@ -31,6 +31,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import {ArrowDownBold, ArrowLeft, ArrowLeftBold, ArrowRightBold, ArrowUpBold} from "@element-plus/icons-vue";
+import { getAvatars } from "@/api/userService";
 
 interface Props {
   avatarSize: number
@@ -46,6 +47,7 @@ const emit = defineEmits(['update:selectedAvatar'])
 const avatars = ref<string[]>([])
 const isLoaded = ref(false)
 const customAvatar = ref("")
+const selectedAvatarModel = ref<string>("")
 
 const grid_flow = computed(() => props.isVertical ? "row" : "column")
 const height = computed(() => props.isVertical ? (props.showButtons ? "calc(100% - 40px)" : "100%") : props.avatarSize + 5 + "px")
@@ -91,73 +93,44 @@ const scroll_right = () => {
   }
 }
 
-const getSelectedAvatar  = (): string | null => {
-  const selected = document.querySelector('input[name="avatar"]:checked') as HTMLInputElement | null
-  if (selected === null) {
-    if (props.selectedAvatar !== undefined && props.selectedAvatar !== null) {
-      return props.selectedAvatar
-    }
-    if (customAvatar.value !== "") {
-      return customAvatar.value
-    }
-    return null
-  }
-  return selected.value
-}
-
-const selectAvatar = (avatar: string) => {
-  const select = document.querySelector(`input[name="avatar"][value="${avatar}"]`) as HTMLInputElement | null
-  if (select !== null) {
-    select.checked = true
-  }
-}
+// This function is no longer needed as we're using Vue's reactivity system
+// with the selectedAvatarModel ref
 
 const fetchAvatars = async () => {
   try {
-    avatars.value = [
-        'https://beon.vip/uploads_user/21000/20822/0_2668.jpg',
-      'https://beon.vip/uploads_user/21000/20822/0_2668.jpg',
-      'https://beon.vip/uploads_user/21000/20822/0_2668.jpg',
-      'https://beon.vip/uploads_user/21000/20822/0_2668.jpg',
-      'https://beon.vip/uploads_user/21000/20822/0_2668.jpg',
-      'https://beon.vip/uploads_user/21000/20822/0_2668.jpg',
-      'https://beon.vip/uploads_user/21000/20822/0_2668.jpg',
-      'https://beon.vip/uploads_user/21000/20822/0_2668.jpg',
-      'https://beon.vip/uploads_user/21000/20822/0_2668.jpg',
-      'https://beon.vip/uploads_user/21000/20822/0_2668.jpg',
-      'https://beon.vip/uploads_user/21000/20822/0_2668.jpg',
-      'https://beon.vip/uploads_user/21000/20822/0_2668.jpg',
-      'https://beon.vip/uploads_user/21000/20822/0_2668.jpg',
-    ]
+    const response = await getAvatars()
+    avatars.value = response
     isLoaded.value = true
-    // const response = await getAvatars()
-    // avatars.value = response
-    // isLoaded.value = true
-    // if (props.selectedAvatar !== undefined) {
-    //   if (!avatars.value.includes(props.selectedAvatar)) {
-    //     customAvatar.value = props.selectedAvatar
-    //     selectAvatar(props.selectedAvatar)
-    //   }
-    // }
+
+    // If avatars array is not empty
+    if (avatars.value.length > 0) {
+      // If selectedAvatar is undefined or not found in the avatars list
+      if (props.selectedAvatar === undefined || !avatars.value.includes(props.selectedAvatar)) {
+        // Select the first avatar by default
+        selectedAvatarModel.value = avatars.value[0]
+        emit('update:selectedAvatar', avatars.value[0])
+      } else {
+        // If selectedAvatar is defined and found, select it
+        selectedAvatarModel.value = props.selectedAvatar
+      }
+    }
   } catch (error) {
     console.error('Failed to fetch avatars:', error)
   }
 }
 
-const handleAvatarChange = () => {
-  const selectedAvatar = getSelectedAvatar()
-  if (selectedAvatar !== null) {
-    emit('update:selectedAvatar', selectedAvatar)
+// Watch for changes in the selectedAvatarModel
+watch(selectedAvatarModel, (newValue) => {
+  if (newValue) {
+    emit('update:selectedAvatar', newValue)
   }
-}
-
-watch(customAvatar, () => {
-  handleAvatarChange()
 })
 
-const avatarInputs = document.querySelectorAll('input[name="avatar"]')
-avatarInputs.forEach((input) => {
-  input.addEventListener('change', handleAvatarChange)
+// Watch for changes in customAvatar
+watch(customAvatar, () => {
+  if (customAvatar.value) {
+    selectedAvatarModel.value = customAvatar.value
+  }
 })
 
 onMounted(() => {
