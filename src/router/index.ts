@@ -9,6 +9,10 @@ import DialogsView from "@/views/DialogsView.vue";
 import ProfileView from "@/views/ProfileView.vue";
 import ResetPassword from "@/views/ResetPassword.vue";
 import AvatarComponent from "@/components/AvatarComponent.vue";
+import PostClientImpl from "@/api/postClient/postClient.ts";
+import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
+import NProgress from "nprogress";
+import "nprogress/nprogress.css";
 
 export const profileStub = {
   text: "Hi there! Welcome to my webpage.\n" +
@@ -214,11 +218,21 @@ const router = createRouter({
       props: true
     },
     {
-      path: "/post",
+      path: "/:login/post-:postUri",
       name: "post",
       component: PostView,
-      props: {
-        post: stubPost,
+      props: true,
+      beforeEnter: async (to, _, next) => {
+        const postClient = new PostClientImpl();
+        const postDto = await postClient.getPost(to.params.login as string, to.params.postUri as string);
+
+        if (postDto.type === 'ok') {
+          to.meta.post = mapPostDtoToPost(postDto.data);
+          next();
+        } else {
+          to.meta.post = null;
+          next(); // todo redirect if post not found
+        }
       }
     },
     {
@@ -235,4 +249,22 @@ const router = createRouter({
   ],
 })
 
+NProgress.configure({
+  showSpinner: false,          // Disable spinner (just show the bar)
+  trickleSpeed: 100,           // How often it moves (ms)
+  minimum: 0.2,                // Minimum % shown when starting (0.0–1.0)
+  easing: 'ease',              // CSS easing
+  speed: 250,                  // Transition speed of the bar (ms)
+});
+
+router.beforeEach((to, from, next) => {
+  NProgress.start();
+  next();
+});
+
+router.afterEach(() => {
+  NProgress.done();
+});
+
 export default router
+

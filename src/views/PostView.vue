@@ -1,25 +1,32 @@
 <script setup lang="ts">
-import type { Post as PostModel } from "@/models/posts/post.ts";
-import Post from "@/components/post/Post.vue";
+import { useRoute } from "vue-router";
+import {computed, type ComputedRef} from "vue";
+
 import CommentEdit from "@/components/post/CommentEdit.vue";
 import Comment from "@/components/post/Comment.vue";
+import PostComponent from "@/components/post/PostComponent.vue";
+import type {Post} from "@/models/posts/post.ts";
 
 const props = defineProps<{
-  post: PostModel,
+  login: string;
+  postUri: string;
 }>();
+
+const route = useRoute();
+const post: ComputedRef<Post> = computed(() => route.meta.post as Post);
 </script>
 
 <template>
-  <div class="centralized_block">
-    <Post :post="post" :show-editing-buttons="false" :show-comments-count="false"/>
+  <div v-if="post" class="centralized_block">
+    <PostComponent :login="props.login" :post="post" :show-editing-buttons="false" :show-comments-count="false"/>
     <div class="comments_block">
-      <Comment  v-for="comment in post.comments" :key="comment.id"
-                :comment="comment"
-                :post="post"
-                :is-reactable="true"
+      <Comment v-for="comment in post.comments" :key="comment.id"
+               :comment="comment"
+               :post="post"
+               :is-reactable="true"
       />
     </div>
-    <CommentEdit/>
+    <CommentEdit v-if="post.isCommentable"/>
   </div>
 </template>
 
