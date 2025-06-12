@@ -141,7 +141,7 @@ function replaceLinks(text: string): string {
   const pattern = /\[link="(.*?)"\](.*?)\[\/link\]/;
   let match = result.match(pattern);
   while (match !== null) {
-    result = result.replace(match[0], '<a href="' + match[1] + '">' + match[2] + '</a>');
+    result = result.replace(match[0], '<a href="' + match[2] + '">' + match[1] + '</a>');
     match = result.match(pattern);
   }
   return result;
