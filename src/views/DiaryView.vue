@@ -15,6 +15,7 @@ const props = defineProps<{
 }>();
 
 const loggedIn: boolean = isSignedIn();
+const isLoaded = ref(false);
 const posts = ref<PostModel[]>([]);
 
 onMounted(async () => {
@@ -26,6 +27,7 @@ onMounted(async () => {
   if (!props.login) return;
 
   const searchResult = await postsClient.getDiaryPosts(props.login, page - 1);
+  isLoaded.value = true;
   if (searchResult.type === 'ok') {
     posts.value = searchResult.data.content.map((c) => mapPostDtoToPost(c));
   }
@@ -33,7 +35,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="centralized_block">
+  <div v-if="isLoaded" class="centralized_block">
     <Post v-for="post in posts" :post="post" :show-comments-count="true" />
     <PostEdit v-if="loggedIn" :diary-login="props.login"/>
   </div>
