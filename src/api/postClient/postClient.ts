@@ -113,9 +113,7 @@ class PostClientImpl implements IPostClient {
 
     public async getPost(login: string, uri: string): Promise<Result<PostViewDto>> {
         try {
-            const response = await fetch(
-                `${backendURL}/posts?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}`
-            );
+            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
