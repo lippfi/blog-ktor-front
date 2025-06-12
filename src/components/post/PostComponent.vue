@@ -13,7 +13,9 @@
         :nickname="post.authorNickname"
       />
       <div class="post-content">
-        <h1 class="title"> {{ post.title }} </h1>
+        <router-link :to="{name: 'post', params: {'login': login, 'postUri': post.uri}}">
+          <h1 class="title"> {{ post.title }} </h1>
+        </router-link>
         <ProcessedText :text="post.text" />
         <div v-if="post.tags.length > 0" class="tags">
           <div class="tag">
@@ -60,6 +62,7 @@ import FooterButtons from "@/components/post/FooterButtons.vue";
 import ProcessedText from "@/components/post/ProcessedText.vue";
 import PostEdit from "@/components/post/PostEdit.vue";
 import NicknameComponent from "@/components/NicknameComponent.vue";
+import router from "@/router";
 
 let isEditing = ref(false);
 
@@ -76,6 +79,7 @@ const finishEditing = () => {
 };
 
 const props = defineProps<{
+  login: string;
   post: Post,
   showCommentsCount: boolean,
   redirectOnDelete?: string,

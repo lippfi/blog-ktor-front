@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Post from "@/components/post/Post.vue";
+import PostComponent from "@/components/post/PostComponent.vue";
 import PostEdit from "@/components/post/PostEdit.vue";
 import PostClientMock from "@/api/postClient/postClientMock.ts";
 import type { Post as PostModel} from "@/models/posts/post.ts";
@@ -36,7 +36,7 @@ onMounted(async () => {
 
 <template>
   <div v-if="isLoaded" class="centralized_block">
-    <Post v-for="post in posts" :post="post" :show-comments-count="true" />
+    <PostComponent v-for="post in posts" :login="login" :post="post" :show-comments-count="true" />
     <PostEdit v-if="loggedIn" :diary-login="props.login"/>
   </div>
 </template>

@@ -6,7 +6,7 @@
       <el-button type="text" @click="loadPosts('popular')">{{ t('feed.popular') }}</el-button>
       <el-button type="text" @click="loadPosts('following')">{{ t('feed.following') }}</el-button>
     </div>
-    <Post v-for="post in posts" :key="post.id" :post="post" class="post-item" show-comments-count/>
+    <PostComponent v-for="post in posts" :key="post.id" :post="post" class="post-item" show-comments-count/>
     <el-pagination
         v-if="totalPosts > postsPerPage"
         @current-change="handlePageChange"
@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import Post from '@/components/post/Post.vue';
+import PostComponent from '@/components/post/PostComponent.vue';
 import type { Post as PostType } from '@/models/posts/post';
 import PostClientMock from "@/api/postClient/postClientMock.ts";
 import {mapPostDtoToPost} from "@/models/posts/mapper.ts";

@@ -57,7 +57,7 @@ async function toggleReaction() {
   try {
     if (props.type === 'post') {
       if (!props.postLogin || !props.postUri) {
-        throw new Error('Post login and URI are required for post reactions')
+        throw new Error('PostComponent login and URI are required for post reactions')
       }
       if (localReaction.value.userReacted) {
         await addPostReaction(props.postLogin, props.postUri, props.reaction.id)

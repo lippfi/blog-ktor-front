@@ -49,7 +49,7 @@ async function handleReactionSelect(reaction: BasicReactionResponse) {
     try {
       if (props.type === 'post') {
         if (!props.postLogin || !props.postUri) {
-          throw new Error('Post login and URI are required for post reactions')
+          throw new Error('PostComponent login and URI are required for post reactions')
         }
         addPostReaction(props.postLogin, props.postUri, existingReaction.name)
       } else {
@@ -83,7 +83,7 @@ async function handleReactionSelect(reaction: BasicReactionResponse) {
   try {
     if (props.type === 'post') {
       if (!props.postLogin || !props.postUri) {
-        throw new Error('Post login and URI are required for post reactions')
+        throw new Error('PostComponent login and URI are required for post reactions')
       }
       addPostReaction(props.postLogin, props.postUri, newReaction.name)
     } else {
