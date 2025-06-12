@@ -64,11 +64,12 @@ import {getCurrentUserLogin} from "@/api/userService.ts";
 import {mapPostEditToPostEditDto} from "@/api/dto/mapper.ts";
 import PostClientImpl from "@/api/postClient/postClient.ts";
 import type {PostCreateDto} from "@/api/dto/postServiceDto.ts";
-import { getAccessGroups } from "@/api/accessGroupService.ts";
+import {getAccessGroups, getDefaultAccessGroups} from "@/api/accessGroupService.ts";
 
 const { t } = useI18n()
 
 const props = withDefaults(defineProps<{
+  diaryLogin: string;
   tags?: string[];
   content?: string;
   title?: string;
@@ -105,6 +106,13 @@ const accessGroups = ref<Map<string, string>>(new Map())
 
 onMounted(async () => {
   await fetchAccessGroups()
+  const defaultGroupsResponse = await getDefaultAccessGroups(props.diaryLogin);
+  if (defaultGroupsResponse.type === 'ok') {
+    const defaultGroups: Record<string, string> = defaultGroupsResponse.data.content;
+    localReadGroup.value = defaultGroups["read"] ?? ''
+    localCommentGroup.value = defaultGroups["comment"] ?? ''
+    localReactionGroup.value = defaultGroups["react"] ?? ''
+  }
 })
 
 async function fetchAccessGroups() {

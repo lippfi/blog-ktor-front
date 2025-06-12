@@ -60,7 +60,7 @@ import {
 } from "@/api/userService.ts";
 import router from "@/router";
 import {useI18n} from "vue-i18n";
-import {getDefaultAccessGroups} from "@/api/accessGroupService.ts";
+import {getBasicAccessGroups} from "@/api/accessGroupService.ts";
 import {updateDiaryInfo} from "@/api/diaryService.ts";
 
 const { t } = useI18n()
@@ -92,7 +92,7 @@ const submitForm = (form: FormInstance | undefined) => {
   if (!form) return
   form.validate(async (valid) => {
     if (valid) {
-      const accessGroups = await getDefaultAccessGroups()
+      const accessGroups = await getBasicAccessGroups()
       if (accessGroups.type === 'ok') {
         const dictionary = accessGroups.data.content
         const read = dictionary[diaryInfoForm.read]!!

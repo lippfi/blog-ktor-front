@@ -6,12 +6,15 @@ import type { Post as PostModel} from "@/models/posts/post.ts";
 import { mapPostDtoToPost } from "@/models/posts/mapper.ts";
 import { ref, onMounted } from 'vue';
 import PostClientImpl from "@/api/postClient/postClient.ts";
+import {getDefaultAccessGroups} from "@/api/accessGroupService.ts";
+import {getCurrentSessionInfo, getCurrentUserLogin, isSignedIn} from "@/api/userService.ts";
 
 const props = defineProps<{
   login: string;
   page: string;
 }>();
 
+const loggedIn: boolean = isSignedIn();
 const posts = ref<PostModel[]>([]);
 
 onMounted(async () => {
@@ -32,7 +35,7 @@ onMounted(async () => {
 <template>
   <div class="centralized_block">
     <Post v-for="post in posts" :post="post" :show-comments-count="true" />
-    <PostEdit />
+    <PostEdit v-if="loggedIn" :diary-login="props.login"/>
   </div>
 </template>
 

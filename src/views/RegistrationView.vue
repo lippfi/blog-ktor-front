@@ -8,7 +8,7 @@ import LanguageChooser from '@/components/LanguageChooser.vue';
 import ConfirmEmailForm from "@/components/ConfirmEmailForm.vue";
 import {getCurrentUserLogin, isSignedIn, logOut} from "@/api/userService.ts";
 import {useRouter} from "vue-router";
-import {getDefaultAccessGroups} from "@/api/accessGroupService.ts";
+import {getBasicAccessGroups} from "@/api/accessGroupService.ts";
 
 const { t } = useI18n();
 const router = useRouter();

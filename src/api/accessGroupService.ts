@@ -32,14 +32,31 @@ async function authenticatedRequest(
 }
 
 interface AccessGroupsMapResponse {
-    content: Map<string, string>;
+    content: Record<string, string>;
 }
 
 // API Methods
-export async function getDefaultAccessGroups(): Promise<Result<AccessGroupsMapResponse>> {
+export async function getBasicAccessGroups(): Promise<Result<AccessGroupsMapResponse>> {
     try {
         const response = await fetch(
-            `${backendURL}/access-groups/default`
+            `${backendURL}/access-groups/basic`
+        );
+        if (response.ok) {
+            const data = await response.json();
+            return { type: 'ok', data };
+        } else {
+            const message = await response.text();
+            return { type: 'error', message };
+        }
+    } catch (error) {
+        return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+    }
+}
+
+export async function getDefaultAccessGroups(diaryLogin: string): Promise<Result<AccessGroupsMapResponse>> {
+    try {
+        const response = await authenticatedRequest(
+            `/access-groups/default?diary=${encodeURIComponent(diaryLogin)}`
         );
         if (response.ok) {
             const data = await response.json();
