@@ -198,4 +198,8 @@ body {
   color: var(--comment);
   font-size: 14px;
 }
+
+html {
+  scrollbar-gutter: stable;
+}
 </style>
