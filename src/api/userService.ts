@@ -67,8 +67,8 @@ export function clearCurrentSessionInfo(): void {
     localStorage.removeItem('timeToSessionInfo');
 }
 
-export function getCurrentUserLogin(): string {
-    return JSON.parse(localStorage.getItem('sessionInfo')!!).login
+export function getCurrentUserLogin(): string | undefined {
+    return JSON.parse(localStorage.getItem('sessionInfo') || 'null')?.login;
 }
 
 export async function getCurrentUserNickname(): Promise<string> {

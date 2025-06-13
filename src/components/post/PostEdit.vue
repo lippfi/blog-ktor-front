@@ -60,7 +60,7 @@ import {useI18n} from "vue-i18n";
 import SmartTextArea from "@/components/post/SmartTextArea.vue";
 import AvatarChooser from "@/components/post/AvatarChooser.vue";
 import type {PostEdit} from "@/models/posts/post.ts";
-import {getCurrentUserLogin} from "@/api/userService.ts";
+import {getCurrentSessionInfo, getCurrentUserLogin} from "@/api/userService.ts";
 import {mapPostEditToPostEditDto} from "@/api/dto/mapper.ts";
 import PostClientImpl from "@/api/postClient/postClient.ts";
 import type {PostCreateDto} from "@/api/dto/postServiceDto.ts";
@@ -106,9 +106,10 @@ const accessGroups = ref<Map<string, string>>(new Map())
 
 onMounted(async () => {
   await fetchAccessGroups()
-  const defaultGroupsResponse = await getDefaultAccessGroups(props.diaryLogin);
+  const language = (await getCurrentSessionInfo()).language
+  const defaultGroupsResponse = await getDefaultAccessGroups(props.diaryLogin, language);
   if (defaultGroupsResponse.type === 'ok') {
-    const defaultGroups: Record<string, string> = defaultGroupsResponse.data.content;
+    const defaultGroups: Record<string, string> = defaultGroupsResponse.data;
     localReadGroup.value = defaultGroups["read"] ?? ''
     localCommentGroup.value = defaultGroups["comment"] ?? ''
     localReactionGroup.value = defaultGroups["react"] ?? ''
@@ -116,10 +117,11 @@ onMounted(async () => {
 })
 
 async function fetchAccessGroups() {
-  const userLogin = getCurrentUserLogin()
-  const result = await getAccessGroups(userLogin)
+  const userLogin = getCurrentUserLogin()!!
+  const language = (await getCurrentSessionInfo()).language
+  const result = await getAccessGroups(userLogin, language)
   if (result.type === 'ok') {
-    accessGroups.value = new Map(Object.entries(result.data.content))
+    accessGroups.value = new Map(Object.entries(result.data))
 
     // Set default values if not already set
     if (!props.readGroup && accessGroups.value.size > 0) {

@@ -52,10 +52,6 @@ import {onMounted, reactive, ref} from 'vue'
 import type {FormInstance, FormRules} from "element-plus";
 import {
   getCurrentUserLogin,
-  isEmailBusy,
-  isLoginBusy,
-  isNicknameBusy,
-  signUp,
   updateCurrentSessionInfo
 } from "@/api/userService.ts";
 import router from "@/router";
@@ -92,9 +88,9 @@ const submitForm = (form: FormInstance | undefined) => {
   if (!form) return
   form.validate(async (valid) => {
     if (valid) {
-      const accessGroups = await getBasicAccessGroups()
+      const accessGroups = await getBasicAccessGroups("EN")
       if (accessGroups.type === 'ok') {
-        const dictionary = accessGroups.data.content
+        const dictionary = accessGroups.data
         const read = dictionary[diaryInfoForm.read]!!
         const comment = dictionary[diaryInfoForm.comment]!!
         const react = dictionary[diaryInfoForm.react]!!
@@ -105,7 +101,7 @@ const submitForm = (form: FormInstance | undefined) => {
           defaultCommentGroup: comment,
           defaultReactGroup: react,
         }
-        const diaryInfoUpdate = await updateDiaryInfo(getCurrentUserLogin(), diaryInfo)
+        const diaryInfoUpdate = await updateDiaryInfo(getCurrentUserLogin()!!, diaryInfo)
         if (diaryInfoUpdate.type === 'ok') {
           await updateCurrentSessionInfo()
           emit('on-success')

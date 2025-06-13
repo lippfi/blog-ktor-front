@@ -1,4 +1,5 @@
 import { backendURL } from "@/main";
+import type {Language} from "@/api/userService.ts";
 
 // Types
 export type AccessGroupType = 'EVERYONE' | 'REGISTERED_USERS' | 'PRIVATE' | 'CUSTOM';
@@ -36,14 +37,20 @@ interface AccessGroupsMapResponse {
 }
 
 // API Methods
-export async function getBasicAccessGroups(): Promise<Result<AccessGroupsMapResponse>> {
+export async function getBasicAccessGroups(language: Language): Promise<Result<Record<string, string>>> {
     try {
         const response = await fetch(
             `${backendURL}/access-groups/basic`
         );
         if (response.ok) {
-            const data = await response.json();
-            return { type: 'ok', data };
+            const data = (await response.json() as AccessGroupsMapResponse).content;
+            const dataLocalized: Record<string, string> = {};
+
+            for (const [key, value] of Object.entries(data)) {
+                dataLocalized[localizeGroupName(key, language)] = value;
+            }
+
+            return { type: 'ok', data: dataLocalized };
         } else {
             const message = await response.text();
             return { type: 'error', message };
@@ -53,14 +60,20 @@ export async function getBasicAccessGroups(): Promise<Result<AccessGroupsMapResp
     }
 }
 
-export async function getDefaultAccessGroups(diaryLogin: string): Promise<Result<AccessGroupsMapResponse>> {
+export async function getDefaultAccessGroups(diaryLogin: string, language: Language): Promise<Result<Record<string, string>>> {
     try {
         const response = await authenticatedRequest(
             `/access-groups/default?diary=${encodeURIComponent(diaryLogin)}`
         );
         if (response.ok) {
-            const data = await response.json();
-            return { type: 'ok', data };
+            const data = (await response.json() as AccessGroupsMapResponse).content;
+            const dataLocalized: Record<string, string> = {};
+
+            for (const [key, value] of Object.entries(data)) {
+                dataLocalized[localizeGroupName(key, language)] = value;
+            }
+
+            return { type: 'ok', data: dataLocalized };
         } else {
             const message = await response.text();
             return { type: 'error', message };
@@ -70,20 +83,50 @@ export async function getDefaultAccessGroups(diaryLogin: string): Promise<Result
     }
 }
 
-export async function getAccessGroups(diary: string): Promise<Result<AccessGroupsMapResponse>> {
+export async function getAccessGroups(diary: string, language: Language): Promise<Result<Record<string, string>>> {
     try {
         const response = await authenticatedRequest(
             `/access-groups?diary=${encodeURIComponent(diary)}`
         );
         if (response.ok) {
-            const data = await response.json();
-            return { type: 'ok', data };
+            const data = (await response.json() as AccessGroupsMapResponse).content;
+            const dataLocalized: Record<string, string> = {};
+
+            for (const [key, value] of Object.entries(data)) {
+                dataLocalized[localizeGroupName(key, language)] = value;
+            }
+
+            return { type: 'ok', data: dataLocalized };
         } else {
             const message = await response.text();
             return { type: 'error', message };
         }
     } catch (error) {
         return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+    }
+}
+
+function localizeGroupName(name: string, language: Language): string {
+    if (language === "EN") {
+        return name;
+    } else if (language === "KK") {
+        return name // todo
+    } else if (language === "KK_CYRILLIC") {
+        return name // todo
+    } else if (language === "RU") {
+        if (name === "everyone") {
+            return "все"
+        } else if (name === "registered") {
+            return "пользователи"
+        } else if (name === "friends") {
+            return "друзья"
+        } else if (name === "private") {
+            return "только я"
+        } else {
+            return name
+        }
+    } else {
+        return name;
     }
 }
 
