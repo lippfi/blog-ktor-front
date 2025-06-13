@@ -67,7 +67,7 @@ import type {PostCreateDto} from "@/api/dto/postServiceDto.ts";
 import {getAccessGroups, getDefaultAccessGroups} from "@/api/accessGroupService.ts";
 import router from "@/router";
 
-const { t } = useI18n()
+const {t } = useI18n()
 
 const props = withDefaults(defineProps<{
   diaryLogin: string;
@@ -158,7 +158,7 @@ async function createPost() {
   const newPost: PostCreateDto = {
     uri: '',
     avatar: localAvatar.value || '',
-    title: localTitle.value,
+    title: preprocessPostTitle(localTitle.value),
     text: localContent.value,
     isPreface: false,
     isEncrypted: false,
@@ -194,7 +194,7 @@ async function updatePost() {
     tags: localTags.value || [],
     classes: localClasses.value || "",
     text: localContent.value || "",
-    title: localTitle.value || "",
+    title: preprocessPostTitle(localTitle.value || ""),
     uri: ""
   }
 
@@ -204,6 +204,13 @@ async function updatePost() {
   } else {
     console.log("update error")
   }
+}
+
+function preprocessPostTitle(title: string): string {
+  if (!title || title.length === 0) {
+    return t('post.form.fields.title.defaultValue')
+  }
+  return title
 }
 
 </script>

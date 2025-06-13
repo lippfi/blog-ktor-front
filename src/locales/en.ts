@@ -278,6 +278,7 @@ export default {
             fields: {
                 title: {
                     label: 'Title:',
+                    defaultValue: 'Unnamed',
                 },
                 textarea: {
                     buttons: {
