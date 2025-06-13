@@ -714,10 +714,12 @@ function hideCompletionDropdown() {
 }
 
 function handleKeyDown(event: KeyboardEvent) {
-  // Only handle keys when there are no options
-  if (options.value.length === 0) {
+  const mentionDropdown = document.querySelector('.el-mention-dropdown__list')
+
+  // Only handle keys when there are no options shown (either empty options or dropdown not visible)
+  if (options.value.length === 0 || !mentionDropdown) {
     // Handle Enter and arrow keys
-    if (event.key === 'Enter' || 
+    if (event.key === 'Enter' ||
         event.key === 'ArrowUp' || 
         event.key === 'ArrowDown') {
       // Stop el-mention from handling the event
