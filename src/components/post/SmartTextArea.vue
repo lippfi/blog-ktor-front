@@ -813,83 +813,83 @@ const handleMentionSelect = (option: MentionOption) => {
   <div class="textarea">
     <div class="text-buttons">
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.bold.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapSelectedText('[b]', '[/b]')" class="format-btn">B</el-button>
+        <el-button @click="wrapSelectedText('[b]', '[/b]')" class="format-btn" tabindex="-1">B</el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.italic.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapSelectedText('[i]', '[/i]')" class="format-btn">I</el-button>
+        <el-button @click="wrapSelectedText('[i]', '[/i]')" class="format-btn" tabindex="-1">I</el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.underline.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapSelectedText('[u]', '[/u]')" class="format-btn">U</el-button>
+        <el-button @click="wrapSelectedText('[u]', '[/u]')" class="format-btn" tabindex="-1">U</el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.strikethrough.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapSelectedText('[s]', '[/s]')" class="format-btn">S</el-button>
+        <el-button @click="wrapSelectedText('[s]', '[/s]')" class="format-btn" tabindex="-1">S</el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.expandable.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapWithExpandable" class="format-btn">⤵</el-button>
+        <el-button @click="wrapWithExpandable" class="format-btn" tabindex="-1">⤵</el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.quote.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapSelectedTextFromPage('[quote]', '[/quote]')" class="format-btn">‟</el-button>
+        <el-button @click="wrapSelectedTextFromPage('[quote]', '[/quote]')" class="format-btn" tabindex="-1">‟</el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.link.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapWithLink" class="format-btn">
+        <el-button @click="wrapWithLink" class="format-btn" tabindex="-1">
           <el-icon size="18">
             <Link/>
           </el-icon>
         </el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.image.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapWithImage" class="format-btn">
+        <el-button @click="wrapWithImage" class="format-btn" tabindex="-1">
           <el-icon size="18">
             <Picture/>
           </el-icon>
         </el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.slider.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapWithSlider" class="format-btn">
+        <el-button @click="wrapWithSlider" class="format-btn" tabindex="-1">
           <el-icon size="18">
             <DataBoard/>
           </el-icon>
         </el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.left.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapSelectedText('[l]', '[/l]')" class="format-btn">
+        <el-button @click="wrapSelectedText('[l]', '[/l]')" class="format-btn" tabindex="-1">
           <el-icon size="18">
             <img src="../../assets/icons/left.svg" alt="left" style="width: 20px; height: 20px;"/>
           </el-icon>
         </el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.center.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapSelectedText('[c]', '[/c]')" class="format-btn">
+        <el-button @click="wrapSelectedText('[c]', '[/c]')" class="format-btn" tabindex="-1">
           <el-icon size="18">
             <img src="../../assets/icons/center.svg" alt="center" style="width: 20px; height: 20px;"/>
           </el-icon>
         </el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.right.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapSelectedText('[r]', '[/r]')" class="format-btn">
+        <el-button @click="wrapSelectedText('[r]', '[/r]')" class="format-btn" tabindex="-1">
           <el-icon size="18">
             <img src="../../assets/icons/right.svg" alt="right" style="width: 20px; height: 20px;"/>
           </el-icon>
         </el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.bigger.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapSelectedText('[+]', '[/+]')" class="format-btn">A+</el-button>
+        <el-button @click="wrapSelectedText('[+]', '[/+]')" class="format-btn" tabindex="-1">A+</el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.smaller.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapSelectedText('[-]', '[/-]')" class="format-btn">A-</el-button>
+        <el-button @click="wrapSelectedText('[-]', '[/-]')" class="format-btn" tabindex="-1">A-</el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.gothic.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapSelectedText('[g]', '[/g]')" class="format-btn"><span class="gothic">G</span></el-button>
+        <el-button @click="wrapSelectedText('[g]', '[/g]')" class="format-btn" tabindex="-1"><span class="gothic">G</span></el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.code.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapWithCode" class="format-btn">
+        <el-button @click="wrapWithCode" class="format-btn" tabindex="-1">
           <el-icon size="18">
             <Tickets/>
           </el-icon>
         </el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.css.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapWithClasses" class="format-btn">CSS</el-button>
+        <el-button @click="wrapWithClasses" class="format-btn" tabindex="-1">CSS</el-button>
       </el-tooltip>
     </div>
     <el-mention
@@ -935,7 +935,7 @@ const handleMentionSelect = (option: MentionOption) => {
           </div>
         </template>
         <template #reference>
-          <el-button @focus="focusTextarea" class="format-btn">
+          <el-button @focus="focusTextarea" class="format-btn" tabindex="-1">
             <span style="font-size: 20px; margin-top: -2px;">
               @
             </span>
@@ -949,7 +949,7 @@ const handleMentionSelect = (option: MentionOption) => {
           v-model:visible="isReactionPopoverVisible"
       >
         <template #reference>
-          <el-button @click="focusTextarea" @focus="focusTextarea" class="format-btn">
+          <el-button @click="focusTextarea" @focus="focusTextarea" class="format-btn" tabindex="-1">
             <el-icon size="20">
               <svg fill="currentColor" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                    viewBox="0 0 330 330" xml:space="preserve">
