@@ -1,32 +1,13 @@
-<script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
-import PostComponent from '@/components/post/PostComponent.vue';
-import PostClientImpl from '@/api/postClient/postClient';
+<script lang="ts">
+import type { RouteLocationNormalized } from 'vue-router';
 import type { SearchPostsParamsDto } from '@/api/dto/postServiceDto';
-import type { Post } from '@/models/posts/post';
-import { mapPostDtoToPost } from '@/models/posts/mapper';
 
-const route = useRoute();
-const postClient = new PostClientImpl();
-const posts = ref<Post[]>([]);
-const loading = ref(false);
-const error = ref<string | null>(null);
-const currentPage = ref(0);
-const totalPages = ref(0);
-const login = ref('');
-
-const fetchPosts = async () => {
-  loading.value = true;
-  error.value = null;
-
-  // Extract query parameters
+export const extractSearchParams = (route: RouteLocationNormalized): SearchPostsParamsDto => {
   const params: SearchPostsParamsDto = {};
 
   // Get diary from route params
   if (route.params.diary) {
     params.diary = route.params.diary as string;
-    login.value = params.diary;
   }
 
   // Get other search parameters from query
@@ -47,6 +28,39 @@ const fetchPosts = async () => {
   if (route.query.to) params.to = route.query.to as string;
   if (route.query.page) params.page = parseInt(route.query.page as string);
 
+  return params;
+};
+</script>
+
+<script setup lang="ts">
+import { ref, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import PostComponent from '@/components/post/PostComponent.vue';
+import PostClientImpl from '@/api/postClient/postClient';
+import type { Post } from '@/models/posts/post';
+import { mapPostDtoToPost } from '@/models/posts/mapper';
+
+const route = useRoute();
+const postClient = new PostClientImpl();
+const posts = ref<Post[]>([]);
+const loading = ref(false);
+const error = ref<string | null>(null);
+const currentPage = ref(0);
+const totalPages = ref(0);
+const login = ref('');
+
+const fetchPosts = async () => {
+  loading.value = true;
+  error.value = null;
+
+  // Extract search parameters from the route
+  const params = extractSearchParams(route);
+
+  // Set login from diary parameter
+  if (params.diary) {
+    login.value = params.diary;
+  }
+
   try {
     const result = await postClient.searchPosts(params);
     if (result.type === 'ok') {
@@ -63,8 +77,29 @@ const fetchPosts = async () => {
   }
 };
 
-// Fetch posts when component is mounted
-onMounted(fetchPosts);
+// Check for pre-fetched data when component is mounted
+onMounted(() => {
+  // If we have pre-fetched data in route.meta, use it
+  const meta = route.meta as any;
+  if (meta.posts) {
+    posts.value = meta.posts as Post[];
+    currentPage.value = meta.currentPage as number;
+    totalPages.value = meta.totalPages as number;
+
+    // Set login from route params
+    if (route.params.diary) {
+      login.value = route.params.diary as string;
+    }
+
+    // Check for error
+    if (meta.error) {
+      error.value = meta.error as string;
+    }
+  } else {
+    // Otherwise fetch the data
+    fetchPosts();
+  }
+});
 
 // Re-fetch posts when route changes
 watch(() => route.query, fetchPosts, { deep: true });
@@ -93,16 +128,6 @@ watch(() => route.params, fetchPosts, { deep: true });
   width: 100%;
   box-sizing: border-box;
   margin: 0 auto;
-}
-
-.loading, .error, .no-results {
-  text-align: center;
-  padding: 2rem;
-  color: var(--text-color);
-}
-
-.error {
-  color: var(--error-color, #ff5252);
 }
 
 .posts-container {

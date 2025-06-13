@@ -13,7 +13,8 @@ import PostClientImpl from "@/api/postClient/postClient.ts";
 import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
-import DiarySearchView from "@/views/DiarySearchView.vue";
+import DiarySearchView, { extractSearchParams } from "@/views/DiarySearchView.vue";
+import type {SearchPostsParamsDto} from "@/api/dto/postServiceDto.ts";
 
 export const profileStub = {
   text: "Hi there! Welcome to my webpage.\n" +
@@ -222,7 +223,22 @@ const router = createRouter({
       path: "/:diary/search",
       name: "diary search",
       component: DiarySearchView,
-      props: true
+      props: true,
+      beforeEnter: async (to, _, next) => {
+        const postClient = new PostClientImpl();
+        const params = extractSearchParams(to);
+        const result = await postClient.searchPosts(params);
+
+        if (result.type === 'ok') {
+          to.meta.posts = result.data.content.map(mapPostDtoToPost);
+          to.meta.currentPage = result.data.currentPage;
+          to.meta.totalPages = result.data.totalPages;
+          next();
+        } else {
+          to.meta.error = result.message;
+          next();
+        }
+      }
     },
     {
       path: "/:login/post-:postUri",
@@ -274,4 +290,3 @@ router.afterEach(() => {
 });
 
 export default router
-
