@@ -1,15 +1,6 @@
 import type {CommentDto, PostViewDto, ReactionDto, PostEditDto, SearchPostsParamsDto} from "@/api/dto/postServiceDto.ts";
 import type {Comment, Post, Reaction, PostEdit, SearchPostsParams} from "@/models/posts/post.ts";
-
-const mapReactionDtoToReaction = (dto: ReactionDto): Reaction => ({
-    id: dto.id,
-    name: dto.name,
-    iconUri: dto.iconUri,
-    count: dto.count,
-    anonymousCount: dto.anonymousCount,
-    userNicknames: dto.userNicknames,
-    userReacted: dto.userReacted,
-});
+import {mapDtoToReaction} from "@/api/dto/mapper.ts";
 
 const mapCommentDtoToComment = (dto: CommentDto): Comment => ({
     id: dto.id,
@@ -19,7 +10,7 @@ const mapCommentDtoToComment = (dto: CommentDto): Comment => ({
     text: dto.text,
     creationTime: new Date(dto.creationTime), // Преобразуем строку в Date
     isReactable: dto.isReactable,
-    reactions: dto.reactions?.map(mapReactionDtoToReaction),
+    reactions: dto.reactions?.map(mapDtoToReaction),
     reactionGroupId: dto.reactionGroupId,
 });
 
@@ -37,7 +28,7 @@ export const mapPostDtoToPost = (dto: PostViewDto): Post => ({
     classes: dto.classes,
     tags: dto.tags,
     isReactable: dto.isReactable,
-    reactions: dto.reactions.map(mapReactionDtoToReaction),
+    reactions: dto.reactions.map(mapDtoToReaction),
     isCommentable: dto.isCommentable,
     comments: dto.comments.map(mapCommentDtoToComment),
     readGroupId: dto.readGroupId,

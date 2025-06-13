@@ -5,8 +5,12 @@ export interface ReactionDto {
     iconUri: string;
     count: number;
     anonymousCount: number;
-    userNicknames: string[];
-    userReacted: boolean;
+    users: ReactionSender[];
+}
+
+export interface ReactionSender {
+    login: string;
+    nickname: string;
 }
 
 export interface CommentDto {

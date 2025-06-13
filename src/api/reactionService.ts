@@ -134,8 +134,8 @@ export async function deleteReaction(name: string): Promise<Result<string>> {
 export async function getRecentReactions(limit?: number): Promise<Result<RecentReactionResponse[]>> {
     try {
         const url = limit 
-            ? `${backendURL}/reactions/recent?limit=${limit}`
-            : `${backendURL}/reactions/recent`;
+            ? `/reactions/recent?limit=${limit}`
+            : `/reactions/recent`;
         const response = await authenticatedRequest(url);
         if (response.ok) {
             const data = await response.json();
@@ -151,49 +151,40 @@ export async function getRecentReactions(limit?: number): Promise<Result<RecentR
 
 export async function addPostReaction(login: string, uri: string, reactionName: string): Promise<void> {
     try {
-        const response = await fetch(
-            `${backendURL}/reactions/post-reaction?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}&reactionName=${encodeURIComponent(reactionName)}`,
-            {
-                method: 'POST',
-                headers: localStorage.getItem('jwt') 
-                    ? { 'Authorization': `Bearer ${localStorage.getItem('jwt')}` }
-                    : undefined
-            }
-        );
+        const response = await authenticatedRequest(`/reactions/post-reaction?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}&name=${encodeURIComponent(reactionName)}`, {
+            method: 'POST'
+        });
 
         if (response.ok) {
-            const message = await response.text();
-            return { type: 'ok', data: message };
+            // const message = await response.text();
+            // return { type: 'ok', data: message };
         } else {
-            const message = await response.text();
-            return { type: 'error', message };
+            // const message = await response.text();
+            // return { type: 'error', message };
         }
     } catch (error) {
-        return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        // return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
     }
 }
 
 export async function removePostReaction(login: string, uri: string, reactionName: string): Promise<void> {
     try {
-        const response = await fetch(
-            `${backendURL}/reactions/post-reaction?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}&reactionName=${encodeURIComponent(reactionName)}`,
+        const response = await authenticatedRequest(
+            `/reactions/post-reaction?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}&reactionName=${encodeURIComponent(reactionName)}`,
             {
                 method: 'DELETE',
-                headers: localStorage.getItem('jwt') 
-                    ? { 'Authorization': `Bearer ${localStorage.getItem('jwt')}` }
-                    : undefined
             }
         );
 
         if (response.ok) {
-            const message = await response.text();
-            return { type: 'ok', data: message };
+            // const message = await response.text();
+            // return { type: 'ok', data: message };
         } else {
-            const message = await response.text();
-            return { type: 'error', message };
+            // const message = await response.text();
+            // return { type: 'error', message };
         }
     } catch (error) {
-        return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        // return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
     }
 }
 

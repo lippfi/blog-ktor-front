@@ -6,10 +6,10 @@
       </div>
       <div v-else class="reaction-grid">
         <button v-for="reaction in searchResults" 
-                :key="reaction.id" 
+                :key="reaction.name"
                 class="reaction-button"
                 @click="handleReactionSelect(reaction)">
-          <img :src="reaction.iconUrl" :alt="reaction.name" />
+          <img :src="reaction.iconUri" :alt="reaction.name" />
         </button>
       </div>
     </template>
@@ -19,10 +19,10 @@
         <h3>{{ $t('reactions.add_reaction.recent') }}</h3>
         <div class="reaction-grid">
           <button v-for="reaction in recentReactions" 
-                  :key="reaction.id" 
+                  :key="reaction.name"
                   class="reaction-button"
                   @click="handleReactionSelect(reaction)">
-            <img :src="reaction.iconUrl" :alt="reaction.name" />
+            <img :src="reaction.iconUri" :alt="reaction.name" />
           </button>
         </div>
       </div>
@@ -103,20 +103,19 @@ const searchQuery = ref('')
 const searchResults = ref<BasicReactionResponse[]>([])
 
 // Convert ReactionViewDto to BasicReactionResponse
-const convertToBasicReactionResponse = (reaction: ReactionViewDto, index: number): BasicReactionResponse => {
+const convertToBasicReactionResponse = (reaction: ReactionViewDto): BasicReactionResponse => {
   return {
-    id: `${index}`, // Generate a unique ID
     name: reaction.name,
-    iconUrl: String(reaction.iconUri)
+    iconUri: String(reaction.iconUri)
   }
 }
 
 // Flatten all reactions from all packs for search
 const allReactions = computed(() => {
   const result: BasicReactionResponse[] = []
-  props.basicReactions.forEach((pack, packIndex) => {
-    pack.reactions.forEach((reaction, reactionIndex) => {
-      result.push(convertToBasicReactionResponse(reaction, packIndex * 1000 + reactionIndex))
+  props.basicReactions.forEach((pack, _) => {
+    pack.reactions.forEach((reaction, _) => {
+      result.push(convertToBasicReactionResponse(reaction))
     })
   })
   return result
@@ -146,9 +145,8 @@ const handleReactionSelectFromPack = (reaction: ReactionViewDto) => {
   searchQuery.value = '';
   // Convert ReactionViewDto to BasicReactionResponse before emitting
   const basicReaction: BasicReactionResponse = {
-    id: reaction.name, // Using name as ID since ReactionViewDto doesn't have an ID
     name: reaction.name,
-    iconUrl: String(reaction.iconUri)
+    iconUri: String(reaction.iconUri)
   }
   emit('select-reaction', basicReaction);
 }

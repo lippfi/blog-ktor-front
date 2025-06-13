@@ -1,5 +1,6 @@
 import type {Post, Reaction, Comment, PostEdit} from "@/models/posts/post.ts";
 import type {CommentDto, PostViewDto, PostEditDto, ReactionDto, PostCreateDto} from "@/api/dto/postServiceDto.ts";
+import {getCurrentUserLogin} from "@/api/userService.ts";
 
 export function mapPostToCreateDto(post: Post): PostCreateDto {
     return {
@@ -43,14 +44,24 @@ export function mapPostToViewDto(post: Post): PostViewDto {
     };
 }
 
+export function mapDtoToReaction(dto: ReactionDto): Reaction {
+    return {
+        name: dto.name,
+        iconUri: dto.iconUri,
+        count: dto.count,
+        anonymousCount: dto.anonymousCount,
+        userNicknames: dto.users.map(user => user.nickname),
+        userReacted: dto.users.some(user => user.login === getCurrentUserLogin()),
+    };
+}
+
 export function mapReactionToDto(reaction: Reaction): ReactionDto {
     return {
         name: reaction.name,
         iconUri: reaction.iconUri,
-        count: reaction.count,
-        anonymousCount: reaction.anonymousCount,
-        userNicknames: reaction.userNicknames,
-        userReacted: reaction.userReacted
+        count: 0,
+        anonymousCount: 0,
+        users: [],
     };
 }
 

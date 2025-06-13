@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { ReactionView } from '@/api/postClient/postClient.ts'
 import { addPostReaction, removePostReaction, addCommentReaction, removeCommentReaction } from '@/api/reactionService'
-import { getCurrentUserNickname } from "@/api/userService.ts"
+import {getCurrentUserLogin, getCurrentUserNickname} from "@/api/userService.ts"
 import { ref, watch } from 'vue'
 import {useI18n} from "vue-i18n";
+import type { Reaction as ReactionModel } from '@/models/posts/post.ts'
 
 const { t } = useI18n()
 
 const props = defineProps<{
-  reaction: ReactionView
+  reaction: ReactionModel
   postLogin?: string,
   postUri?: string,
   commentId?: string,
@@ -20,7 +20,7 @@ const emit = defineEmits<{
   (e: 'remove'): void
 }>()
 
-const localReaction = ref<ReactionView>({
+const localReaction = ref<ReactionModel>({
   ...props.reaction,
   userNicknames: [...props.reaction.userNicknames]
 })
@@ -60,9 +60,9 @@ async function toggleReaction() {
         throw new Error('PostComponent login and URI are required for post reactions')
       }
       if (localReaction.value.userReacted) {
-        await addPostReaction(props.postLogin, props.postUri, props.reaction.id)
+        await addPostReaction(props.postLogin, props.postUri, props.reaction.name)
       } else {
-        await removePostReaction(props.postLogin, props.postUri, props.reaction.id)
+        await removePostReaction(props.postLogin, props.postUri, props.reaction.name)
       }
     } else {
       if (!props.commentId) {

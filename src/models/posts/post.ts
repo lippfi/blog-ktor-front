@@ -1,3 +1,5 @@
+import type {ReactionSender} from "@/api/dto/postServiceDto.ts";
+
 type TagPolicy = 'UNION' | 'INTERSECTION';
 export interface Reaction {
     name: string;

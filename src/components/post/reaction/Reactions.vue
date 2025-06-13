@@ -31,32 +31,28 @@ function handleReactionRemove(reactionToRemove: ReactionModel) {
 }
 
 async function handleReactionSelect(reaction: BasicReactionResponse) {
-  // Check if reaction already exists
   const existingReaction = localReactions.value.find(r => r.name === reaction.name)
 
   if (existingReaction) {
-    // If already reacted, do nothing
     if (existingReaction.userReacted) {
       return
     }
 
-    // Update existing reaction
     existingReaction.userReacted = true
     existingReaction.userNicknames.push(await getCurrentUserNickname())
     existingReaction.count++
 
-    // Send request in background
     try {
       if (props.type === 'post') {
         if (!props.postLogin || !props.postUri) {
           throw new Error('PostComponent login and URI are required for post reactions')
         }
-        addPostReaction(props.postLogin, props.postUri, existingReaction.name)
+        await addPostReaction(props.postLogin, props.postUri, existingReaction.name)
       } else {
         if (!props.commentId) {
           throw new Error('Comment ID is required for comment reactions')
         }
-        addCommentReaction(props.commentId, existingReaction.name)
+        await addCommentReaction(props.commentId, existingReaction.name)
       }
     } catch (error) {
       console.error('Error sending reaction update:', error)
@@ -68,7 +64,6 @@ async function handleReactionSelect(reaction: BasicReactionResponse) {
     return
   }
 
-  // Create new reaction if it doesn't exist
   const newReaction: ReactionModel = {
     name: reaction.name,
     iconUri: reaction.iconUri,
@@ -78,19 +73,18 @@ async function handleReactionSelect(reaction: BasicReactionResponse) {
     userReacted: true,
   }
 
-  // Add to local reactions and send request in background
   localReactions.value.push(newReaction)
   try {
     if (props.type === 'post') {
       if (!props.postLogin || !props.postUri) {
         throw new Error('PostComponent login and URI are required for post reactions')
       }
-      addPostReaction(props.postLogin, props.postUri, newReaction.name)
+      await addPostReaction(props.postLogin, props.postUri, newReaction.name)
     } else {
       if (!props.commentId) {
         throw new Error('Comment ID is required for comment reactions')
       }
-      addCommentReaction(props.commentId, newReaction.name)
+      await addCommentReaction(props.commentId, newReaction.name)
     }
   } catch (error) {
     console.error('Error sending reaction update:', error)
