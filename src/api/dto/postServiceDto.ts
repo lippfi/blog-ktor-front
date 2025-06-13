@@ -103,8 +103,6 @@ export interface SearchPostsParamsDto {
     tagPolicy?: TagPolicyDto;
     from?: string;
     to?: string;
-    page?: number
+    page?: number;
+    sort?: 'ASC' | 'DESC';
 }
-
-
-

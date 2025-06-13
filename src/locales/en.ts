@@ -1,4 +1,44 @@
 export default {
+    search: {
+        placeholder: 'Search posts...',
+        advanced: {
+            label: 'Advanced search',
+            tags: {
+                label: 'Tags',
+                placeholder: 'Enter tags'
+            },
+            tagPolicy: {
+                label: 'Tag matching',
+                union: 'any tag (OR)',
+                intersection: 'all tags (AND)'
+            },
+            from: {
+                label: 'From date',
+                placeholder: 'Select start date'
+            },
+            to: {
+                label: 'To date',
+                placeholder: 'Select end date'
+            },
+            sorting: {
+                label: 'Sort by',
+                field: {
+                    label: 'Field',
+                    creationTime: 'Date',
+                    title: 'Title'
+                },
+                order: {
+                    label: 'Order',
+                    asc: 'oldest first',
+                    desc: 'newest first'
+                }
+            }
+        },
+        button: {
+            search: 'Search',
+            clear: 'Clear'
+        }
+    },
     registration: {
         title: 'Registration',
         form: {

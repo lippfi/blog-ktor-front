@@ -27,6 +27,7 @@ export const extractSearchParams = (route: RouteLocationNormalized): SearchPosts
   if (route.query.from) params.from = route.query.from as string;
   if (route.query.to) params.to = route.query.to as string;
   if (route.query.page) params.page = parseInt(route.query.page as string);
+  if (route.query.sort) params.sort = (route.query.sort as string).toLowerCase() === 'asc' ? 'ASC' : 'DESC';
 
   return params;
 };
@@ -39,6 +40,7 @@ import PostComponent from '@/components/post/PostComponent.vue';
 import PostClientImpl from '@/api/postClient/postClient';
 import type { Post } from '@/models/posts/post';
 import { mapPostDtoToPost } from '@/models/posts/mapper';
+import PostSearchComponent from '@/components/PostSearchComponent.vue';
 
 const route = useRoute();
 const postClient = new PostClientImpl();
@@ -108,6 +110,8 @@ watch(() => route.params, fetchPosts, { deep: true });
 
 <template>
   <div class="diary-search">
+    <PostSearchComponent :diary-login="login" />
+
     <div v-if="loading" class="loading">Loading...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else-if="posts.length === 0" class="no-results">No posts found</div>
