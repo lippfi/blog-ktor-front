@@ -1,4 +1,4 @@
-import { backendURL } from "@/main";
+import { backendURL, i18n } from "@/main";
 import type {Language} from "@/api/userService.ts";
 
 // Types
@@ -107,24 +107,14 @@ export async function getAccessGroups(diary: string, language: Language): Promis
 }
 
 function localizeGroupName(name: string, language: Language): string {
-    if (language === "EN") {
-        return name;
-    } else if (language === "KK") {
-        return name // todo
-    } else if (language === "KK_CYRILLIC") {
-        return name // todo
-    } else if (language === "RU") {
-        if (name === "everyone") {
-            return "все"
-        } else if (name === "registered") {
-            return "пользователи"
-        } else if (name === "friends") {
-            return "друзья"
-        } else if (name === "private") {
-            return "только я"
-        } else {
-            return name
-        }
+    if (name === "everyone") {
+        return i18n.global.t('groups.basic.everyone.label', {}, { locale: language });
+    } else if (name === "registered") {
+        return i18n.global.t('groups.basic.registered.label', {}, { locale: language });
+    } else if (name === "friends") {
+        return i18n.global.t('groups.basic.friends.label', {}, { locale: language });
+    } else if (name === "private") {
+        return i18n.global.t('groups.basic.nobody.label', {}, { locale: language });
     } else {
         return name;
     }
