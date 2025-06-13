@@ -13,6 +13,7 @@ import PostClientImpl from "@/api/postClient/postClient.ts";
 import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
+import DiarySearchView from "@/views/DiarySearchView.vue";
 
 export const profileStub = {
   text: "Hi there! Welcome to my webpage.\n" +
@@ -215,6 +216,12 @@ const router = createRouter({
       path: "/:login/diary/:page?",
       name: "diary",
       component: DiaryView,
+      props: true
+    },
+    {
+      path: "/:diary/search",
+      name: "diary search",
+      component: DiarySearchView,
       props: true
     },
     {

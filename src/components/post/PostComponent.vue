@@ -20,7 +20,9 @@
         <div v-if="post.tags.length > 0" class="tags">
           <div class="tag">
             <template v-for="(tag, index) in post.tags" :key="tag">
-              <el-link class="tag-link" type="primary">#{{tag}}</el-link><span v-if="index < post.tags.length - 1">, </span>
+              <router-link :to="{name: 'diary search', params: {'diary': login}, query: {tags: [tag]} }">
+                #{{ tag }}
+              </router-link><span v-if="index < post.tags.length - 1">, </span>
             </template>
           </div>
         </div>

@@ -138,7 +138,7 @@ class PostClientImpl implements IPostClient {
             if (params.to) queryParams.set('to', params.to);
             if (params.page !== undefined) queryParams.set('page', params.page.toString());
 
-            const response = await fetch(`${backendURL}/posts/search?${queryParams.toString()}`);
+            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/search?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
