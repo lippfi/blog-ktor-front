@@ -9,11 +9,60 @@ import { computed, ref, onMounted, watch } from 'vue'
 import RuntimeTemplate from 'vue3-runtime-template';
 import { getReactions } from '@/api/reactionService';
 
+// Extend the Window interface to include our custom function
+declare global {
+  interface Window {
+    toggleRepostCollapse: (repostId: string) => void;
+  }
+}
+
 const props = defineProps<{
   text: string
 }>();
 
 const processedText = ref('');
+const collapsedReposts = ref<Set<string>>(new Set());
+
+// Define the toggleRepostCollapse function and make it available globally
+function toggleRepostCollapse(repostId: string) {
+  const contentElement = document.getElementById(`content-${repostId}`);
+  const indicatorElement = document.getElementById(`indicator-${repostId}`);
+
+  if (contentElement && indicatorElement) {
+    if (contentElement.classList.contains('collapsed')) {
+      // Expand
+      contentElement.classList.remove('collapsed');
+      indicatorElement.classList.remove('collapsed');
+      // Set max-height to a large value to ensure content is fully visible
+      contentElement.style.maxHeight = contentElement.scrollHeight + 'px';
+      // After animation completes, remove the fixed height to allow content to adjust if needed
+      setTimeout(() => {
+        if (!contentElement.classList.contains('collapsed')) {
+          contentElement.style.maxHeight = 'none';
+        }
+      }, 300); // Match the transition duration
+    } else {
+      // Collapse
+      // First set a fixed height to enable animation
+      contentElement.style.maxHeight = contentElement.scrollHeight + 'px';
+      // Force a reflow to ensure the browser registers the maxHeight
+      void contentElement.offsetHeight;
+      // Then collapse
+      contentElement.classList.add('collapsed');
+      indicatorElement.classList.add('collapsed');
+      contentElement.style.maxHeight = '0';
+    }
+  }
+}
+
+// Make the function available on the window object
+window.toggleRepostCollapse = toggleRepostCollapse;
+
+// Expose variables and functions to the template
+defineExpose({
+  collapsedReposts,
+  toggleRepostCollapse
+});
 
 async function processTextAsync(text: string): Promise<string> {
   let result = text;
@@ -253,13 +302,35 @@ function replaceQuote(text: string): string {
 
 function replaceRepost(text: string): string {
   let result = text;
-  const pattern = /\n?\[repost author="(.*?)"" origin="(.*?)"\]\n?([\s\S]*?)\n?\[\/repost\]\n?/;
+  const pattern = /\n?\[repost author="(.*?)" origin="(.*?)"( collapsed="(.*?)")?\]\n?([\s\S]*?)\n?\[\/repost\]\n?/;
   let match = result.match(pattern);
+
   while (match !== null) {
     const author = match[1];
     const origin = match[2];
-    const content = match[3];
-    result = result.replace(match[0], '<div class="repost">' + content + '</div>');
+    const collapsed = match[4] ? match[4].toLowerCase() : 'false';
+    const content = match[5];
+    const repostId = `repost-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+
+    // Determine if the repost should be initially collapsed
+    const isCollapsed = collapsed === 'true';
+
+    // Set initial classes and styles based on collapsed state
+    const contentClasses = isCollapsed ? 'repost-content collapsed' : 'repost-content';
+    const indicatorClasses = isCollapsed ? 'collapse-indicator collapsed' : 'collapse-indicator';
+    const contentStyle = isCollapsed ? 'max-height: 0;' : 'max-height: none;';
+
+    // Create a data attribute to store the repost ID
+    result = result.replace(match[0], 
+      '<div class="repost-block">' +
+        '<div class="repost-header clickable" onclick="window.toggleRepostCollapse(\'' + repostId + '\')">' +
+          '<span class="repost-icon">↻</span>' +
+          '<span class="repost-info">Reposted from <a href="' + origin + '" class="repost-link" onclick="event.stopPropagation()">' + author + '</a></span>' +
+          '<span class="' + indicatorClasses + '" id="indicator-' + repostId + '">▼</span>' +
+        '</div>' +
+        '<div class="' + contentClasses + '" id="content-' + repostId + '" style="' + contentStyle + '">' + content + '</div>' +
+      '</div>'
+    );
     match = result.match(pattern);
   }
   return result;
@@ -291,10 +362,73 @@ function replaceRepost(text: string): string {
   margin: 0 0.1em;
 }
 
-.repost {
-  border: #e6e8eb solid 3px;
-  border-radius: 5px;
-  padding: 10px;
+.repost-block {
+  border: #e6e8eb solid 2px;
+  border-radius: 8px;
+  margin: 15px 0;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.08);
+}
+
+.repost-header {
+  background-color: #eaecef;
+  padding: 8px 12px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  font-size: 0.9em;
+  color: #586069;
+  display: flex;
+  align-items: center;
+}
+
+.repost-icon {
+  font-size: 1.2em;
+  margin-right: 8px;
+  color: #0366d6;
+}
+
+.repost-info {
+  font-weight: 500;
+}
+
+.repost-link {
+  color: #0366d6;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.repost-link:hover {
+  text-decoration: underline;
+}
+
+.repost-content {
+  padding: 12px;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+  overflow: hidden;
+}
+
+.repost-content.collapsed {
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+}
+
+.repost-header.clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.repost-header.clickable:hover {
+  background-color: #dfe2e5;
+}
+
+.collapse-indicator {
+  margin-left: auto;
+  font-size: 0.8em;
+  transition: transform 0.3s ease;
+}
+
+.collapse-indicator.collapsed {
+  transform: rotate(-90deg);
 }
 
 </style>
