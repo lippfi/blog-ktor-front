@@ -248,7 +248,9 @@ export default {
                 },
             },
             button: {
-                send: 'жариялау'
+                send: 'жариялау',
+                cancel: 'болдырмау',
+                repost: 'қайта жариялау'
             }
         },
     },

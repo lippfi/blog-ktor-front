@@ -14,7 +14,7 @@ import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import DiarySearchView, { extractSearchParams } from "@/views/DiarySearchView.vue";
-import type {SearchPostsParamsDto} from "@/api/dto/postServiceDto.ts";
+import RepostView from "@/views/RepostView.vue";
 
 export const profileStub = {
   text: "Hi there! Welcome to my webpage.\n" +
@@ -268,6 +268,36 @@ const router = createRouter({
       path: "/messages",
       name: "messages",
       component: DialogsView,
+    },
+    {
+      path: "/repost",
+      name: "repost",
+      component: RepostView,
+      beforeEnter: async (to, _, next) => {
+        const authorLogin = to.query.authorLogin as string;
+        const postUri = to.query.postUri as string;
+        const postTitle = to.query.postTitle as string;
+
+        if (!authorLogin || !postUri) {
+          to.meta.error = 'Missing required query parameters: authorLogin and postUri';
+          next();
+          return;
+        }
+
+        const postClient = new PostClientImpl();
+        const result = await postClient.getPost(authorLogin, postUri);
+
+        if (result.type === 'ok') {
+          to.meta.postContent = result.data.text;
+          to.meta.authorLogin = authorLogin;
+          to.meta.postUri = postUri;
+          to.meta.postTitle = postTitle
+          next();
+        } else {
+          to.meta.error = result.message || 'Failed to fetch post content';
+          next();
+        }
+      }
     },
   ],
 })

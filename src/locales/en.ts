@@ -313,8 +313,11 @@ export default {
     },
     post: {
         form: {
-            title: 'New post:',
-            edit: 'Edit ',
+            title: {
+                add: 'New post:',
+                edit: 'Edit:',
+                repost: 'Repost:',
+            },
             fields: {
                 title: {
                     label: 'Title:',
@@ -399,7 +402,8 @@ export default {
             },
             button: {
                 send: 'publish',
-                cancel: 'cancel'
+                cancel: 'cancel',
+                repost: 'repost'
             }
         },
         view: {

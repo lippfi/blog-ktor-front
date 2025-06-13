@@ -248,7 +248,9 @@ export default {
                 },
             },
             button: {
-                send: 'jariyalau'
+                send: 'jariyalau',
+                cancel: 'boldyrmau',
+                repost: 'qayta jariyalau'
             }
         },
     },

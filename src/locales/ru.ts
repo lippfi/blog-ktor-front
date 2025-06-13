@@ -263,7 +263,9 @@ export default {
                 },
             },
             button: {
-                send: 'опубликовать'
+                send: 'опубликовать',
+                cancel: 'отмена',
+                repost: 'репост'
             }
         },
     },

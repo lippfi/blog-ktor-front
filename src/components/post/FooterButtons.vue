@@ -24,6 +24,17 @@ function startEdit() {
   emit('startEdit', '');
 }
 
+function handleRepost() {
+  router.push({
+    name: 'repost',
+    query: {
+      postUri: props.post.uri,
+      postTitle: props.post.title,
+      authorLogin: props.post.authorLogin
+    }
+  });
+}
+
 const showHiddenButtons = ref(false);
 const toggleHiddenButtons = (value: boolean) => {
   showHiddenButtons.value = value;
@@ -83,7 +94,7 @@ const props = defineProps<{
 <template>
   <div v-if="getCurrentUserLogin()" class="right-buttons">
     <div class="hidden-buttons">
-      <el-icon v-if="showHiddenButtons" size="20" class="repost">
+      <el-icon v-if="showHiddenButtons" size="20" class="repost" @click="handleRepost">
         <svg width="20" height="20" viewBox="2 8.5 20 7" xmlns="http://www.w3.org/2000/svg" class="icon line">
           <g transform="rotate(90 12 12)">
             <polyline points="8 12 6 14 4 12" style="fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.2;"/>

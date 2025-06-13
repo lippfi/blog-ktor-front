@@ -1,7 +1,8 @@
 <template>
   <div class="post-edit">
-    <h3 v-if="isEditing()">{{ $t('post.form.edit') }}</h3>
-    <h3 v-if="!isEditing()">{{ $t('post.form.title') }}</h3>
+    <h3 v-if="isRepost()">{{ $t('post.form.title.repost') }}</h3>
+    <h3 v-else-if="isEditing()">{{ $t('post.form.title.edit') }}</h3>
+    <h3 v-else>{{ $t('post.form.title.add') }}</h3>
 
     <div class="form">
       <AvatarChooser :avatar-size="100" :outline-size="3" :show-buttons="true" :is-vertical="true" v-model:selected-avatar="localAvatar"/>
@@ -46,7 +47,7 @@
             <span>{{ $t('post.form.fields.advanced.label') }}</span>
             <el-switch v-model="showAdvancedOptions"/>
           </div>
-          <el-button type="primary" @click="handleSave">{{ $t('post.form.button.send')}}</el-button>
+          <el-button type="primary" @click="handleSave">{{ isRepost() ? $t('post.form.button.repost') : $t('post.form.button.send')}}</el-button>
           <el-button v-if="isEditing()" type="info" @click="cancelEdit">{{$t('post.form.button.cancel')}}</el-button>
         </div>
       </div>
@@ -80,12 +81,14 @@ const props = withDefaults(defineProps<{
   reactionGroup?: string;
   commentGroup?: string;
   readGroup?: string;
+  isRepost?: boolean;
 }>(), {
   tags: () => [],
   content: '',
   title: '',
   classes: '',
-  avatar: ''
+  avatar: '',
+  isRepost: false
 });
 
 const emit = defineEmits(['cancelEdit']);
@@ -143,7 +146,10 @@ function cancelEdit() {
 const showAdvancedOptions = ref<boolean>()
 const isEditing = () => {
   return !!props.postID;
+};
 
+const isRepost = () => {
+  return props.isRepost;
 };
 
 async function handleSave() {
