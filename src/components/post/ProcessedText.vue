@@ -39,8 +39,9 @@ async function processTextAsync(text: string): Promise<string> {
   result = replaceSlider(result);
   result = replaceReadMore(result);
   result = replaceCode(result);
-  result = processWhiteSpaces(result);
   result = replaceQuote(result);
+  result = replaceRepost(result);
+  result = processWhiteSpaces(result);
 
   // Process reactions
   result = await replaceReactions(result);
@@ -250,6 +251,18 @@ function replaceQuote(text: string): string {
   return result;
 }
 
+function replaceRepost(text: string): string {
+  let result = text;
+  const pattern = /\n?\[repost origin="(.*?)"\]\n?([\s\S]*?)\n?\[\/repost\]\n?/;
+  let match = result.match(pattern);
+  while (match !== null) {
+    const origin = match[1];
+    const content = match[2];
+    result = result.replace(match[0], '<div class="repost">' + content + '</div>');
+    match = result.match(pattern);
+  }
+  return result;
+}
 </script>
 
 <style>
@@ -275,6 +288,12 @@ function replaceQuote(text: string): string {
   width: auto;
   vertical-align: middle;
   margin: 0 0.1em;
+}
+
+.repost {
+  border: #e6e8eb solid 3px;
+  border-radius: 5px;
+  padding: 10px;
 }
 
 </style>
