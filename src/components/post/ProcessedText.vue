@@ -8,6 +8,10 @@
 import { computed, ref, onMounted, watch } from 'vue'
 import RuntimeTemplate from 'vue3-runtime-template';
 import { getReactions } from '@/api/reactionService';
+import { useI18n } from 'vue-i18n';
+
+// Initialize i18n
+const { t } = useI18n();
 
 // Extend the Window interface to include our custom function
 declare global {
@@ -325,7 +329,7 @@ function replaceRepost(text: string): string {
       '<div class="repost-block">' +
         '<div class="repost-header clickable" onclick="window.toggleRepostCollapse(\'' + repostId + '\')">' +
           '<span class="repost-icon">↻</span>' +
-          '<span class="repost-info">Reposted from <a href="' + origin + '" class="repost-link" onclick="event.stopPropagation()">' + author + '</a></span>' +
+          '<span class="repost-info">' + t('post.repost.from') + ' <a href="' + origin + '" class="repost-link" onclick="event.stopPropagation()">' + author + '</a></span>' +
           '<span class="' + indicatorClasses + '" id="indicator-' + repostId + '">▼</span>' +
         '</div>' +
         '<div class="' + contentClasses + '" id="content-' + repostId + '" style="' + contentStyle + '">' + content + '</div>' +

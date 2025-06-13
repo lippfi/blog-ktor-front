@@ -406,6 +406,9 @@ export default {
                 repost: 'repost'
             }
         },
+        repost: {
+            from: 'Reposted from',
+        },
         view: {
             footer: {
                 buttons: {
