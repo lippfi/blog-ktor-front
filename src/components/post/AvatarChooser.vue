@@ -14,7 +14,7 @@
       <input type="radio" name="avatar" :id="String(avatars.length)" :value="customAvatar" v-model="selectedAvatarModel">
       <label :for="String(avatars.length)" class="one-time-avatar">
         <div class="avatar">
-          <p style="margin: 5px; text-align: center;">One time avatar</p>
+          <p style="margin: 5px; text-align: center;">{{ t('avatarChooser.oneTimeAvatar') }}</p>
           <el-input v-model="customAvatar" style="padding: 0 10px;"/>
         </div>
       </label>
@@ -32,6 +32,9 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import {ArrowDownBold, ArrowLeft, ArrowLeftBold, ArrowRightBold, ArrowUpBold} from "@element-plus/icons-vue";
 import { getAvatars } from "@/api/userService";
+import {useI18n} from "vue-i18n";
+
+const { t } = useI18n()
 
 interface Props {
   avatarSize: number
@@ -100,8 +103,18 @@ const fetchAvatars = async () => {
     avatars.value = response
     isLoaded.value = true
 
+    // If there's a selected avatar (from editing a post)
+    if (selectedAvatarModel.value) {
+      // Check if the selected avatar is in the list of available avatars
+      const avatarExists = avatars.value.includes(selectedAvatarModel.value)
+
+      // If it's not in the list, select the "One time avatar" option and paste the link
+      if (!avatarExists) {
+        customAvatar.value = selectedAvatarModel.value
+      }
+    } 
     // If avatars array is not empty and no avatar is selected yet
-    if (avatars.value.length > 0 && !selectedAvatarModel.value) {
+    else if (avatars.value.length > 0) {
       // Select the first avatar by default
       selectedAvatarModel.value = avatars.value[0]
     }

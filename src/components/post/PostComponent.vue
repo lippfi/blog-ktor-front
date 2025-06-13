@@ -40,11 +40,13 @@
       </div>
     </div>
   </div>
+  <!--    todo what about other fields? -->
   <PostEdit v-if="isEditing"
     :content="post.text"
     :title="post.title"
     :postID="post.id"
     :tags="post.tags"
+    :avatar="post.avatar"
     @cancelEdit="cancelEditing"
   />
 </template>

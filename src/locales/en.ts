@@ -268,6 +268,9 @@ export default {
             basic: 'Basic reactions',
         },
     },
+    avatarChooser: {
+      oneTimeAvatar: 'link',
+    },
     post: {
         form: {
             title: 'New post:',
