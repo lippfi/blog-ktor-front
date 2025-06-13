@@ -65,6 +65,7 @@ import {mapPostEditToPostEditDto} from "@/api/dto/mapper.ts";
 import PostClientImpl from "@/api/postClient/postClient.ts";
 import type {PostCreateDto} from "@/api/dto/postServiceDto.ts";
 import {getAccessGroups, getDefaultAccessGroups} from "@/api/accessGroupService.ts";
+import router from "@/router";
 
 const { t } = useI18n()
 
@@ -168,12 +169,10 @@ async function createPost() {
     reactionGroupId: localReactionGroup.value,
     commentReactionGroupId: localReactionGroup.value,
   }
-  console.log(newPost)
 
   const res = await client.addPost(newPost)
   if (res.type == 'ok') {
-    console.log("ok post add")
-    return
+    await router.push({name: 'post', params: {'login': props.diaryLogin, 'postUri': res.data.uri}})
   } else {
     console.log("add post error")
   }
@@ -187,7 +186,7 @@ async function updatePost() {
   const postEdit: PostEdit = {
     avatar: localAvatar.value || "",
     commentGroupId: localCommentGroup.value || "",
-    commentReactionGroupId: localCommentReactionGroup.value || "",
+    commentReactionGroupId: localReactionGroup.value || "",
     id: localID.value,
     isEncrypted: false,
     reactionGroupId: localReactionGroup.value || "",
@@ -201,8 +200,7 @@ async function updatePost() {
 
   const res = await client.updatePost(mapPostEditToPostEditDto(postEdit))
   if (res.type == 'ok') {
-    console.log("ok post update")
-    return
+    await router.push({name: 'post', params: {'login': props.diaryLogin, 'postUri': res.data.uri}})
   } else {
     console.log("update error")
   }
