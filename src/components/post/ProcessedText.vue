@@ -253,11 +253,12 @@ function replaceQuote(text: string): string {
 
 function replaceRepost(text: string): string {
   let result = text;
-  const pattern = /\n?\[repost origin="(.*?)"\]\n?([\s\S]*?)\n?\[\/repost\]\n?/;
+  const pattern = /\n?\[repost author="(.*?)"" origin="(.*?)"\]\n?([\s\S]*?)\n?\[\/repost\]\n?/;
   let match = result.match(pattern);
   while (match !== null) {
-    const origin = match[1];
-    const content = match[2];
+    const author = match[1];
+    const origin = match[2];
+    const content = match[3];
     result = result.replace(match[0], '<div class="repost">' + content + '</div>');
     match = result.match(pattern);
   }
