@@ -1,4 +1,4 @@
-import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
+import type {ReactionPackDto, ReactionViewDto} from "@/api/dto/reactionServiceDto.ts";
 import {backendURL} from "@/main.ts";
 import type {RecentReactionResponse} from "@/api/reactionService.ts";
 
@@ -7,6 +7,7 @@ type Result<T> =
     | { type: 'error'; message: string };
 
 export interface IReactionClient {
+    search(text: String): Promise<Result<ReactionViewDto[]>>
     addPostReaction(login: string, uri: string, reactionName: string): Promise<void>
     removePostReaction(login: string, uri: string, reactionName: string): Promise<void>
     getBasicReactions(): Promise<Result<ReactionPackDto[]>>
@@ -102,6 +103,13 @@ export class ReactionClientImpl implements IReactionClient {
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
         }
+    }
+
+    public async search(text: string): Promise<Result<ReactionViewDto[]>> {
+        const response = await fetch(`${backendURL}/reactions/search?text=${encodeURIComponent(text)}`);
+        return response.ok
+            ? { type: 'ok', data: await response.json() }
+            : { type: 'error', message: await response.text() };
     }
 }
 

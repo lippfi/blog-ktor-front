@@ -478,3 +478,10 @@ export async function removeFriend(login: string): Promise<Result> {
         ? { type: 'ok' }
         : { type: 'error', message: await response.text() };
 }
+
+export async function searchUsers(text: string): Promise<Result<UserBase[]>> {
+    const response = await fetch(`${backendURL}/user/search?text=${encodeURIComponent(text)}`);
+    return response.ok
+        ? { type: 'ok', data: await response.json() }
+        : { type: 'error', message: await response.text() };
+}
