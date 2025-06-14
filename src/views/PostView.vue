@@ -8,9 +8,7 @@ import PostComponent from "@/components/post/PostComponent.vue";
 import type {Post} from "@/models/posts/post.ts";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
-import PostClientImpl from "@/api/postClient/postClient.ts";
 import {reactionClient} from "@/api/postClient/reactionClient.ts";
-import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
 
 const props = defineProps<{
   login: string;
@@ -63,14 +61,20 @@ const reactionAdded = (reaction: BasicReactionResponse) => {
         :recent-reactions="recentReactions"
         @reaction-added="reactionAdded"
     />
+    <CommentEdit v-if="post.isCommentable" :post-id="post.id"
+                 :basic-reactions="basicReactions"
+                 :recent-reactions="recentReactions"
+                 @reaction-added="reactionAdded"/>
     <div class="comments_block">
       <Comment v-for="comment in post.comments" :key="comment.id"
                :comment="comment"
                :post="post"
                :is-reactable="true"
+               :basic-reactions="basicReactions"
+               :recent-reactions="recentReactions"
+               @reaction-added="reactionAdded"
       />
     </div>
-    <CommentEdit v-if="post.isCommentable"/>
   </div>
 </template>
 
@@ -82,7 +86,7 @@ const reactionAdded = (reaction: BasicReactionResponse) => {
   max-width: 850px;
   width: 100%;
   box-sizing: border-box;
-  gap: 60px;
+  gap: 25px;
 }
 .comments_block {
   width: 100%;
@@ -90,5 +94,6 @@ const reactionAdded = (reaction: BasicReactionResponse) => {
   display: flex;
   flex-direction: column;
   gap: 60px;
+  margin-top: 20px;
 }
 </style>

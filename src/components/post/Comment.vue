@@ -8,14 +8,25 @@ import FooterButtons from "@/components/post/FooterButtons.vue";
 import CommentEdit from "@/components/post/CommentEdit.vue";
 import {getDateTimeString} from "@/components/post/util.ts";
 import NicknameComponent from "@/components/NicknameComponent.vue";
-
-const emit = defineEmits(['commentDeleted']);
+import type {BasicReactionResponse} from "@/api/reactionService.ts";
+import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 
 const props = defineProps<{
   comment: Comment,
   post: Post,
   isReactable: boolean,
+  basicReactions: ReactionPackDto[],
+  recentReactions: BasicReactionResponse[],
 }>();
+
+const emit = defineEmits<{
+  (e: 'comment-deleted'): void
+  (e: 'reaction-added', reaction: BasicReactionResponse): void
+}>();
+
+const reactionAdded = (reaction: BasicReactionResponse) => {
+  emit('reaction-added', reaction);
+}
 
 const formattedCreationTime = computed(() => {
   return getDateTimeString(props.comment.creationTime);
@@ -37,7 +48,7 @@ const finishEditing = () => {
 </script>
 
 <template>
-  <div class="comment"v-if="!isEditing">
+  <div class="comment" v-if="!isEditing">
     <UserAvatarComponent 
       avatar-size="80px"
       :avatar-url="comment.avatar" 
@@ -54,17 +65,21 @@ const finishEditing = () => {
         {{ comment.text}}
       </div>
       <div class="footer">
+<!--        todo reaction added-->
         <Reactions
             :reactions="comment.reactions"
             :is-reactable="isReactable"
             type="comment"
             :comment-id="comment.id"
+            :basic-reactions="props.basicReactions"
+            :recent-reactions="props.recentReactions"
+            @reaction-added="reactionAdded"
         />
         <FooterButtons :post="post" :comment="comment" :show-comments-count="false" @startEdit="startEditing"/>
       </div>
     </div>
   </div>
-  <CommentEdit :content="comment.text" :avatar="comment.avatar" :id="comment.id" @cancel-edit="cancelEditing" v-if="isEditing" />
+  <CommentEdit :post-id="props.post.id" :content="comment.text" :avatar="comment.avatar" :id="comment.id" @cancel-edit="cancelEditing" v-if="isEditing" :is-edit="true"/>
 </template>
 
 <style scoped>

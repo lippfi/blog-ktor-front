@@ -18,7 +18,7 @@ export interface Comment {
     text: string;
     creationTime: Date;
     isReactable: boolean;
-    reactions?: Reaction[];
+    reactions: Reaction[];
     reactionGroupId?: string;
 }
 

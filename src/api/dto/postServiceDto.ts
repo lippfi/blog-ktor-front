@@ -86,15 +86,14 @@ export interface PostEditDto {
 
 export interface CommentCreateRequest {
     postId: string;
-    avatar: string;
+    avatar?: string;
     text: string;
     parentCommentId?: string;
-    reactionGroupId: string;
+    reactionGroupId?: string;
 }
 
 export interface CommentUpdateRequest {
     id: string;
-    postId: string;
     avatar: string;
     text: string;
 }

@@ -121,10 +121,6 @@ const reactionAdded = (reaction: BasicReactionResponse) => {
   font-size: 14px;
 }
 
-.post {
-  margin-bottom: 35px;
-}
-
 .post > .top {
   display: flex;
   justify-content: space-between;
