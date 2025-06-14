@@ -1,11 +1,23 @@
 <template>
   <div class="reaction-list">
+    <el-input
+        v-model="searchQuery"
+        class="reaction-search"
+        :placeholder="$t('reactions.add_reaction.search')"
+        clearable
+        style="margin-bottom: 10px;"
+    >
+      <template #prefix>
+        <el-icon><Search /></el-icon>
+      </template>
+    </el-input>
+
     <template v-if="searchQuery">
       <div v-if="searchResults.length === 0" class="search-status">
         {{ $t('reactions.add_reaction.no_reactions') }}
       </div>
       <div v-else class="reaction-grid">
-        <button v-for="reaction in searchResults" 
+        <button v-for="reaction in searchResults"
                 :key="reaction.name"
                 class="reaction-button"
                 @click="handleReactionSelect(reaction)">
@@ -13,21 +25,9 @@
         </button>
       </div>
     </template>
-
     <template v-else>
       <div class="section">
         <div class="tabs-container">
-          <el-input
-              v-model="searchQuery"
-              class="reaction-search"
-              :placeholder="$t('reactions.add_reaction.search')"
-              clearable
-              style="margin-bottom: 10px;"
-          >
-            <template #prefix>
-              <el-icon><Search /></el-icon>
-            </template>
-          </el-input>
           <el-tabs v-model="activeTab" class="reaction-tabs">
             <!-- Recent Reactions Tab -->
             <el-tab-pane 
@@ -98,6 +98,7 @@ import type { BasicReactionResponse } from '@/api/reactionService.ts'
 import {useI18n} from "vue-i18n";
 import { Search, Clock } from '@element-plus/icons-vue';
 import type {ReactionPackDto, ReactionViewDto} from "@/api/dto/reactionServiceDto.ts";
+import { reactionClient } from '@/api/postClient/reactionClient.ts';
 
 const { t } = useI18n()
 
@@ -129,15 +130,28 @@ const allReactions = computed(() => {
   return result
 })
 
-watch(searchQuery, (newQuery) => {
+watch(searchQuery, async (newQuery) => {
   if (!newQuery.trim()) {
     searchResults.value = []
     return
   }
 
-  searchResults.value = allReactions.value.filter(reaction =>
-    reaction.name.toLowerCase().includes(newQuery.toLowerCase())
-  )
+  try {
+    const result = await reactionClient.search(newQuery.trim())
+    if (result.type === 'ok') {
+      // Convert ReactionViewDto[] to BasicReactionResponse[]
+      searchResults.value = result.data.map(reaction => ({
+        name: reaction.name,
+        iconUri: String(reaction.iconUri)
+      }))
+    } else {
+      console.error('Error searching for reactions:', result.message)
+      searchResults.value = []
+    }
+  } catch (error) {
+    console.error('Error searching for reactions:', error)
+    searchResults.value = []
+  }
 })
 
 // Watch for changes in recentReactions to update activeTab
@@ -172,6 +186,7 @@ const handleReactionSelectFromPack = (reaction: ReactionViewDto) => {
 <style scoped>
 .reaction-list {
   padding: 8px;
+  height: 320px;
 }
 
 .reaction-search {
@@ -240,7 +255,7 @@ const handleReactionSelectFromPack = (reaction: ReactionViewDto) => {
   display: grid;
   grid-template-columns: repeat(6, 36px);
   gap: 0;
-  height: 180px;
+  height: 220px;
   overflow-y: auto;
 }
 
