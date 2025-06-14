@@ -534,7 +534,10 @@ export default {
         cancel: 'Cancel',
         changesSaved: 'Avatar order saved successfully',
         addAvatar: 'Add avatar',
-        uploadSuccess: 'Avatar(s) uploaded successfully'
+        uploadSuccess: 'Avatar(s) uploaded successfully',
+        addToCollection: 'Add to my collection',
+        adding: 'Adding...',
+        added: 'Added successfully',
     },
     errors: {
         failedToLoadAvatars: 'Failed to load avatars',

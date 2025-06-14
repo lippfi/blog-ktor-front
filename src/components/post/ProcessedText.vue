@@ -8,16 +8,17 @@
 import { computed, ref, onMounted, watch } from 'vue'
 import RuntimeTemplate from 'vue3-runtime-template';
 import { getReactions } from '@/api/reactionService';
-import { getUsers } from '@/api/userService';
+import { getUsers, isSignedIn, addAvatarByUrl } from '@/api/userService';
 import { useI18n } from 'vue-i18n';
 
 // Initialize i18n
 const { t } = useI18n();
 
-// Extend the Window interface to include our custom function
+// Extend the Window interface to include our custom functions
 declare global {
   interface Window {
     toggleRepostCollapse: (repostId: string) => void;
+    addAvatarToCollection: (url: string) => void;
   }
 }
 
@@ -60,13 +61,102 @@ function toggleRepostCollapse(repostId: string) {
   }
 }
 
-// Make the function available on the window object
+// Track avatar addition states
+const avatarStates = ref<Map<string, 'idle' | 'loading' | 'success' | 'error'>>(new Map());
+
+// Define the addAvatarToCollection function
+async function addAvatarToCollection(url: string) {
+  try {
+    // Set state to loading
+    avatarStates.value.set(url, 'loading');
+
+    // Force re-render by creating a new Map with the same entries
+    avatarStates.value = new Map(avatarStates.value);
+
+    const result = await addAvatarByUrl(url);
+
+    if (result.type === 'ok') {
+      // Set state to success
+      avatarStates.value.set(url, 'success');
+      // Force re-render
+      avatarStates.value = new Map(avatarStates.value);
+
+      // Reset to idle after 3 seconds
+      setTimeout(() => {
+        if (avatarStates.value.get(url) === 'success') {
+          avatarStates.value.set(url, 'idle');
+          // Force re-render
+          avatarStates.value = new Map(avatarStates.value);
+        }
+      }, 3000);
+    } else {
+      // Set state to error
+      avatarStates.value.set(url, 'error');
+      // Force re-render
+      avatarStates.value = new Map(avatarStates.value);
+      console.error('Failed to add avatar:', result.message);
+
+      // Reset to idle after 3 seconds
+      setTimeout(() => {
+        if (avatarStates.value.get(url) === 'error') {
+          avatarStates.value.set(url, 'idle');
+          // Force re-render
+          avatarStates.value = new Map(avatarStates.value);
+        }
+      }, 3000);
+    }
+  } catch (error) {
+    // Set state to error
+    avatarStates.value.set(url, 'error');
+    // Force re-render
+    avatarStates.value = new Map(avatarStates.value);
+    console.error('Failed to add avatar:', error);
+
+    // Reset to idle after 3 seconds
+    setTimeout(() => {
+      if (avatarStates.value.get(url) === 'error') {
+        avatarStates.value.set(url, 'idle');
+        // Force re-render
+        avatarStates.value = new Map(avatarStates.value);
+      }
+    }, 3000);
+  }
+}
+
+// Make the functions available on the window object
 window.toggleRepostCollapse = toggleRepostCollapse;
+window.addAvatarToCollection = addAvatarToCollection;
+
+// Watch for changes in avatarStates and update the DOM accordingly
+watch(avatarStates, (newStates) => {
+  // For each URL in the states map
+  newStates.forEach((state, url) => {
+    // Find all elements related to this URL
+    const loadingOverlays = document.querySelectorAll(`.loading-overlay[data-url="${url}"]`);
+    const successOverlays = document.querySelectorAll(`.success-overlay[data-url="${url}"]`);
+    const addButtons = document.querySelectorAll(`.add-avatar-btn[data-url="${url}"]`);
+
+    // Update their display based on the current state
+    loadingOverlays.forEach(overlay => {
+      (overlay as HTMLElement).style.display = state === 'loading' ? 'flex' : 'none';
+    });
+
+    successOverlays.forEach(overlay => {
+      (overlay as HTMLElement).style.display = state === 'success' ? 'flex' : 'none';
+    });
+
+    addButtons.forEach(button => {
+      (button as HTMLElement).style.display = state === 'idle' ? 'block' : 'none';
+    });
+  });
+}, { deep: true });
 
 // Expose variables and functions to the template
 defineExpose({
   collapsedReposts,
-  toggleRepostCollapse
+  toggleRepostCollapse,
+  addAvatarToCollection,
+  avatarStates
 });
 
 async function processTextAsync(text: string): Promise<string> {
@@ -87,6 +177,7 @@ async function processTextAsync(text: string): Promise<string> {
 
   result = replaceLinks(result);
   result = replaceImages(result);
+  result = replaceAvatar(result);
   result = replaceAudio(result);
   result = replaceVideo(result);
 
@@ -254,6 +345,56 @@ function replaceImages(text: string): string {
   while (match !== null) {
     const alt = match[3] === undefined ? 'no description' : match[3];
     result = result.replace(match[0], '<img src="' + match[1] + '" alt="' + alt + '" class="post-content-img">');
+    match = result.match(pattern);
+  }
+  return result;
+}
+
+function replaceAvatar(text: string): string {
+  let result = text;
+  const pattern = /\[avatar="(.*?)"\]/;
+  let match = result.match(pattern);
+
+  while (match !== null) {
+    const url = match[1];
+
+    // Initialize state for this avatar if not already set
+    if (!avatarStates.value.has(url)) {
+      avatarStates.value.set(url, 'idle');
+    }
+
+    // Create a unique ID for this avatar
+    const avatarId = `avatar-${url.replace(/[^a-zA-Z0-9]/g, '-')}`;
+
+    // Create the HTML with dynamic classes based on state
+    let avatarHtml = `<div class="avatar-container" id="${avatarId}">`;
+    avatarHtml += '<img src="' + url + '" alt="avatar" class="avatar-img">';
+
+    // Add state-dependent overlays
+    if (isSignedIn()) {
+     const currentState = avatarStates.value.get(url) || 'idle';
+
+      // Add loading overlay with a data attribute for the URL
+      avatarHtml += `<div class="avatar-overlay loading-overlay" data-url="${url}" style="display: ${currentState === 'loading' ? 'flex' : 'none'}">`;
+      avatarHtml += '<div class="loading-spinner"></div>';
+      avatarHtml += '<div class="overlay-text">' + t('avatars.adding') + '</div>';
+      avatarHtml += '</div>';
+
+      // Add success overlay with a data attribute for the URL
+      avatarHtml += `<div class="avatar-overlay success-overlay" data-url="${url}" style="display: ${currentState === 'success' ? 'flex' : 'none'}">`;
+      avatarHtml += '<div class="success-icon">✓</div>';
+      avatarHtml += '<div class="overlay-text">' + t('avatars.added') + '</div>';
+      avatarHtml += '</div>';
+
+      // Add "Add to collection" button with a data attribute for the URL
+      avatarHtml += `<button class="add-avatar-btn" onclick="window.addAvatarToCollection('${url}')" data-url="${url}" style="display: ${currentState === 'idle' ? 'block' : 'none'}">`;
+      avatarHtml += t('avatars.addToCollection');
+      avatarHtml += '</button>';
+    }
+
+    avatarHtml += '</div>';
+
+    result = result.replace(match[0], avatarHtml);
     match = result.match(pattern);
   }
   return result;
@@ -494,6 +635,91 @@ function replaceRepost(text: string): string {
 .user-mention:hover {
   text-decoration: underline;
   background-color: rgba(3, 102, 214, 0.15);
+}
+
+.avatar-container {
+  display: inline-block;
+  position: relative;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.avatar-img {
+  display: block;
+  max-width: 200px;
+  max-height: 200px;
+  width: auto;
+  height: auto;
+}
+
+.add-avatar-btn {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.avatar-container:hover .add-avatar-btn {
+  opacity: 1;
+}
+
+.add-avatar-btn:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+.avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+  padding: 10px;
+}
+
+.loading-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.success-overlay {
+  background-color: rgba(46, 125, 50, 0.8);
+}
+
+.loading-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.success-icon {
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+.overlay-text {
+  font-size: 0.8em;
+  font-weight: bold;
 }
 
 </style>

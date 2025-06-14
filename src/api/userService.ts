@@ -365,6 +365,18 @@ function extractUUID(url: string): string {
     return fileName.split('.')[0];
 }
 
+export async function addAvatarByUrl(url: string): Promise<Result> {
+    const response = await authenticatedRequest('/user/add-avatar-by-uri?uri=' + encodeURIComponent(url), {
+        method: 'POST',
+    });
+
+    if (!response.ok) {
+        return { type: 'error', message: await response.text() };
+    }
+
+    return { type: 'ok' };
+}
+
 export async function addAvatars(files: File[]): Promise<Result<string[]>> {
     const formData = new FormData();
     for (const file of files) {

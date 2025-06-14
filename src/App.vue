@@ -202,4 +202,11 @@ body {
 html {
   scrollbar-gutter: stable;
 }
+
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px;
+}
 </style>
