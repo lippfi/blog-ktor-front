@@ -17,8 +17,9 @@ const props = defineProps<{
   postId: string;
   parentCommentId?: string | null;
   replyingToComment?: any | null;
-  basicReactions?: ReactionPackDto[],
-  recentReactions?: BasicReactionResponse[],
+  avatars: string[];
+  basicReactions: ReactionPackDto[],
+  recentReactions: BasicReactionResponse[],
   isEdit: boolean;
   isReply?: boolean;
 }>();
@@ -239,7 +240,7 @@ async function updateComment() {
       <el-button size="small" @click="quoteSelectedText">{{ $t('comment.form.button.quote') }}</el-button>
     </div>
     <div class="form">
-      <AvatarChooser :avatar-size="80" :outline-size="3" :show-buttons="true" :is-vertical="true" v-model:selected-avatar="localAvatar"/>
+      <AvatarChooser :avatar-size="80" :outline-size="3" :show-buttons="true" :is-vertical="true" v-model:selected-avatar="localAvatar" :avatars="avatars"/>
       <div class="right">
         <SmartTextArea v-model:content="localContent" :basic-reactions="basicReactions" :recent-reactions="recentReactions" @reaction-added="reactionAdded"/>
         <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>

@@ -16,7 +16,7 @@
         <router-link :to="{name: 'post', params: {'login': login, 'postUri': post.uri}}">
           <h1 class="title"> {{ post.title }} </h1>
         </router-link>
-        <ProcessedText :text="post.text" />
+        <ProcessedText :text="post.text" @update-avatars="emit('update-avatars')"/>
         <div v-if="post.tags.length > 0" class="tags">
           <div class="tag">
             <template v-for="(tag, index) in post.tags" :key="tag">
@@ -47,12 +47,15 @@
   </div>
   <!--    todo what about other fields? -->
   <PostEdit v-if="isEditing"
-    :content="post.text"
-    :title="post.title"
-    :postID="post.id"
-    :tags="post.tags"
-    :avatar="post.avatar"
-    @cancelEdit="cancelEditing"
+            :content="post.text"
+            :title="post.title"
+            :postID="post.id"
+            :tags="post.tags"
+            :avatar="post.avatar"
+            :avatars="avatars"
+            :basic-reactions="basicReactions"
+            :recent-reactions="recentReactions"
+            @cancelEdit="cancelEditing"
   />
 </template>
 
@@ -88,6 +91,7 @@ const finishEditing = () => {
 };
 
 const emit = defineEmits<{
+  (e: 'update-avatars'): void
   (e: 'reaction-added', reaction: BasicReactionResponse): void
 }>();
 
@@ -96,6 +100,7 @@ const props = defineProps<{
   post: Post,
   showCommentsCount: boolean,
   redirectOnDelete?: string,
+  avatars: string[],
   basicReactions: ReactionPackDto[],
   recentReactions: BasicReactionResponse[],
 }>();

@@ -21,6 +21,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
+  (e: 'update-avatars'): void
   (e: 'comment-deleted'): void
   (e: 'reaction-added', reaction: BasicReactionResponse): void
   (e: 'reply', comment: Comment): void
@@ -67,7 +68,7 @@ const reply = () => {
         <NicknameComponent :nickname="comment.authorNickname" :login="comment.authorLogin"/>
         <span class="date">{{ formattedCreationTime }}</span>
       </div>
-      <ProcessedText :text="comment.text"/>
+      <ProcessedText :text="comment.text" @update-avatars="emit('update-avatars')"/>/>
       <div class="footer">
 <!--        todo reaction added-->
         <Reactions

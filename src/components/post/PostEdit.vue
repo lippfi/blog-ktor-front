@@ -5,7 +5,7 @@
     <h3 v-else>{{ $t('post.form.title.add') }}</h3>
 
     <div class="form">
-      <AvatarChooser :avatar-size="100" :outline-size="3" :show-buttons="true" :is-vertical="true" v-model:selected-avatar="localAvatar"/>
+      <AvatarChooser :avatar-size="100" :outline-size="3" :show-buttons="true" :is-vertical="true" v-model:selected-avatar="localAvatar" :avatars="avatars"/>
       <div class="fields">
         <div class="title-row">
           <span>{{ $t('post.form.fields.title.label') }}</span>
@@ -84,8 +84,9 @@ const props = withDefaults(defineProps<{
   commentGroup?: string;
   readGroup?: string;
   isRepost?: boolean;
-  basicReactions?: ReactionPackDto[],
-  recentReactions?: BasicReactionResponse[],
+  avatars: string[];
+  basicReactions: ReactionPackDto[],
+  recentReactions: BasicReactionResponse[],
 }>(), {
   tags: () => [],
   content: '',

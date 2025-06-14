@@ -7,12 +7,16 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, watch } from 'vue'
 import RuntimeTemplate from 'vue3-runtime-template';
-import { getReactions } from '@/api/reactionService';
+import {type BasicReactionResponse, getReactions} from '@/api/reactionService';
 import { getUsers, isSignedIn, addAvatarByUrl } from '@/api/userService';
 import { useI18n } from 'vue-i18n';
 
 // Initialize i18n
 const { t } = useI18n();
+
+const emit = defineEmits<{
+  (e: 'update-avatars'): void
+}>();
 
 // Extend the Window interface to include our custom functions
 declare global {
@@ -76,6 +80,7 @@ async function addAvatarToCollection(url: string) {
     const result = await addAvatarByUrl(url);
 
     if (result.type === 'ok') {
+      emit('update-avatars')
       // Set state to success
       avatarStates.value.set(url, 'success');
       // Force re-render

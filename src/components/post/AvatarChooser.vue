@@ -6,7 +6,7 @@
         <ArrowUpBold v-if="isVertical"/>
       </el-icon>
     </div>
-    <div v-if="isLoaded" class="avatars">
+    <div class="avatars">
       <template v-for="(avatar, index) in avatars" :key="avatar">
         <input type="radio" name="avatar" :id="String(index)" :value="avatar" v-model="selectedAvatarModel">
         <label :for="String(index)"><img class="avatar" :src="avatar" alt="avatar"></label>
@@ -41,13 +41,12 @@ interface Props {
   outlineSize: number
   showButtons: boolean
   isVertical: boolean
+  avatars: string[]
 }
 
 const props = defineProps<Props>()
 const selectedAvatarModel = defineModel<string>('selectedAvatar', { default: "" })
 
-const avatars = ref<string[]>([])
-const isLoaded = ref(false)
 const customAvatar = ref("")
 
 const grid_flow = computed(() => props.isVertical ? "row" : "column")
@@ -94,37 +93,7 @@ const scroll_right = () => {
   }
 }
 
-// This function is no longer needed as we're using Vue's reactivity system
-// with the selectedAvatarModel ref
-
-const fetchAvatars = async () => {
-  try {
-    const response = await getAvatars()
-    avatars.value = response
-    isLoaded.value = true
-
-    // If there's a selected avatar (from editing a post)
-    if (selectedAvatarModel.value) {
-      // Check if the selected avatar is in the list of available avatars
-      const avatarExists = avatars.value.includes(selectedAvatarModel.value)
-
-      // If it's not in the list, select the "One time avatar" option and paste the link
-      if (!avatarExists) {
-        customAvatar.value = selectedAvatarModel.value
-      }
-    } 
-    // If avatars array is not empty and no avatar is selected yet
-    else if (avatars.value.length > 0) {
-      // Select the first avatar by default
-      selectedAvatarModel.value = avatars.value[0]
-    }
-  } catch (error) {
-    console.error('Failed to fetch avatars:', error)
-  }
-}
-
 // Watch for changes in customAvatar and update selectedAvatarModel
-
 // Watch for changes in customAvatar
 watch(customAvatar, () => {
   if (customAvatar.value) {
@@ -133,7 +102,15 @@ watch(customAvatar, () => {
 })
 
 onMounted(() => {
-  fetchAvatars()
+  if (selectedAvatarModel.value) {
+    const avatarExists = props.avatars.includes(selectedAvatarModel.value)
+    if (!avatarExists) {
+      customAvatar.value = selectedAvatarModel.value
+    }
+  }
+  else if (props.avatars.length > 0) {
+    selectedAvatarModel.value = props.avatars[0]
+  }
 })
 </script>
 

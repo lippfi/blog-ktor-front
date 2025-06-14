@@ -42,7 +42,7 @@ pupa
 
 <template>
   <div class="profile">
-    <ProcessedText :text="text"/>
+    <ProcessedText :text="text" @update-avatars="updateAvatars"/>/>
     <div class="section friends-section">
       <h2>Friends</h2>
       <Friends :friends="profileStub.friends"/>

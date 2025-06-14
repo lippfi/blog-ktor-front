@@ -11,15 +11,18 @@ import {getCurrentSessionInfo, getCurrentUserLogin, isSignedIn} from "@/api/user
 import { reactionClient } from "@/api/postClient/reactionClient.ts";
 import type { ReactionPackDto } from "@/api/dto/reactionServiceDto.ts";
 import type { BasicReactionResponse } from "@/api/reactionService.ts";
+import {RouterView} from "vue-router";
 
 const props = defineProps<{
   login: string;
   page: string;
+  avatars: string[];
   basicReactions: ReactionPackDto[],
   recentReactions: BasicReactionResponse[],
 }>();
 
 const emit = defineEmits<{
+  (e: 'update-avatars'): void
   (e: 'reaction-added', reaction: BasicReactionResponse): void
 }>();
 
@@ -53,6 +56,8 @@ onMounted(async () => {
         :login="login"
         :post="post"
         :show-comments-count="true"
+        :avatars="avatars"
+        @update-avatars="emit('update-avatars')"
         :basic-reactions="basicReactions"
         :recent-reactions="recentReactions"
         @reaction-added="emit('reaction-added', $event)"
@@ -60,6 +65,7 @@ onMounted(async () => {
     <PostEdit
         v-if="loggedIn"
         :diary-login="props.login"
+        :avatars="avatars"
         :basic-reactions="basicReactions"
         :recent-reactions="recentReactions"
         @reaction-added="emit('reaction-added', $event)"

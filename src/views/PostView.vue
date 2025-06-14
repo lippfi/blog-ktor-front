@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRoute } from "vue-router";
+import {RouterView, useRoute} from "vue-router";
 import {computed, type ComputedRef, ref, nextTick} from "vue";
 
 import CommentEdit from "@/components/post/CommentEdit.vue";
@@ -8,15 +8,18 @@ import PostComponent from "@/components/post/PostComponent.vue";
 import type {Post} from "@/models/posts/post.ts";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
+import PostEdit from "@/components/post/PostEdit.vue";
 
 const props = defineProps<{
   login: string;
   postUri: string;
+  avatars: string[];
   basicReactions: ReactionPackDto[],
   recentReactions: BasicReactionResponse[],
 }>();
 
 const emit = defineEmits<{
+  (e: 'update-avatars'): void
   (e: 'reaction-added', reaction: BasicReactionResponse): void
 }>();
 
@@ -52,11 +55,15 @@ const cancelReply = () => {
         :post="post"
         :show-editing-buttons="false"
         :show-comments-count="false"
+        :avatars="avatars"
+        @update-avatars="emit('update-avatars')"
         :basic-reactions="basicReactions"
         :recent-reactions="recentReactions"
         @reaction-added="emit('reaction-added', $event)"
     />
-    <CommentEdit v-if="post.isCommentable && !parentCommentId" :post-id="post.id"
+    <CommentEdit v-if="post.isCommentable && !parentCommentId"
+                 :post-id="post.id"
+                 :avatars="avatars"
                  :basic-reactions="basicReactions"
                  :recent-reactions="recentReactions"
                  :is-edit="false"
@@ -66,6 +73,8 @@ const cancelReply = () => {
                :comment="comment"
                :post="post"
                :is-reactable="true"
+               :avatars="avatars"
+               @update-avatars="emit('update-avatars')"
                :basic-reactions="basicReactions"
                :recent-reactions="recentReactions"
                @reaction-added="emit('reaction-added', $event)"
@@ -76,6 +85,7 @@ const cancelReply = () => {
                  :post-id="post.id"
                  :parent-comment-id="parentCommentId"
                  :replying-to-comment="replyingToComment"
+                 :avatars="avatars"
                  :basic-reactions="basicReactions"
                  :recent-reactions="recentReactions"
                  :is-edit="false"

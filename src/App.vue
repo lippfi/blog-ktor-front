@@ -1,19 +1,17 @@
 <template>
-  <!-- Comment form -->
-  <!-- Add post form -->
-  <!-- Edit posts -->
-  <!-- Review login -->
-  <!-- Review registration -->
-  <!-- Store user in session -->
-
   <MenuComponent v-if="signedIn && $route.name !== 'register'"/>
-  <router-view v-if="isLoaded" :basic-reactions="basicReactions" :recent-reactions="recentReactions" @reaction-added="reactionAdded"/>
+  <router-view v-if="isLoaded"
+               :avatars="avatars"
+               @update-avatars="updateAvatars"
+               :basic-reactions="basicReactions"
+               :recent-reactions="recentReactions"
+               @reaction-added="reactionAdded"/>
 </template>
 
 <script setup lang="ts">
 import {RouterView, useRouter} from 'vue-router'
 import MenuComponent from "@/components/MenuComponent.vue";
-import { isSignedIn, authEvents} from "@/api/userService.ts";
+import {isSignedIn, authEvents, getAvatars} from "@/api/userService.ts";
 import { ref, onMounted, watch, onUnmounted } from 'vue'
 import {reactionClient} from "@/api/postClient/reactionClient.ts";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
@@ -23,6 +21,7 @@ const router = useRouter()
 const signedIn = ref(isSignedIn())
 const isLoaded = ref(false)
 
+const avatars = ref<string[]>([]);
 const basicReactions = ref<ReactionPackDto[]>([]);
 const recentReactions = ref<BasicReactionResponse[]>([]);
 
@@ -44,6 +43,12 @@ onUnmounted(() => {
 
 onMounted(async () => {
   signedIn.value = isSignedIn()
+  if (!signedIn.value) {
+    return
+  }
+
+  const avatarsResponse = await getAvatars();
+  avatars.value = avatarsResponse
 
   const basicReactionsResponse = await reactionClient.getBasicReactions();
   if (basicReactionsResponse.type === 'ok') {
@@ -73,6 +78,12 @@ const reactionAdded = (reaction: BasicReactionResponse) => {
   }
   recentReactions.value.unshift(reaction);
 };
+
+const updateAvatars = async () => {
+  console.log('Updating avatars');
+  const avatarsResponse = await getAvatars();
+  avatars.value = avatarsResponse;
+}
 </script>
 
 <style>
