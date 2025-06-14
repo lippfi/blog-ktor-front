@@ -10,6 +10,7 @@ import {getDateTimeString} from "@/components/post/util.ts";
 import NicknameComponent from "@/components/NicknameComponent.vue";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
+import ProcessedText from "@/components/post/ProcessedText.vue";
 
 const props = defineProps<{
   comment: Comment,
@@ -22,6 +23,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'comment-deleted'): void
   (e: 'reaction-added', reaction: BasicReactionResponse): void
+  (e: 'reply', comment: Comment): void
 }>();
 
 const reactionAdded = (reaction: BasicReactionResponse) => {
@@ -45,6 +47,10 @@ const cancelEditing = () => {
 const finishEditing = () => {
   isEditing.value = false;
 };
+
+const reply = () => {
+  emit('reply', props.comment);
+};
 </script>
 
 <template>
@@ -61,9 +67,7 @@ const finishEditing = () => {
         <NicknameComponent :nickname="comment.authorNickname" :login="comment.authorLogin"/>
         <span class="date">{{ formattedCreationTime }}</span>
       </div>
-      <div class="content">
-        {{ comment.text}}
-      </div>
+      <ProcessedText :text="comment.text"/>
       <div class="footer">
 <!--        todo reaction added-->
         <Reactions
@@ -75,7 +79,7 @@ const finishEditing = () => {
             :recent-reactions="props.recentReactions"
             @reaction-added="reactionAdded"
         />
-        <FooterButtons :post="post" :comment="comment" :show-comments-count="false" @startEdit="startEditing"/>
+        <FooterButtons :post="post" :comment="comment" :show-comments-count="false" @startEdit="startEditing" @reply="reply"/>
       </div>
     </div>
   </div>
@@ -113,11 +117,5 @@ const finishEditing = () => {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-}
-
-.footer > .right-buttons {
-  display: flex;
-  gap: 20px;
-  height: 25px;
 }
 </style>

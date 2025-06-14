@@ -307,6 +307,10 @@ export default {
             recent: 'Recent reactions',
             basic: 'Basic reactions',
         },
+        error: {
+            'failed-to-load-basic': 'Failed to load basic reactions',
+            'failed-to-load-recent': 'Failed to load recent reactions'
+        },
     },
     avatarChooser: {
       oneTimeAvatar: 'link',
@@ -417,7 +421,7 @@ export default {
                         question: 'Are you sure you want to delete this post?',
                         confirm: 'Delete',
                         cancel: 'Cancel',
-                    }
+                    },
                 }
             }
         }
@@ -427,8 +431,14 @@ export default {
             button: {
                 send: 'add comment',
                 cancel: 'cancel',
-                apply: 'apply'
+                apply: 'apply',
+                reply: 'reply',
+                'cancel-reply': 'cancel',
+                'quote': 'Quote'
             },
+            'replying-to': 'Replying to',
+            'show-preview': 'Show comment',
+            'hide-preview': 'Hide comment'
         },
         view: {
             footer: {
@@ -437,7 +447,10 @@ export default {
                         question: 'Are you sure you want to delete this comment?',
                         confirm: 'Delete',
                         cancel: 'Cancel',
-                    }
+                    },
+                    reply: {
+                        text: 'reply',
+                    },
                 }
             }
         }

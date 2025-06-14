@@ -6,7 +6,7 @@ import {
   type Post
 } from "@/models/posts/post.ts";
 import {ElMessage, ElMessageBox} from "element-plus";
-import {ChatLineRound, Delete, Edit, More, MoreFilled, Warning} from "@element-plus/icons-vue";
+import {BottomLeft, ChatLineRound, Delete, Edit, More, MoreFilled, Warning} from "@element-plus/icons-vue";
 import {getCurrentUserLogin} from "@/api/userService.ts";
 import {useI18n} from "vue-i18n";
 import PostClientMock from "@/api/postClient/postClientMock.ts";
@@ -16,12 +16,16 @@ const { t } = useI18n()
 
 const router = useRouter();
 
-const emit = defineEmits(['startEdit']);
+const emit = defineEmits(['startEdit', 'reply']);
 
 const postClient = new PostClientImpl()
 
 function startEdit() {
   emit('startEdit', '');
+}
+
+function reply() {
+  emit('reply', '');
 }
 
 function handleRepost() {
@@ -131,16 +135,36 @@ const props = defineProps<{
         <span class="count">{{post.comments.length}}</span>
       </div>
     </div>
+    <div v-if="comment" class="reply-button" @click="reply">
+      <span class="reply-text">{{ t('comment.view.footer.buttons.reply.text') }}</span>
+      <el-icon size="20">
+        <BottomLeft />
+      </el-icon>
+    </div>
     <el-icon v-if="!showHiddenButtons" size="20" @click="toggleHiddenButtons(true)" class="more"><More/></el-icon>
     <el-icon v-if="showHiddenButtons" size="20" @click="toggleHiddenButtons(false)" class="more-filled"><MoreFilled/></el-icon>
   </div>
 </template>
 
 <style scoped>
+.reply-button {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  gap: 5px;
+  margin-top: -3px;
+  border-radius: 4px;
+  padding: 3px 5px 3px 10px;
+}
+.reply-button:hover {
+  background-color: #f2f2f2;
+}
+
 .right-buttons {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 12px;
   height: 25px;
   margin-top: 3px;
 }
@@ -151,7 +175,7 @@ const props = defineProps<{
 
 .hidden-buttons {
   display: flex;
-  gap: 20px;
+  gap: 12px;
 }
 
 .comments-count {
@@ -166,23 +190,26 @@ const props = defineProps<{
   transition: color 0s ease;
 }
 
-.right-buttons .el-icon,
-.right-buttons .repost,
-.comments-count,
-.comments-count .el-icon {
-  color: #606060;
-}
-
 .right-buttons .el-icon:hover,
 .right-buttons .repost:hover,
 .comments-count:hover,
 .comments-count:hover .el-icon {
   color: #000000;
 }
+
+.right-buttons .el-icon,
+.right-buttons .repost,
+.comments-count,
+.comments-count .el-icon,
+.reply-button:hover .el-icon
+{
+  color: #606060;
+}
+
 .comments-count {
   margin-top: -4px;
 }
 .more, .more-filled {
-  margin-top: -5px;
+  margin-top: -2px;
 }
 </style>

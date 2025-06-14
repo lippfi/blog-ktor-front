@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
-import {computed, type ComputedRef, onMounted, ref} from "vue";
+import {computed, type ComputedRef, onMounted, ref, nextTick} from "vue";
 
 import CommentEdit from "@/components/post/CommentEdit.vue";
 import Comment from "@/components/post/Comment.vue";
@@ -17,6 +17,8 @@ const props = defineProps<{
 
 const basicReactions = ref<ReactionPackDto[]>([]);
 const recentReactions = ref<BasicReactionResponse[]>([]);
+const parentCommentId = ref<string | null>(null);
+const replyingToComment = ref<any | null>(null);
 
 const route = useRoute();
 const post: ComputedRef<Post> = computed(() => route.meta.post as Post);
@@ -28,7 +30,7 @@ onMounted(async () => {
         ? basicReactionsResponse.data
         : [basicReactionsResponse.data];
   } else {
-    console.error('Failed to load basic reactions:', basicReactionsResponse.message);
+    console.error(t('reactions.error.failed-to-load-basic'), basicReactionsResponse.message);
   }
 
   const recentReactionsResponse = await reactionClient.getRecentReactions(60);
@@ -37,7 +39,7 @@ onMounted(async () => {
         ? recentReactionsResponse.data
         : [recentReactionsResponse.data];
   } else {
-    console.error('Failed to load recent reactions:', recentReactionsResponse.message);
+    console.error(t('reactions.error.failed-to-load-recent'), recentReactionsResponse.message);
   }
 });
 
@@ -47,6 +49,24 @@ const reactionAdded = (reaction: BasicReactionResponse) => {
     recentReactions.value.splice(existingIndex, 1);
   }
   recentReactions.value.unshift(reaction);
+};
+
+const startReply = (comment: any) => {
+  parentCommentId.value = comment.id;
+  replyingToComment.value = comment;
+
+  // Scroll to the bottom after the DOM updates
+  nextTick(() => {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: 'smooth'
+    });
+  });
+};
+
+const cancelReply = () => {
+  parentCommentId.value = null;
+  replyingToComment.value = null;
 };
 </script>
 
@@ -61,9 +81,10 @@ const reactionAdded = (reaction: BasicReactionResponse) => {
         :recent-reactions="recentReactions"
         @reaction-added="reactionAdded"
     />
-    <CommentEdit v-if="post.isCommentable" :post-id="post.id"
+    <CommentEdit v-if="post.isCommentable && !parentCommentId" :post-id="post.id"
                  :basic-reactions="basicReactions"
                  :recent-reactions="recentReactions"
+                 :is-edit="false"
                  @reaction-added="reactionAdded"/>
     <div class="comments_block">
       <Comment v-for="comment in post.comments" :key="comment.id"
@@ -73,8 +94,19 @@ const reactionAdded = (reaction: BasicReactionResponse) => {
                :basic-reactions="basicReactions"
                :recent-reactions="recentReactions"
                @reaction-added="reactionAdded"
+               @reply="startReply(comment)"
       />
     </div>
+    <CommentEdit v-if="post.isCommentable && parentCommentId" 
+                 :post-id="post.id"
+                 :parent-comment-id="parentCommentId"
+                 :replying-to-comment="replyingToComment"
+                 :basic-reactions="basicReactions"
+                 :recent-reactions="recentReactions"
+                 :is-edit="false"
+                 :is-reply="true"
+                 @reaction-added="reactionAdded"
+                 @cancel-reply="cancelReply"/>
   </div>
 </template>
 
