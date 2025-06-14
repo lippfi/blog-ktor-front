@@ -5,9 +5,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import RuntimeTemplate from 'vue3-runtime-template';
-import {type BasicReactionResponse, getReactions} from '@/api/reactionService';
+import { getReactions} from '@/api/reactionService';
 import { getUsers, isSignedIn, addAvatarByUrl } from '@/api/userService';
 import { useI18n } from 'vue-i18n';
 
@@ -27,7 +27,8 @@ declare global {
 }
 
 const props = defineProps<{
-  text: string
+  text: string,
+  avatars: string[],
 }>();
 
 const processedText = ref('');
@@ -209,6 +210,11 @@ watch(() => props.text, async (newText) => {
   processedText.value = await processTextAsync(newText);
 });
 
+// Watch for changes in avatars and reprocess the text
+watch(() => props.avatars, async () => {
+  processedText.value = await processTextAsync(props.text);
+}, { deep: true });
+
 
 function processWhiteSpaces(text: string): string {
   let result = text;
@@ -363,6 +369,9 @@ function replaceAvatar(text: string): string {
   while (match !== null) {
     const url = match[1];
 
+    // Check if the avatar is already in the collection
+    const isAlreadyAdded = props.avatars.includes(url);
+
     // Initialize state for this avatar if not already set
     if (!avatarStates.value.has(url)) {
       avatarStates.value.set(url, 'idle');
@@ -391,10 +400,17 @@ function replaceAvatar(text: string): string {
       avatarHtml += '<div class="overlay-text">' + t('avatars.added') + '</div>';
       avatarHtml += '</div>';
 
-      // Add "Add to collection" button with a data attribute for the URL
-      avatarHtml += `<button class="add-avatar-btn" onclick="window.addAvatarToCollection('${url}')" data-url="${url}" style="display: ${currentState === 'idle' ? 'block' : 'none'}">`;
-      avatarHtml += t('avatars.addToCollection');
-      avatarHtml += '</button>';
+      if (isAlreadyAdded) {
+        // Show "Already added" text instead of the "Add to collection" button
+        avatarHtml += `<div class="already-added-text" data-url="${url}">`;
+        avatarHtml += t('avatars.alreadyAdded');
+        avatarHtml += '</div>';
+      } else {
+        // Add "Add to collection" button with a data attribute for the URL
+        avatarHtml += `<button class="add-avatar-btn" onclick="window.addAvatarToCollection('${url}')" data-url="${url}" style="display: ${currentState === 'idle' ? 'block' : 'none'}">`;
+        avatarHtml += t('avatars.addToCollection');
+        avatarHtml += '</button>';
+      }
     }
 
     avatarHtml += '</div>';
@@ -676,10 +692,6 @@ function replaceRepost(text: string): string {
   opacity: 1;
 }
 
-.add-avatar-btn:hover {
-  background-color: rgba(0, 0, 0, 0.9);
-}
-
 .avatar-overlay {
   position: absolute;
   top: 0;
@@ -727,4 +739,25 @@ function replaceRepost(text: string): string {
   font-weight: bold;
 }
 
+.already-added-text {
+  display: flex;
+  align-items: center;
+  align-content: center;
+  height: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(100, 100, 100, 0.7);
+  color: white;
+  padding: 0 4px;
+  font-size: 0.9em;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.avatar-container:hover .already-added-text {
+  opacity: 1;
+}
 </style>

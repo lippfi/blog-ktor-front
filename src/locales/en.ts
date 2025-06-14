@@ -548,6 +548,7 @@ export default {
         changesSaved: 'Avatar order saved successfully',
         addAvatar: 'Add avatar',
         uploadSuccess: 'Avatar(s) uploaded successfully',
+        alreadyAdded: 'Avatar added',
         addToCollection: 'Add to my collection',
         adding: 'Adding...',
         added: 'Added successfully',

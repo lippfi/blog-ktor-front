@@ -16,6 +16,7 @@ const props = defineProps<{
   comment: Comment,
   post: Post,
   isReactable: boolean,
+  avatars: string[],
   basicReactions: ReactionPackDto[],
   recentReactions: BasicReactionResponse[],
 }>();
@@ -68,7 +69,7 @@ const reply = () => {
         <NicknameComponent :nickname="comment.authorNickname" :login="comment.authorLogin"/>
         <span class="date">{{ formattedCreationTime }}</span>
       </div>
-      <ProcessedText :text="comment.text" @update-avatars="emit('update-avatars')"/>/>
+      <ProcessedText :text="comment.text" :avatars="avatars" @update-avatars="emit('update-avatars')"/>/>
       <div class="footer">
 <!--        todo reaction added-->
         <Reactions

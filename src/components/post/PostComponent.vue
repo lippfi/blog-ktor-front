@@ -16,7 +16,7 @@
         <router-link :to="{name: 'post', params: {'login': login, 'postUri': post.uri}}">
           <h1 class="title"> {{ post.title }} </h1>
         </router-link>
-        <ProcessedText :text="post.text" @update-avatars="emit('update-avatars')"/>
+        <ProcessedText :text="post.text" :avatars="avatars" @update-avatars="emit('update-avatars')"/>
         <div v-if="post.tags.length > 0" class="tags">
           <div class="tag">
             <template v-for="(tag, index) in post.tags" :key="tag">
