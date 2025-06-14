@@ -638,12 +638,12 @@ const wrapWithLink = () => {
   const end = textarea.selectionEnd
   const selectedText = textarea.value.substring(start, end)
 
+  let insertText: string
+  let caretPosition: number
+
   if (selectedText) {
     const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i
     const isUrl = urlPattern.test(selectedText.trim())
-
-    let insertText: string
-    let caretPosition: number
 
     if (isUrl) {
       insertText = '[link="' + selectedText + '"]' + '[/link]'
@@ -652,35 +652,40 @@ const wrapWithLink = () => {
       insertText = '[link=""]' + selectedText + '[/link]'
       caretPosition = start + '[link="'.length
     }
+  } else {
+    // No text selected, insert template with localized default text
+    const defaultLinkText = t('post.form.fields.textarea.buttons.link.default_text', 'link text')
+    insertText = '[link=""]' + defaultLinkText + '[/link]'
+    caretPosition = start + '[link="'.length
+  }
 
-    // Focus the textarea
-    textarea.focus()
+  // Focus the textarea
+  textarea.focus()
 
-    // Try to use execCommand first
-    try {
-      // Insert the text with execCommand to preserve undo history
-      document.execCommand('insertText', false, insertText)
+  // Try to use execCommand first
+  try {
+    // Insert the text with execCommand to preserve undo history
+    document.execCommand('insertText', false, insertText)
 
-      // Position the caret
-      textarea.setSelectionRange(caretPosition, caretPosition)
+    // Position the caret
+    textarea.setSelectionRange(caretPosition, caretPosition)
 
-      // Ensure v-model is updated
-      textarea.dispatchEvent(new Event('input', { bubbles: true }))
-    } catch (e) {
-      // Fallback: use direct manipulation if execCommand fails
-      const newText = textarea.value.substring(0, start) +
-          insertText +
-          textarea.value.substring(end)
+    // Ensure v-model is updated
+    textarea.dispatchEvent(new Event('input', { bubbles: true }))
+  } catch (e) {
+    // Fallback: use direct manipulation if execCommand fails
+    const newText = textarea.value.substring(0, start) +
+        insertText +
+        textarea.value.substring(end)
 
-      // Update the textarea value
-      textarea.value = newText
+    // Update the textarea value
+    textarea.value = newText
 
-      // Position the caret
-      textarea.setSelectionRange(caretPosition, caretPosition)
+    // Position the caret
+    textarea.setSelectionRange(caretPosition, caretPosition)
 
-      // Ensure v-model is updated
-      textarea.dispatchEvent(new Event('input', { bubbles: true }))
-    }
+    // Ensure v-model is updated
+    textarea.dispatchEvent(new Event('input', { bubbles: true }))
   }
 }
 

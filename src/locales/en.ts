@@ -341,6 +341,7 @@ export default {
                             tooltip: 'Add \'Read more..\' section',
                         },
                         link: {
+                            default_text: 'link description',
                             tooltip: 'Insert link',
                         },
                         image: {
