@@ -485,3 +485,19 @@ export async function searchUsers(text: string): Promise<Result<UserBase[]>> {
         ? { type: 'ok', data: await response.json() }
         : { type: 'error', message: await response.text() };
 }
+
+export async function getUsers(logins: string[]): Promise<Result<UserBase[]>> {
+    try {
+        const url = `${backendURL}/user/search-logins?logins=${encodeURIComponent(logins.join(','))}`;
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            return {type: 'ok', data};
+        } else {
+            const message = await response.text();
+            return {type: 'error', message};
+        }
+    } catch (error) {
+        return {type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred'};
+    }
+}

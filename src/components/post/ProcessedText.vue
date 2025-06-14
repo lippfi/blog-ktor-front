@@ -8,6 +8,7 @@
 import { computed, ref, onMounted, watch } from 'vue'
 import RuntimeTemplate from 'vue3-runtime-template';
 import { getReactions } from '@/api/reactionService';
+import { getUsers } from '@/api/userService';
 import { useI18n } from 'vue-i18n';
 
 // Initialize i18n
@@ -98,6 +99,7 @@ async function processTextAsync(text: string): Promise<string> {
 
   // Process reactions
   result = await replaceReactions(result);
+  result = await replaceMentions(result);
 
   return result;
 }
@@ -161,6 +163,48 @@ async function replaceReactions(text: string): Promise<string> {
       result = result.replace(
         fullMatch, 
         `<img src="${iconUrl}" alt="${reactionName}" class="reaction-icon" />`
+      );
+    }
+  }
+
+  return result;
+}
+
+async function replaceMentions(text: string): Promise<string> {
+  let result = text;
+
+  const mentionPattern = /@([a-zA-Z0-9_-]+)/g;
+  const matches = [...result.matchAll(mentionPattern)];
+
+  if (matches.length === 0) {
+    return result;
+  }
+
+  const logins = [...new Set(matches.map(match => match[1]))];
+
+  const usersResult = await getUsers(logins);
+
+  if (usersResult.type === 'error') {
+    console.error('Failed to fetch users:', usersResult.message);
+    return result;
+  }
+
+  const users = usersResult.data;
+
+  const userMap = new Map<string, { login: string, nickname: string }>();
+  users.forEach(user => {
+    userMap.set(user.login, { login: user.login, nickname: user.nickname });
+  });
+
+  for (const match of matches) {
+    const fullMatch = match[0]; // @login
+    const login = match[1]; // login
+
+    if (userMap.has(login)) {
+      const user = userMap.get(login)!!;
+      result = result.replace(
+        fullMatch, 
+        `<a href="/${user?.login}" class="user-mention">${user.nickname}</a>`
       );
     }
   }
@@ -435,6 +479,21 @@ function replaceRepost(text: string): string {
 
 .collapse-indicator.collapsed {
   transform: rotate(-90deg);
+}
+
+.user-mention {
+  color: #0366d6;
+  font-weight: 600;
+  text-decoration: none;
+  background-color: rgba(3, 102, 214, 0.08);
+  border-radius: 3px;
+  padding: 0 3px;
+  transition: background-color 0.2s ease;
+}
+
+.user-mention:hover {
+  text-decoration: underline;
+  background-color: rgba(3, 102, 214, 0.15);
 }
 
 </style>
