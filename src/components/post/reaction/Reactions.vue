@@ -7,6 +7,7 @@ import AddReaction from '@/components/post/reaction/AddReaction.vue'
 import {ref, watch} from 'vue'
 import {reactionClient} from "@/api/postClient/reactionClient.ts";
 import Reaction from "@/components/Reaction.vue";
+import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 
 const props = defineProps<{
   reactions: ReactionModel[],
@@ -15,6 +16,8 @@ const props = defineProps<{
   postLogin?: string,
   postUri?: string,
   commentId?: string,
+  basicReactions: ReactionPackDto[],
+  recentReactions: BasicReactionResponse[],
 }>()
 
 const localReactions = ref<ReactionModel[]>([...props.reactions])
@@ -130,7 +133,12 @@ async function handleReactionSelect(reaction: BasicReactionResponse) {
       />
       <div v-if="index < localReactions.length - 1 || isReactable" style="width: 5px"/>
     </template>
-    <AddReaction v-if="isReactable" @reaction-selected="handleReactionSelect"/>
+    <AddReaction 
+      v-if="isReactable" 
+      :basic-reactions="basicReactions"
+      :recent-reactions="recentReactions"
+      @reaction-selected="handleReactionSelect"
+    />
   </div>
 </template>
 

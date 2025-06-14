@@ -11,8 +11,8 @@
       </div>
     </template>
     <ReactionList 
-      :basic-reactions="basicReactions"
-      :recent-reactions="recentReactions"
+      :basic-reactions="props.basicReactions"
+      :recent-reactions="props.recentReactions"
       @select-reaction="handleReactionSelect"
     />
   </el-popover>
@@ -25,24 +25,10 @@ import { ref, watch, onMounted } from 'vue';
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import { reactionClient } from "@/api/postClient/reactionClient.ts";
 
-const basicReactions = ref<ReactionPackDto[]>([]);
-const recentReactions = ref<BasicReactionResponse[]>([]);
-
-onMounted(async () => {
-  const basicReactionsResponse = await reactionClient.getBasicReactions();
-  if (basicReactionsResponse.type === 'ok') {
-    basicReactions.value = Array.isArray(basicReactionsResponse.data) ? basicReactionsResponse.data : [basicReactionsResponse.data];
-  } else {
-    console.error('Failed to load basic reactions:', basicReactionsResponse.message);
-  }
-
-  const recentReactionsResponse = await reactionClient.getRecentReactions();
-  if (recentReactionsResponse.type === 'ok') {
-    recentReactions.value = Array.isArray(recentReactionsResponse.data) ? recentReactionsResponse.data : [recentReactionsResponse.data];
-  } else {
-    console.error('Failed to load recent reactions:', recentReactionsResponse.message);
-  }
-});
+const props = defineProps<{
+  basicReactions: ReactionPackDto[],
+  recentReactions: BasicReactionResponse[],
+}>()
 
 const searchResults = ref<BasicReactionResponse[]>([]);
 const isSearching = ref(false);
@@ -55,11 +41,6 @@ watch(searchQuery, (newQuery) => {
     searchResults.value = [];
     return;
   }
-
-  // Simple client-side search for testing
-  // searchResults.value = basicReactions.value.filter(reaction =>
-  //   reaction.name.toLowerCase().includes(newQuery.toLowerCase())
-  // );
 });
 
 const emit = defineEmits<{

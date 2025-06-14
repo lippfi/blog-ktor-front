@@ -35,6 +35,8 @@
               :isReactable="post.isReactable"
               :post-login="post.authorLogin"
               :post-uri="post.uri"
+              :basic-reactions="basicReactions"
+              :recent-reactions="recentReactions"
             />
           </div>
           <FooterButtons :post="post" :show-comments-count="showCommentsCount" @startEdit="startEditing"/>
@@ -67,6 +69,8 @@ import ProcessedText from "@/components/post/ProcessedText.vue";
 import PostEdit from "@/components/post/PostEdit.vue";
 import NicknameComponent from "@/components/NicknameComponent.vue";
 import router from "@/router";
+import type { ReactionPackDto } from "@/api/dto/reactionServiceDto.ts";
+import type { BasicReactionResponse } from "@/api/reactionService.ts";
 
 let isEditing = ref(false);
 
@@ -87,6 +91,8 @@ const props = defineProps<{
   post: Post,
   showCommentsCount: boolean,
   redirectOnDelete?: string,
+  basicReactions?: ReactionPackDto[],
+  recentReactions?: BasicReactionResponse[],
 }>();
 
 const formattedCreationTime = computed(() => {
