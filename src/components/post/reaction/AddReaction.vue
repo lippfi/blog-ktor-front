@@ -26,17 +26,24 @@ import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import { reactionClient } from "@/api/postClient/reactionClient.ts";
 
 const basicReactions = ref<ReactionPackDto[]>([]);
+const recentReactions = ref<BasicReactionResponse[]>([]);
 
 onMounted(async () => {
-  const result = await reactionClient.getBasicReactions();
-  if (result.type === 'ok') {
-    basicReactions.value = Array.isArray(result.data) ? result.data : [result.data];
+  const basicReactionsResponse = await reactionClient.getBasicReactions();
+  if (basicReactionsResponse.type === 'ok') {
+    basicReactions.value = Array.isArray(basicReactionsResponse.data) ? basicReactionsResponse.data : [basicReactionsResponse.data];
   } else {
-    console.error('Failed to load basic reactions:', result.message);
+    console.error('Failed to load basic reactions:', basicReactionsResponse.message);
+  }
+
+  const recentReactionsResponse = await reactionClient.getRecentReactions();
+  if (recentReactionsResponse.type === 'ok') {
+    recentReactions.value = Array.isArray(recentReactionsResponse.data) ? recentReactionsResponse.data : [recentReactionsResponse.data];
+  } else {
+    console.error('Failed to load recent reactions:', recentReactionsResponse.message);
   }
 });
 
-const recentReactions = ref<BasicReactionResponse[]>([]);
 const searchResults = ref<BasicReactionResponse[]>([]);
 const isSearching = ref(false);
 const searchError = ref<string | null>(null);
