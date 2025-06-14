@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { addPostReaction, removePostReaction, addCommentReaction, removeCommentReaction } from '@/api/reactionService'
+import { addCommentReaction, removeCommentReaction } from '@/api/reactionService'
 import {getCurrentUserLogin, getCurrentUserNickname} from "@/api/userService.ts"
 import { ref, watch } from 'vue'
 import {useI18n} from "vue-i18n";
 import type { Reaction as ReactionModel } from '@/models/posts/post.ts'
+import {reactionClient} from "@/api/postClient/reactionClient.ts";
 
 const { t } = useI18n()
 
@@ -60,9 +61,9 @@ async function toggleReaction() {
         throw new Error('PostComponent login and URI are required for post reactions')
       }
       if (localReaction.value.userReacted) {
-        await addPostReaction(props.postLogin, props.postUri, props.reaction.name)
+        await reactionClient.addPostReaction(props.postLogin, props.postUri, props.reaction.name)
       } else {
-        await removePostReaction(props.postLogin, props.postUri, props.reaction.name)
+        await reactionClient.removePostReaction(props.postLogin, props.postUri, props.reaction.name)
       }
     } else {
       if (!props.commentId) {

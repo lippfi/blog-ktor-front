@@ -6,6 +6,8 @@ import {useI18n} from "vue-i18n";
 import {DataBoard, Tickets, Search} from "@element-plus/icons-vue";
 import ReactionList from "./reaction/ReactionList.vue";
 import type { BasicReactionResponse } from "@/api/reactionService.ts";
+import { reactionClient } from "@/api/postClient/reactionClient.ts";
+import type { ReactionPackDto } from "@/api/dto/reactionServiceDto.ts";
 
 const { t } = useI18n()
 
@@ -15,34 +17,40 @@ const props = defineProps<{
 }>();
 
 // Reuse the same reactions as in AddReaction component
-const basicReactions: BasicReactionResponse[] = [
-  {
-    id: 'like',
-    name: 'like',
-    iconUrl: 'https://a.slack-edge.com/production-standard-emoji-assets/14.0/google-small/1f44d@2x.png'
-  },
-  {
-    id: 'heart',
-    name: 'heart',
-    iconUrl: 'https://a.slack-edge.com/production-standard-emoji-assets/14.0/google-small/2764-fe0f@2x.png'
-  },
-  {
-    id: 'sad_cat',
-    name: 'sad_cat',
-    iconUrl: 'https://emoji.slack-edge.com/T0288D531/sad_cat/4253f3b1013d6920.png'
-  },
-  {
-    id: 'begemot',
-    name: 'begemot',
-    iconUrl: 'src/assets/icons/begemot.png'
-  }
-];
-
-const recentReactions = ref<BasicReactionResponse[]>([basicReactions[0], basicReactions[1]]);
+const basicReactions = ref<ReactionPackDto[]>([]);
+const recentReactions = ref<BasicReactionResponse[]>([]);
 const isReactionPopoverVisible = ref(false);
 const showUserPopover = ref(false);
 const userSearchQuery = ref('');
 const tooltipDelay = 300;
+
+// Fetch reactions when component is mounted
+onMounted(async () => {
+  try {
+    // Get basic reactions
+    const basicResult = await reactionClient.getBasicReactions();
+    if (basicResult.type === 'ok') {
+      basicReactions.value = basicResult.data;
+    } else {
+      console.error('Failed to load basic reactions:', basicResult.message);
+      ElMessage.error(t('reactions.load_error'));
+    }
+
+    // Get recent reactions
+    const recentResult = await reactionClient.getRecentReactions(60);
+    if (recentResult.type === 'ok') {
+      recentReactions.value = recentResult.data.map(reaction => ({
+        name: reaction.name,
+        iconUri: reaction.iconUri,
+      }));
+    } else {
+      console.error('Failed to load recent reactions:', recentResult.message);
+    }
+  } catch (error) {
+    console.error('Error loading reactions:', error);
+    ElMessage.error(t('reactions.load_error'));
+  }
+});
 
 const filteredUsers = computed(() => {
   const query = userSearchQuery.value.toLowerCase();
@@ -944,7 +952,7 @@ const handleMentionSelect = (option: MentionOption) => {
       </el-popover>
       <el-popover
           placement="top"
-          :width="292"
+          :width="275"
           trigger="click"
           v-model:visible="isReactionPopoverVisible"
       >

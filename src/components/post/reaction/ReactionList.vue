@@ -15,18 +15,6 @@
     </template>
 
     <template v-else>
-      <div class="section" v-if="recentReactions.length > 0">
-        <h3>{{ $t('reactions.add_reaction.recent') }}</h3>
-        <div class="reaction-grid">
-          <button v-for="reaction in recentReactions" 
-                  :key="reaction.name"
-                  class="reaction-button"
-                  @click="handleReactionSelect(reaction)">
-            <img :src="reaction.iconUri" :alt="reaction.name" />
-          </button>
-        </div>
-      </div>
-
       <div class="section">
         <div class="tabs-container">
           <el-input
@@ -41,6 +29,26 @@
             </template>
           </el-input>
           <el-tabs v-model="activeTab" class="reaction-tabs">
+            <!-- Recent Reactions Tab -->
+            <el-tab-pane 
+              v-if="recentReactions.length > 0"
+              name="recent"
+            >
+              <template #label>
+                <el-icon class="tab-icon" size="20" style="margin-top: 5px;">
+                  <Clock />
+                </el-icon>
+              </template>
+              <div class="reaction-grid">
+                <button v-for="reaction in recentReactions" 
+                        :key="reaction.name"
+                        class="reaction-button"
+                        @click="handleReactionSelect(reaction)">
+                  <img :src="reaction.iconUri" :alt="reaction.name" />
+                </button>
+              </div>
+            </el-tab-pane>
+
             <el-tab-pane 
               v-for="(pack, index) in basicReactions" 
               :key="index" 
@@ -88,7 +96,7 @@
 import { ref, watch, computed } from 'vue'
 import type { BasicReactionResponse } from '@/api/reactionService.ts'
 import {useI18n} from "vue-i18n";
-import { Search } from '@element-plus/icons-vue';
+import { Search, Clock } from '@element-plus/icons-vue';
 import type {ReactionPackDto, ReactionViewDto} from "@/api/dto/reactionServiceDto.ts";
 
 const { t } = useI18n()
@@ -98,7 +106,7 @@ const props = defineProps<{
   recentReactions: BasicReactionResponse[]
 }>()
 
-const activeTab = ref('0')
+const activeTab = ref(props.recentReactions.length > 0 ? 'recent' : '0')
 const searchQuery = ref('')
 const searchResults = ref<BasicReactionResponse[]>([])
 
@@ -130,6 +138,15 @@ watch(searchQuery, (newQuery) => {
   searchResults.value = allReactions.value.filter(reaction =>
     reaction.name.toLowerCase().includes(newQuery.toLowerCase())
   )
+})
+
+// Watch for changes in recentReactions to update activeTab
+watch(() => props.recentReactions.length, (newLength) => {
+  if (newLength > 0 && activeTab.value === '0') {
+    activeTab.value = 'recent'
+  } else if (newLength === 0 && activeTab.value === 'recent') {
+    activeTab.value = '0'
+  }
 })
 
 const emit = defineEmits<{
@@ -221,8 +238,10 @@ const handleReactionSelectFromPack = (reaction: ReactionViewDto) => {
 
 .reaction-grid {
   display: grid;
-  grid-template-columns: repeat(7, 36px);
+  grid-template-columns: repeat(6, 36px);
   gap: 0;
+  height: 180px;
+  overflow-y: auto;
 }
 
 .reaction-button {

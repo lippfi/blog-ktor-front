@@ -1,7 +1,7 @@
 <template>
   <el-popover
       placement="top"
-      :width="292"
+      :width="275"
       trigger="click"
       v-model:visible="isPopoverVisible"
   >
