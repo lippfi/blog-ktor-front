@@ -5,18 +5,26 @@
   <!-- Review login -->
   <!-- Review registration -->
   <!-- Store user in session -->
+
   <MenuComponent v-if="signedIn && $route.name !== 'register'"/>
-  <router-view/>
+  <router-view v-if="isLoaded" :basic-reactions="basicReactions" :recent-reactions="recentReactions" @reaction-added="reactionAdded"/>
 </template>
 
 <script setup lang="ts">
 import {RouterView, useRouter} from 'vue-router'
 import MenuComponent from "@/components/MenuComponent.vue";
-import {getCurrentUserLogin, isSignedIn, authEvents} from "@/api/userService.ts";
+import { isSignedIn, authEvents} from "@/api/userService.ts";
 import { ref, onMounted, watch, onUnmounted } from 'vue'
+import {reactionClient} from "@/api/postClient/reactionClient.ts";
+import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
+import type {BasicReactionResponse} from "@/api/reactionService.ts";
 
 const router = useRouter()
 const signedIn = ref(isSignedIn())
+const isLoaded = ref(false)
+
+const basicReactions = ref<ReactionPackDto[]>([]);
+const recentReactions = ref<BasicReactionResponse[]>([]);
 
 // Update signedIn state when route changes
 watch(() => router.currentRoute.value, () => {
@@ -34,10 +42,37 @@ onUnmounted(() => {
   authEvents.off('auth-changed', authChangedHandler)
 })
 
-// Initialize signedIn state
-onMounted(() => {
+onMounted(async () => {
   signedIn.value = isSignedIn()
-})
+
+  const basicReactionsResponse = await reactionClient.getBasicReactions();
+  if (basicReactionsResponse.type === 'ok') {
+    basicReactions.value = Array.isArray(basicReactionsResponse.data)
+        ? basicReactionsResponse.data
+        : [basicReactionsResponse.data];
+  } else {
+    console.error('Failed to load basic reactions:', basicReactionsResponse.message);
+  }
+
+  const recentReactionsResponse = await reactionClient.getRecentReactions(60);
+  if (recentReactionsResponse.type === 'ok') {
+    recentReactions.value = Array.isArray(recentReactionsResponse.data)
+        ? recentReactionsResponse.data
+        : [recentReactionsResponse.data];
+  } else {
+    console.error('Failed to load recent reactions:', recentReactionsResponse.message);
+  }
+
+  isLoaded.value = true;
+});
+
+const reactionAdded = (reaction: BasicReactionResponse) => {
+  const existingIndex = recentReactions.value.findIndex(r => r.name === reaction.name);
+  if (existingIndex !== -1) {
+    recentReactions.value.splice(existingIndex, 1);
+  }
+  recentReactions.value.unshift(reaction);
+};
 </script>
 
 <style>

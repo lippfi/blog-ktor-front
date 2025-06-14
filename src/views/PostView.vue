@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
-import {computed, type ComputedRef, onMounted, ref, nextTick} from "vue";
+import {computed, type ComputedRef, ref, nextTick} from "vue";
 
 import CommentEdit from "@/components/post/CommentEdit.vue";
 import Comment from "@/components/post/Comment.vue";
@@ -8,48 +8,23 @@ import PostComponent from "@/components/post/PostComponent.vue";
 import type {Post} from "@/models/posts/post.ts";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
-import {reactionClient} from "@/api/postClient/reactionClient.ts";
 
 const props = defineProps<{
   login: string;
   postUri: string;
+  basicReactions: ReactionPackDto[],
+  recentReactions: BasicReactionResponse[],
 }>();
 
-const basicReactions = ref<ReactionPackDto[]>([]);
-const recentReactions = ref<BasicReactionResponse[]>([]);
+const emit = defineEmits<{
+  (e: 'reaction-added', reaction: BasicReactionResponse): void
+}>();
+
 const parentCommentId = ref<string | null>(null);
 const replyingToComment = ref<any | null>(null);
 
 const route = useRoute();
 const post: ComputedRef<Post> = computed(() => route.meta.post as Post);
-
-onMounted(async () => {
-  const basicReactionsResponse = await reactionClient.getBasicReactions();
-  if (basicReactionsResponse.type === 'ok') {
-    basicReactions.value = Array.isArray(basicReactionsResponse.data)
-        ? basicReactionsResponse.data
-        : [basicReactionsResponse.data];
-  } else {
-    console.error(t('reactions.error.failed-to-load-basic'), basicReactionsResponse.message);
-  }
-
-  const recentReactionsResponse = await reactionClient.getRecentReactions(60);
-  if (recentReactionsResponse.type === 'ok') {
-    recentReactions.value = Array.isArray(recentReactionsResponse.data)
-        ? recentReactionsResponse.data
-        : [recentReactionsResponse.data];
-  } else {
-    console.error(t('reactions.error.failed-to-load-recent'), recentReactionsResponse.message);
-  }
-});
-
-const reactionAdded = (reaction: BasicReactionResponse) => {
-  const existingIndex = recentReactions.value.findIndex(r => r.name === reaction.name);
-  if (existingIndex !== -1) {
-    recentReactions.value.splice(existingIndex, 1);
-  }
-  recentReactions.value.unshift(reaction);
-};
 
 const startReply = (comment: any) => {
   parentCommentId.value = comment.id;
@@ -79,13 +54,13 @@ const cancelReply = () => {
         :show-comments-count="false"
         :basic-reactions="basicReactions"
         :recent-reactions="recentReactions"
-        @reaction-added="reactionAdded"
+        @reaction-added="emit('reaction-added', $event)"
     />
     <CommentEdit v-if="post.isCommentable && !parentCommentId" :post-id="post.id"
                  :basic-reactions="basicReactions"
                  :recent-reactions="recentReactions"
                  :is-edit="false"
-                 @reaction-added="reactionAdded"/>
+                 @reaction-added="emit('reaction-added', $event)"/>
     <div class="comments_block">
       <Comment v-for="comment in post.comments" :key="comment.id"
                :comment="comment"
@@ -93,7 +68,7 @@ const cancelReply = () => {
                :is-reactable="true"
                :basic-reactions="basicReactions"
                :recent-reactions="recentReactions"
-               @reaction-added="reactionAdded"
+               @reaction-added="emit('reaction-added', $event)"
                @reply="startReply(comment)"
       />
     </div>
@@ -105,7 +80,7 @@ const cancelReply = () => {
                  :recent-reactions="recentReactions"
                  :is-edit="false"
                  :is-reply="true"
-                 @reaction-added="reactionAdded"
+                 @reaction-added="emit('reaction-added', $event)"
                  @cancel-reply="cancelReply"/>
   </div>
 </template>

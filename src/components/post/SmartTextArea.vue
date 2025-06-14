@@ -15,8 +15,8 @@ const { t } = useI18n()
 
 const props = defineProps<{
   content?: string;
-  basicReactions?: ReactionPackDto[],
-  recentReactions?: BasicReactionResponse[],
+  basicReactions: ReactionPackDto[],
+  recentReactions: BasicReactionResponse[],
 }>();
 
 const emit = defineEmits<{
@@ -36,35 +36,8 @@ const searchedUsers = ref<Array<{login: string, nickname: string, avatarUri?: st
 const searchedReactions = ref<ReactionViewDto[]>([]);
 
 onMounted(async () => {
-  try {
-    if (props.basicReactions && props.recentReactions) {
-      basicReactions.value = props.basicReactions;
-      recentReactions.value = props.recentReactions;
-      return;
-    }
-
-    const basicResult = await reactionClient.getBasicReactions();
-    if (basicResult.type === 'ok') {
-      basicReactions.value = basicResult.data;
-    } else {
-      console.error('Failed to load basic reactions:', basicResult.message);
-      ElMessage.error(t('reactions.load_error'));
-    }
-
-    // Get recent reactions
-    const recentResult = await reactionClient.getRecentReactions(60);
-    if (recentResult.type === 'ok') {
-      recentReactions.value = recentResult.data.map(reaction => ({
-        name: reaction.name,
-        iconUri: reaction.iconUri,
-      }));
-    } else {
-      console.error('Failed to load recent reactions:', recentResult.message);
-    }
-  } catch (error) {
-    console.error('Error loading reactions:', error);
-    ElMessage.error(t('reactions.load_error'));
-  }
+  basicReactions.value = props.basicReactions;
+  recentReactions.value = props.recentReactions;
 });
 
 // Watch for changes in userSearchQuery and fetch users from backend
