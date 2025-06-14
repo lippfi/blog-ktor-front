@@ -57,6 +57,14 @@ onMounted(async () => {
     posts.value = searchResult.data.content.map((c) => mapPostDtoToPost(c));
   }
 });
+
+const reactionAdded = (reaction: BasicReactionResponse) => {
+  const existingIndex = recentReactions.value.findIndex(r => r.name === reaction.name);
+  if (existingIndex !== -1) {
+    recentReactions.value.splice(existingIndex, 1);
+  }
+  recentReactions.value.unshift(reaction);
+};
 </script>
 
 <template>
@@ -69,8 +77,9 @@ onMounted(async () => {
       :show-comments-count="true"
       :basic-reactions="basicReactions"
       :recent-reactions="recentReactions"
+      @reaction-added="reactionAdded"
     />
-    <PostEdit v-if="loggedIn" :diary-login="props.login"/>
+    <PostEdit v-if="loggedIn" :diary-login="props.login" :basic-reactions="basicReactions" :recent-reactions="recentReactions" @reaction-added="reactionAdded"/>
   </div>
 </template>
 

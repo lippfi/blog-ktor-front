@@ -37,6 +37,7 @@
               :post-uri="post.uri"
               :basic-reactions="basicReactions"
               :recent-reactions="recentReactions"
+              @reaction-added="reactionAdded"
             />
           </div>
           <FooterButtons :post="post" :show-comments-count="showCommentsCount" @startEdit="startEditing"/>
@@ -86,18 +87,26 @@ const finishEditing = () => {
   isEditing.value = false;
 };
 
+const emit = defineEmits<{
+  (e: 'reaction-added', reaction: BasicReactionResponse): void
+}>();
+
 const props = defineProps<{
   login: string;
   post: Post,
   showCommentsCount: boolean,
   redirectOnDelete?: string,
-  basicReactions?: ReactionPackDto[],
-  recentReactions?: BasicReactionResponse[],
+  basicReactions: ReactionPackDto[],
+  recentReactions: BasicReactionResponse[],
 }>();
 
 const formattedCreationTime = computed(() => {
   return getDateTimeString(props.post.creationTime.toString());
 });
+
+const reactionAdded = (reaction: BasicReactionResponse) => {
+  emit('reaction-added', reaction);
+}
 </script>
 
 <style scoped>

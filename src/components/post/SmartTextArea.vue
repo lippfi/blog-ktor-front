@@ -14,6 +14,12 @@ const { t } = useI18n()
 
 const props = defineProps<{
   content?: string;
+  basicReactions?: ReactionPackDto[],
+  recentReactions?: BasicReactionResponse[],
+}>();
+
+const emit = defineEmits<{
+  (e: 'reaction-added', reaction: BasicReactionResponse): void
 }>();
 
 // Reuse the same reactions as in AddReaction component
@@ -24,10 +30,14 @@ const showUserPopover = ref(false);
 const userSearchQuery = ref('');
 const tooltipDelay = 300;
 
-// Fetch reactions when component is mounted
 onMounted(async () => {
   try {
-    // Get basic reactions
+    if (props.basicReactions && props.recentReactions) {
+      basicReactions.value = props.basicReactions;
+      recentReactions.value = props.recentReactions;
+      return;
+    }
+
     const basicResult = await reactionClient.getBasicReactions();
     if (basicResult.type === 'ok') {
       basicReactions.value = basicResult.data;
@@ -146,6 +156,7 @@ const insertMention = (user: UserMention) => {
 const handleReactionSelectAndHideCompletion = (reaction: BasicReactionResponse) => {
   const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement;
   if (!textarea) return;
+  emit("reaction-added", reaction)
 
   try {
     textarea.focus();

@@ -48,15 +48,6 @@ const emit = defineEmits<{
 }>();
 
 const handleReactionSelect = (reaction: BasicReactionResponse) => {
-  // Add the selected reaction to the recent reactions list if it's not already there
-  const existingIndex = recentReactions.value.findIndex(r => r.name === reaction.name);
-  if (existingIndex !== -1) {
-    // If the reaction is already in the list, remove it so we can add it to the front
-    recentReactions.value.splice(existingIndex, 1);
-  }
-  // Add the reaction to the front of the list
-  recentReactions.value.unshift(reaction);
-
   emit('reaction-selected', reaction);
   isPopoverVisible.value = false;
 };

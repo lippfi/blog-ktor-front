@@ -11,7 +11,7 @@
           <span>{{ $t('post.form.fields.title.label') }}</span>
           <el-input v-model="localTitle"/>
         </div>
-        <SmartTextArea v-model:content="localContent"/>
+        <SmartTextArea v-model:content="localContent" :basic-reactions="basicReactions" :recent-reactions="recentReactions" @reaction-added="reactionAdded"/>
         <div class="tags-row">
           <span>{{ $t('post.form.fields.tags.label')}}</span>
           <el-input-tag :trigger="'Space'" v-model="localTags"/>
@@ -67,6 +67,8 @@ import PostClientImpl from "@/api/postClient/postClient.ts";
 import type {PostCreateDto} from "@/api/dto/postServiceDto.ts";
 import {getAccessGroups, getDefaultAccessGroups} from "@/api/accessGroupService.ts";
 import router from "@/router";
+import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
+import type {BasicReactionResponse} from "@/api/reactionService.ts";
 
 const {t } = useI18n()
 
@@ -82,6 +84,8 @@ const props = withDefaults(defineProps<{
   commentGroup?: string;
   readGroup?: string;
   isRepost?: boolean;
+  basicReactions?: ReactionPackDto[],
+  recentReactions?: BasicReactionResponse[],
 }>(), {
   tags: () => [],
   content: '',
@@ -91,7 +95,14 @@ const props = withDefaults(defineProps<{
   isRepost: false
 });
 
-const emit = defineEmits(['cancelEdit']);
+const emit = defineEmits<{
+  (e: 'cancelEdit'): void
+  (e: 'reaction-added', reaction: BasicReactionResponse): void
+}>();
+
+const reactionAdded = (reaction: BasicReactionResponse) => {
+  emit('reaction-added', reaction);
+}
 
 // Use reactive local state
 const localTags = ref<string[]>(props.tags || []);
@@ -140,7 +151,7 @@ async function fetchAccessGroups() {
 }
 
 function cancelEdit() {
-  emit('cancelEdit', '');
+  emit('cancelEdit');
 }
 
 const showAdvancedOptions = ref<boolean>()

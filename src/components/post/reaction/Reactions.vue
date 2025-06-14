@@ -20,6 +20,10 @@ const props = defineProps<{
   recentReactions: BasicReactionResponse[],
 }>()
 
+const emit = defineEmits<{
+  (e: 'reaction-added', reaction: BasicReactionResponse): void
+}>();
+
 const localReactions = ref<ReactionModel[]>([...props.reactions])
 
 // Keep localReactions in sync with props
@@ -57,6 +61,7 @@ async function handleReactionRemove(reactionToRemove: ReactionModel) {
 }
 
 async function handleReactionSelect(reaction: BasicReactionResponse) {
+  emit('reaction-added', reaction)
   const existingReaction = localReactions.value.find(r => r.name === reaction.name)
 
   if (existingReaction) {
