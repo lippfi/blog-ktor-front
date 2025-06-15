@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Reaction as ReactionModel} from '@/models/posts/post.ts'
 import type { BasicReactionResponse } from '@/api/reactionService.ts'
-import { addCommentReaction, removeCommentReaction } from '@/api/reactionService.ts'
 import { getCurrentUserNickname } from '@/api/userService.ts'
 import AddReaction from '@/components/post/reaction/AddReaction.vue'
 import {ref, watch} from 'vue'
@@ -50,7 +49,7 @@ async function handleReactionRemove(reactionToRemove: ReactionModel) {
         if (!props.commentId) {
           throw new Error('Comment ID is required for comment reactions')
         }
-        await removeCommentReaction(props.commentId, reactionToRemove.name)
+        await reactionClient.removeCommentReaction(props.commentId, reactionToRemove.name)
       }
     } catch (error) {
       console.error('Error removing reaction:', error)
@@ -83,7 +82,7 @@ async function handleReactionSelect(reaction: BasicReactionResponse) {
         if (!props.commentId) {
           throw new Error('Comment ID is required for comment reactions')
         }
-        await addCommentReaction(props.commentId, existingReaction.name)
+        await reactionClient.addCommentReaction(props.commentId, existingReaction.name)
       }
     } catch (error) {
       console.error('Error sending reaction update:', error)
@@ -115,7 +114,7 @@ async function handleReactionSelect(reaction: BasicReactionResponse) {
       if (!props.commentId) {
         throw new Error('Comment ID is required for comment reactions')
       }
-      await addCommentReaction(props.commentId, newReaction.name)
+      await reactionClient.addCommentReaction(props.commentId, newReaction.name)
     }
   } catch (error) {
     console.error('Error sending reaction update:', error)

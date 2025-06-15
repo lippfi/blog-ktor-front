@@ -1,6 +1,8 @@
 import type {ReactionPackDto, ReactionViewDto} from "@/api/dto/reactionServiceDto.ts";
 import {backendURL} from "@/main.ts";
 import type {RecentReactionResponse} from "@/api/reactionService.ts";
+import type {Result} from "@/api/postClient/postClient.ts";
+import * as url from "node:url";
 
 type Result<T> =
     | { type: 'ok'; data: T }
@@ -8,8 +10,13 @@ type Result<T> =
 
 export interface IReactionClient {
     search(text: String): Promise<Result<ReactionViewDto[]>>
+
     addPostReaction(login: string, uri: string, reactionName: string): Promise<void>
     removePostReaction(login: string, uri: string, reactionName: string): Promise<void>
+
+    addCommentReaction(commentId: string, reactionName: string): Promise<void>
+    removeCommentReaction(commentId: string, reactionName: string): Promise<void>
+
     getBasicReactions(): Promise<Result<ReactionPackDto[]>>
     getRecentReactions(limit?: number): Promise<Result<RecentReactionResponse[]>>
 }
@@ -110,6 +117,44 @@ export class ReactionClientImpl implements IReactionClient {
         return response.ok
             ? { type: 'ok', data: await response.json() }
             : { type: 'error', message: await response.text() };
+    }
+
+    public async addCommentReaction(commentId: string, reactionName: string): Promise<void> {
+        try {
+            const response = await reactionClient.authenticatedRequest(`/reactions/comment-reaction?commentId=${encodeURIComponent(commentId)}&name=${encodeURIComponent(reactionName)}`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                // const message = await response.text();
+                // return { type: 'ok', data: message };
+            } else {
+                // const message = await response.text();
+                // return { type: 'error', message };
+            }
+        } catch (error) {
+            // return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        }
+    }
+
+    public async removeCommentReaction(commentId: string, reactionName: string): Promise<void> {
+        try {
+            const response = await reactionClient.authenticatedRequest(`/reactions/comment-reaction?commentId=${encodeURIComponent(commentId)}&name=${encodeURIComponent(reactionName)}`,
+                {
+                    method: 'DELETE',
+                }
+            );
+
+            if (response.ok) {
+                // const message = await response.text();
+                // return { type: 'ok', data: message };
+            } else {
+                // const message = await response.text();
+                // return { type: 'error', message };
+            }
+        } catch (error) {
+            // return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        }
     }
 }
 

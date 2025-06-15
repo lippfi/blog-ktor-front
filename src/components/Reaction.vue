@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { addCommentReaction, removeCommentReaction } from '@/api/reactionService'
 import {getCurrentUserLogin, getCurrentUserNickname} from "@/api/userService.ts"
 import { ref, watch } from 'vue'
 import {useI18n} from "vue-i18n";
@@ -70,9 +69,9 @@ async function toggleReaction() {
         throw new Error('Comment ID is required for comment reactions')
       }
       if (localReaction.value.userReacted) {
-        await addCommentReaction(props.commentId, props.reaction.id)
+        await reactionClient.addCommentReaction(props.commentId, props.reaction.name)
       } else {
-        await removeCommentReaction(props.commentId, props.reaction.id)
+        await reactionClient.removeCommentReaction(props.commentId, props.reaction.name)
       }
     }
   } catch (error) {

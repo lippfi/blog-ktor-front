@@ -115,54 +115,6 @@ export async function deleteReaction(name: string): Promise<Result<string>> {
     }
 }
 
-export async function addCommentReaction(commentId: string, reactionId: string): Promise<Result<string>> {
-    try {
-        const response = await fetch(
-            `${backendURL}/reactions/comment-reaction?commentId=${encodeURIComponent(commentId)}&reactionId=${encodeURIComponent(reactionId)}`,
-            {
-                method: 'POST',
-                headers: localStorage.getItem('jwt') 
-                    ? { 'Authorization': `Bearer ${localStorage.getItem('jwt')}` }
-                    : undefined
-            }
-        );
-
-        if (response.ok) {
-            const message = await response.text();
-            return { type: 'ok', data: message };
-        } else {
-            const message = await response.text();
-            return { type: 'error', message };
-        }
-    } catch (error) {
-        return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
-    }
-}
-
-export async function removeCommentReaction(commentId: string, reactionId: string): Promise<Result<string>> {
-    try {
-        const response = await fetch(
-            `${backendURL}/reactions/comment-reaction?commentId=${encodeURIComponent(commentId)}&reactionId=${encodeURIComponent(reactionId)}`,
-            {
-                method: 'DELETE',
-                headers: localStorage.getItem('jwt') 
-                    ? { 'Authorization': `Bearer ${localStorage.getItem('jwt')}` }
-                    : undefined
-            }
-        );
-
-        if (response.ok) {
-            const message = await response.text();
-            return { type: 'ok', data: message };
-        } else {
-            const message = await response.text();
-            return { type: 'error', message };
-        }
-    } catch (error) {
-        return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
-    }
-}
-
 export async function getReactions(names: string[]): Promise<Result<BasicReactionResponse[]>> {
     try {
         const url = `${backendURL}/reactions/search-names?names=${encodeURIComponent(names.join(','))}`;

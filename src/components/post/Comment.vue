@@ -28,10 +28,6 @@ const emit = defineEmits<{
   (e: 'reply', comment: Comment): void
 }>();
 
-const reactionAdded = (reaction: BasicReactionResponse) => {
-  emit('reaction-added', reaction);
-}
-
 const formattedCreationTime = computed(() => {
   return getDateTimeString(props.comment.creationTime);
 });
@@ -79,7 +75,7 @@ const reply = () => {
             :comment-id="comment.id"
             :basic-reactions="props.basicReactions"
             :recent-reactions="props.recentReactions"
-            @reaction-added="reactionAdded"
+            @reaction-added="emit('reaction-added', $event)"
         />
         <FooterButtons :post="post" :comment="comment" :show-comments-count="false" @startEdit="startEditing" @reply="reply"/>
       </div>
