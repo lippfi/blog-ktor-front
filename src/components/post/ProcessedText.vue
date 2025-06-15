@@ -72,7 +72,6 @@ const avatarStates = ref<Map<string, 'idle' | 'loading' | 'success' | 'error'>>(
 // Define the addAvatarToCollection function
 async function addAvatarToCollection(url: string) {
   try {
-    // Set state to loading
     avatarStates.value.set(url, 'loading');
 
     // Force re-render by creating a new Map with the same entries
@@ -82,19 +81,10 @@ async function addAvatarToCollection(url: string) {
 
     if (result.type === 'ok') {
       emit('update-avatars')
-      // Set state to success
-      avatarStates.value.set(url, 'success');
+      // Set state back to idle immediately
+      avatarStates.value.set(url, 'idle');
       // Force re-render
       avatarStates.value = new Map(avatarStates.value);
-
-      // Reset to idle after 3 seconds
-      setTimeout(() => {
-        if (avatarStates.value.get(url) === 'success') {
-          avatarStates.value.set(url, 'idle');
-          // Force re-render
-          avatarStates.value = new Map(avatarStates.value);
-        }
-      }, 3000);
     } else {
       // Set state to error
       avatarStates.value.set(url, 'error');
@@ -139,16 +129,11 @@ watch(avatarStates, (newStates) => {
   newStates.forEach((state, url) => {
     // Find all elements related to this URL
     const loadingOverlays = document.querySelectorAll(`.loading-overlay[data-url="${url}"]`);
-    const successOverlays = document.querySelectorAll(`.success-overlay[data-url="${url}"]`);
     const addButtons = document.querySelectorAll(`.add-avatar-btn[data-url="${url}"]`);
 
     // Update their display based on the current state
     loadingOverlays.forEach(overlay => {
       (overlay as HTMLElement).style.display = state === 'loading' ? 'flex' : 'none';
-    });
-
-    successOverlays.forEach(overlay => {
-      (overlay as HTMLElement).style.display = state === 'success' ? 'flex' : 'none';
     });
 
     addButtons.forEach(button => {
@@ -392,12 +377,6 @@ function replaceAvatar(text: string): string {
       avatarHtml += `<div class="avatar-overlay loading-overlay" data-url="${url}" style="display: ${currentState === 'loading' ? 'flex' : 'none'}">`;
       avatarHtml += '<div class="loading-spinner"></div>';
       avatarHtml += '<div class="overlay-text">' + t('avatars.adding') + '</div>';
-      avatarHtml += '</div>';
-
-      // Add success overlay with a data attribute for the URL
-      avatarHtml += `<div class="avatar-overlay success-overlay" data-url="${url}" style="display: ${currentState === 'success' ? 'flex' : 'none'}">`;
-      avatarHtml += '<div class="success-icon">✓</div>';
-      avatarHtml += '<div class="overlay-text">' + t('avatars.added') + '</div>';
       avatarHtml += '</div>';
 
       if (isAlreadyAdded) {
@@ -711,10 +690,6 @@ function replaceRepost(text: string): string {
   background-color: rgba(0, 0, 0, 0.7);
 }
 
-.success-overlay {
-  background-color: rgba(46, 125, 50, 0.8);
-}
-
 .loading-spinner {
   width: 30px;
   height: 30px;
@@ -727,11 +702,6 @@ function replaceRepost(text: string): string {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
-}
-
-.success-icon {
-  font-size: 30px;
-  margin-bottom: 10px;
 }
 
 .overlay-text {
