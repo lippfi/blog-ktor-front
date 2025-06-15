@@ -37,7 +37,7 @@
               :post-uri="post.uri"
               :basic-reactions="basicReactions"
               :recent-reactions="recentReactions"
-              @reaction-added="reactionAdded"
+              @reaction-added="emit('reaction-added', $event)"
             />
           </div>
           <FooterButtons :post="post" :show-comments-count="showCommentsCount" @startEdit="startEditing"/>
@@ -47,6 +47,7 @@
   </div>
   <!--    todo what about other fields? -->
   <PostEdit v-if="isEditing"
+            :type="'edit'"
             :content="post.text"
             :title="post.title"
             :postID="post.id"
@@ -55,6 +56,7 @@
             :avatars="avatars"
             :basic-reactions="basicReactions"
             :recent-reactions="recentReactions"
+            @post-updated="postUpdated"
             @cancelEdit="cancelEditing"
   />
 </template>
@@ -75,6 +77,9 @@ import NicknameComponent from "@/components/NicknameComponent.vue";
 import router from "@/router";
 import type { ReactionPackDto } from "@/api/dto/reactionServiceDto.ts";
 import type { BasicReactionResponse } from "@/api/reactionService.ts";
+import type {Result} from "@/api/postClient/postClient.ts";
+import type {PostViewDto} from "@/api/dto/postServiceDto.ts";
+import {mapDtoToReaction} from "@/api/dto/mapper.ts";
 
 let isEditing = ref(false);
 
@@ -86,9 +91,27 @@ const cancelEditing = () => {
   isEditing.value = false;
 }
 
-const finishEditing = () => {
-  isEditing.value = false;
-};
+const postUpdated = (result: Result<PostViewDto>) => {
+  if (result.type == 'ok') {
+    const post = result.data;
+    props.post.uri = post.uri;
+    props.post.avatar = post.avatar;
+    props.post.title = post.title;
+    props.post.text = post.text;
+    props.post.tags = post.tags;
+    props.post.classes = post.classes;
+    props.post.reactions = post.reactions.map(mapDtoToReaction);
+    props.post.readGroupId = post.readGroupId;
+    props.post.commentGroupId = post.commentGroupId;
+    props.post.reactionGroupId = post.reactionGroupId;
+    props.post.isReactable = post.isReactable;
+    props.post.isCommentable = post.isCommentable;
+
+    isEditing.value = false;
+  } else {
+    // todo
+  }
+}
 
 const emit = defineEmits<{
   (e: 'update-avatars'): void

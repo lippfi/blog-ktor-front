@@ -31,8 +31,6 @@ const props = defineProps<{
 }>()
 
 const searchResults = ref<BasicReactionResponse[]>([]);
-const isSearching = ref(false);
-const searchError = ref<string | null>(null);
 const searchQuery = ref('');
 const isPopoverVisible = ref(false);
 

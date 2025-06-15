@@ -406,9 +406,10 @@ export default {
                 },
             },
             button: {
-                send: 'publish',
+                send: 'send',
                 cancel: 'cancel',
-                repost: 'repost'
+                repost: 'repost',
+                update: 'update',
             }
         },
         repost: {

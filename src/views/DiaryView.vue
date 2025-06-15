@@ -64,6 +64,7 @@ onMounted(async () => {
     />
     <PostEdit
         v-if="loggedIn"
+        :type="'post'"
         :diary-login="props.login"
         :avatars="avatars"
         :basic-reactions="basicReactions"

@@ -1,8 +1,8 @@
 <template>
   <div class="post-edit">
-    <h3 v-if="isRepost()">{{ $t('post.form.title.repost') }}</h3>
-    <h3 v-else-if="isEditing()">{{ $t('post.form.title.edit') }}</h3>
-    <h3 v-else>{{ $t('post.form.title.add') }}</h3>
+    <h3 v-if="type === 'edit'">{{ $t('post.form.title.edit') }}</h3>
+    <h3 v-if="type === 'post'">{{ $t('post.form.title.add') }}</h3>
+    <h3 v-if="type === 'repost'">{{ $t('post.form.title.repost') }}</h3>
 
     <div class="form">
       <AvatarChooser :avatar-size="100" :outline-size="3" :show-buttons="true" :is-vertical="true" v-model:selected-avatar="localAvatar" :avatars="avatars"/>
@@ -47,8 +47,10 @@
             <span>{{ $t('post.form.fields.advanced.label') }}</span>
             <el-switch v-model="showAdvancedOptions"/>
           </div>
-          <el-button type="primary" @click="handleSave">{{ isRepost() ? $t('post.form.button.repost') : $t('post.form.button.send')}}</el-button>
-          <el-button v-if="isEditing()" type="info" @click="cancelEdit">{{$t('post.form.button.cancel')}}</el-button>
+          <el-button v-if="type === 'edit'" type="info" @click="cancelEdit">{{$t('post.form.button.cancel')}}</el-button>
+          <el-button v-if="type === 'edit'" type="primary" @click="updatePost">{{ $t('post.form.button.update') }}</el-button>
+          <el-button v-if="type === 'post'" type="primary" @click="createPost">{{ $t('post.form.button.send') }}</el-button>
+          <el-button v-if="type === 'repost'" type="primary" @click="createPost">{{ $t('post.form.button.repost') }}</el-button>
         </div>
       </div>
     </div>
@@ -63,8 +65,8 @@ import AvatarChooser from "@/components/post/AvatarChooser.vue";
 import type {PostEdit} from "@/models/posts/post.ts";
 import {getCurrentSessionInfo, getCurrentUserLogin} from "@/api/userService.ts";
 import {mapPostEditToPostEditDto} from "@/api/dto/mapper.ts";
-import PostClientImpl from "@/api/postClient/postClient.ts";
-import type {PostCreateDto} from "@/api/dto/postServiceDto.ts";
+import PostClientImpl, {type Result} from "@/api/postClient/postClient.ts";
+import type {PostCreateDto, PostViewDto} from "@/api/dto/postServiceDto.ts";
 import {getAccessGroups, getDefaultAccessGroups} from "@/api/accessGroupService.ts";
 import router from "@/router";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
@@ -72,7 +74,10 @@ import type {BasicReactionResponse} from "@/api/reactionService.ts";
 
 const {t } = useI18n()
 
+export type PostFormType = 'post' | 'repost' | 'edit';
+
 const props = withDefaults(defineProps<{
+  type: PostFormType;
   diaryLogin: string;
   tags?: string[];
   content?: string;
@@ -83,7 +88,6 @@ const props = withDefaults(defineProps<{
   reactionGroup?: string;
   commentGroup?: string;
   readGroup?: string;
-  isRepost?: boolean;
   avatars: string[];
   basicReactions: ReactionPackDto[],
   recentReactions: BasicReactionResponse[],
@@ -99,6 +103,7 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   (e: 'cancelEdit'): void
   (e: 'reaction-added', reaction: BasicReactionResponse): void
+  (e: 'post-updated', reaction: Result<PostViewDto>): void
 }>();
 
 const reactionAdded = (reaction: BasicReactionResponse) => {
@@ -156,21 +161,6 @@ function cancelEdit() {
 }
 
 const showAdvancedOptions = ref<boolean>()
-const isEditing = () => {
-  return !!props.postID;
-};
-
-const isRepost = () => {
-  return props.isRepost;
-};
-
-async function handleSave() {
-  if (!isEditing()) {
-    await createPost()
-  } else {
-    await updatePost()
-  }
-}
 
 async function createPost() {
   const newPost: PostCreateDto = {
@@ -217,11 +207,7 @@ async function updatePost() {
   }
 
   const res = await client.updatePost(mapPostEditToPostEditDto(postEdit))
-  if (res.type == 'ok') {
-    await router.push({name: 'post', params: {'login': props.diaryLogin, 'postUri': res.data.uri}})
-  } else {
-    console.log("update error")
-  }
+  emit('post-updated', res)
 }
 
 function preprocessPostTitle(title: string): string {

@@ -9,7 +9,7 @@ import type {
 } from "@/api/dto/postServiceDto.ts";
 import {authenticatedRequest} from "@/api/userService.ts";
 
-type Result<T> =
+export type Result<T> =
     | { type: 'ok'; data: T }
     | { type: 'error'; message: string };
 

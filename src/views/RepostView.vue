@@ -3,6 +3,21 @@ import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import PostEdit from '@/components/post/PostEdit.vue';
 import { getCurrentUserLogin } from '@/api/userService.ts';
+import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
+import type {BasicReactionResponse} from "@/api/reactionService.ts";
+
+const props = defineProps<{
+  login: string;
+  postUri: string;
+  avatars: string[];
+  basicReactions: ReactionPackDto[],
+  recentReactions: BasicReactionResponse[],
+}>();
+
+const emit = defineEmits<{
+  (e: 'update-avatars'): void
+  (e: 'reaction-added', reaction: BasicReactionResponse): void
+}>();
 
 const route = useRoute();
 const currentUserLogin = ref(getCurrentUserLogin()!!);
@@ -26,10 +41,14 @@ const wrappedContent = computed(() => {
     <div v-if="error" class="error">{{ error }}</div>
     <PostEdit
       v-else
+      :type="'repost'"
       :diaryLogin="currentUserLogin"
       :content="wrappedContent"
       :title="'Repost: ' + postTitle"
-      :is-repost="true"
+      :avatars="avatars"
+      :basic-reactions="basicReactions"
+      :recent-reactions="recentReactions"
+      @reaction-added="emit('reaction-added', $event)"
     />
   </div>
 </template>
