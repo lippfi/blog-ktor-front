@@ -69,7 +69,7 @@ const reply = () => {
         <NicknameComponent :nickname="comment.authorNickname" :login="comment.authorLogin"/>
         <span class="date">{{ formattedCreationTime }}</span>
       </div>
-      <ProcessedText :text="comment.text" :avatars="avatars" @update-avatars="emit('update-avatars')"/>/>
+      <ProcessedText :text="comment.text" :avatars="avatars" @update-avatars="emit('update-avatars')"/>
       <div class="footer">
 <!--        todo reaction added-->
         <Reactions
@@ -85,7 +85,7 @@ const reply = () => {
       </div>
     </div>
   </div>
-  <CommentEdit :post-id="props.post.id" :content="comment.text" :avatar="comment.avatar" :id="comment.id" @cancel-edit="cancelEditing" v-if="isEditing" :is-edit="true"/>
+  <CommentEdit :post-id="props.post.id" :content="comment.text" :avatar="comment.avatar" :avatars="avatars" :id="comment.id" @cancel-edit="cancelEditing" v-if="isEditing" :is-edit="true"/>
 </template>
 
 <style scoped>
