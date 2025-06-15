@@ -261,6 +261,7 @@ const handleFileUpload = async (event: Event) => {
   grid-auto-rows: 100px; /* Fixed row height */
   gap: 16px;
   width: 100%;
+  position: relative; /* Added for better transition positioning */
 }
 
 .avatar-item {
@@ -271,6 +272,8 @@ const handleFileUpload = async (event: Event) => {
   overflow: hidden;
   cursor: move;
   transition: all 0.3s ease;
+  /* Ensure the item maintains its dimensions during transitions */
+  box-sizing: border-box;
 }
 
 .avatar-item:hover {
@@ -325,6 +328,26 @@ const handleFileUpload = async (event: Event) => {
 /* Animation for avatar transitions */
 .avatar-transition-move {
   transition: transform 0.5s ease;
+  z-index: 1;
+  /* Only transition transform property to prevent "flying" effect */
+}
+
+.avatar-transition-enter-active {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  /* No position: absolute to prevent appearing at the top-left corner */
+  /* No transition for position properties to prevent "flying" effect */
+}
+
+.avatar-transition-leave-active {
+  transition: none; /* No transition for immediate disappearance */
+  position: absolute; /* Ensures items don't affect layout during transitions */
+  z-index: -1; /* Ensure deleted avatars appear behind other elements */
+}
+
+.avatar-transition-enter-from,
+.avatar-transition-leave-to {
+  opacity: 0;
+  transform: scale(0.5);
 }
 
 /* Add avatar styles */
