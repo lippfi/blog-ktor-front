@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {RouterView, useRoute} from "vue-router";
-import {computed, type ComputedRef, ref, nextTick} from "vue";
+import {computed, type ComputedRef, ref, nextTick, onMounted} from "vue";
 
 import CommentEdit from "@/components/post/CommentEdit.vue";
 import Comment from "@/components/post/Comment.vue";
@@ -28,6 +28,10 @@ const replyingToComment = ref<any | null>(null);
 
 const route = useRoute();
 const post: ComputedRef<Post> = computed(() => route.meta.post as Post);
+
+onMounted(() => {
+  document.title = post.value.title;
+})
 
 const startReply = (comment: any) => {
   parentCommentId.value = comment.id;
