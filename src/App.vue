@@ -30,25 +30,17 @@ watch(() => router.currentRoute.value, () => {
   signedIn.value = isSignedIn()
 })
 
-// Listen for auth events
-const authChangedHandler = (isAuthenticated: boolean) => {
-  signedIn.value = isAuthenticated
-}
-authEvents.on('auth-changed', authChangedHandler)
-
-// Clean up event listener when component is unmounted
-onUnmounted(() => {
-  authEvents.off('auth-changed', authChangedHandler)
-})
-
 onMounted(async () => {
   signedIn.value = isSignedIn()
+  console.log('Signed in:', signedIn.value);
   if (!signedIn.value) {
+    isLoaded.value = true;
     return
   }
 
   const avatarsResponse = await getAvatars();
   avatars.value = avatarsResponse
+  console.log('Avatars:', avatars.value);
 
   const basicReactionsResponse = await reactionClient.getBasicReactions();
   if (basicReactionsResponse.type === 'ok') {

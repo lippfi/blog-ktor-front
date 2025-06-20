@@ -69,6 +69,23 @@ export interface PostViewDto {
     commentReactionGroupId: string;
 }
 
+export interface DiaryPageDto {
+    diary: DiaryViewDto;
+    posts: PostSearchResult;
+}
+
+export interface DiaryViewDto {
+    name: string;
+    subtitle: string;
+    style?: string;
+    defaultGroups: Record<string, string>;
+}
+
+export interface PostPageDto {
+    diary: DiaryViewDto;
+    post: PostViewDto;
+}
+
 export interface PostEditDto {
     id: string;
     uri: string;

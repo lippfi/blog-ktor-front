@@ -15,7 +15,6 @@ import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import DiarySearchView, { extractSearchParams } from "@/views/DiarySearchView.vue";
 import RepostView from "@/views/RepostView.vue";
-import { reactionClient } from "@/api/postClient/reactionClient.ts";
 
 export const profileStub = {
   text: "Hi there! Welcome to my webpage.\n" +
@@ -102,26 +101,6 @@ export const profileStub = {
   ],
 }
 
-const stubReaction: Reaction = {
-  id: 'tastatarstn',
-  name: 'sad_cat',
-  iconUri: 'https://emoji.slack-edge.com/T0288D531/sad_cat/4253f3b1013d6920.png',
-  count: 3,
-  anonymousCount: 0,
-  userNicknames: ['детектив шимпански', 'птица не спит', 'саша белый'],
-  userReacted: true
-};
-const stubReaction2: Reaction = {
-  id: 'taintaiestnai',
-  name: 'begemot',
-  iconUri: 'src/assets/icons/begemot.png',
-  count: 2,
-  anonymousCount: 0,
-  userNicknames: ['bikechan', 'Фауст'],
-  userReacted: false
-};
-
-
 const stubComment: Comment = {
   id: '1',
   avatar: 'https://i.pinimg.com/550x/56/90/72/569072435a51a4c2690e08a3026de5a0.jpg',
@@ -130,7 +109,7 @@ const stubComment: Comment = {
   text: 'This is a test comment',
   creationTime: new Date('17:35 12.20.24'),
   isReactable: true,
-  reactions: [stubReaction],
+  reactions: [],
   reactionGroupId: 'comment-reactions-1'
 };
 
@@ -142,7 +121,7 @@ const stubComment2: Comment = {
   text: 'Я ебал бабра',
   creationTime: new Date('17:35 12.20.24'),
   isReactable: true,
-  reactions: [stubReaction],
+  reactions: [],
   reactionGroupId: 'comment-reactions-1'
 };
 
@@ -162,7 +141,7 @@ const stubPost: Post = {
   classes: 'test-post',
   tags: ['test', 'example'],
   isReactable: true,
-  reactions: [stubReaction, stubReaction2],
+  reactions: [],
   isCommentable: true,
   comments: [stubComment, stubComment2],
   readGroupId: 'read-group-1',
@@ -228,12 +207,12 @@ const router = createRouter({
       beforeEnter: async (to, _, next) => {
         const postClient = new PostClientImpl();
         const params = extractSearchParams(to);
-        const result = await postClient.searchPosts(params);
+        const result = await postClient.searchDiaryPosts(params);
 
         if (result.type === 'ok') {
-          to.meta.posts = result.data.content.map(mapPostDtoToPost);
-          to.meta.currentPage = result.data.currentPage;
-          to.meta.totalPages = result.data.totalPages;
+          to.meta.posts = result.data.posts.content.map(mapPostDtoToPost);
+          to.meta.currentPage = result.data.posts.currentPage;
+          to.meta.totalPages = result.data.posts.totalPages;
           next();
         } else {
           to.meta.error = result.message;
@@ -251,7 +230,7 @@ const router = createRouter({
         const postDto = await postClient.getPost(to.params.login as string, to.params.postUri as string);
 
         if (postDto.type === 'ok') {
-          to.meta.post = mapPostDtoToPost(postDto.data);
+          to.meta.post = mapPostDtoToPost(postDto.data.post);
           next();
         } else {
           to.meta.post = null;
@@ -289,7 +268,7 @@ const router = createRouter({
         const result = await postClient.getPost(authorLogin, postUri);
 
         if (result.type === 'ok') {
-          to.meta.postContent = result.data.text;
+          to.meta.postContent = result.data.post.text;
           to.meta.authorLogin = authorLogin;
           to.meta.postUri = postUri;
           to.meta.postTitle = postTitle

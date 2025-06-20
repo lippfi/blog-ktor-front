@@ -16,26 +16,26 @@
     </el-form-item>
     <el-form-item prop="read">
     <el-select :placeholder="t('diaryInfo.form.fields.read_privacy.label')" v-model="diaryInfoForm.read">
-      <el-option :label="t('diaryInfo.form.fields.read_privacy.registered')" value="registered" />
+      <el-option :label="t('diaryInfo.form.fields.read_privacy.registered')" value="registered users" />
       <el-option :label="t('diaryInfo.form.fields.read_privacy.everyone')" value="everyone" />
       <el-option :label="t('diaryInfo.form.fields.read_privacy.friends')" value="friends" />
-      <el-option :label="t('diaryInfo.form.fields.read_privacy.nobody')" value="private" />
+      <el-option :label="t('diaryInfo.form.fields.read_privacy.nobody')" value="only me" />
     </el-select>
     </el-form-item>
     <el-form-item prop="comment">
     <el-select :placeholder="t('diaryInfo.form.fields.comment_privacy.label')" v-model="diaryInfoForm.comment">
-      <el-option :label="t('diaryInfo.form.fields.comment_privacy.registered')" value="registered" />
+      <el-option :label="t('diaryInfo.form.fields.comment_privacy.registered')" value="registered users" />
       <el-option :label="t('diaryInfo.form.fields.comment_privacy.everyone')" value="everyone" />
       <el-option :label="t('diaryInfo.form.fields.comment_privacy.friends')" value="friends" />
-      <el-option :label="t('diaryInfo.form.fields.comment_privacy.nobody')" value="private" />
+      <el-option :label="t('diaryInfo.form.fields.comment_privacy.nobody')" value="only me" />
     </el-select>
     </el-form-item>
     <el-form-item prop="react">
       <el-select :placeholder="t('diaryInfo.form.fields.react_privacy.label')" v-model="diaryInfoForm.react">
-        <el-option :label="t('diaryInfo.form.fields.react_privacy.registered')" value="registered" />
+        <el-option :label="t('diaryInfo.form.fields.react_privacy.registered')" value="registered users" />
         <el-option :label="t('diaryInfo.form.fields.react_privacy.everyone')" value="everyone" />
         <el-option :label="t('diaryInfo.form.fields.react_privacy.friends')" value="friends" />
-        <el-option :label="t('diaryInfo.form.fields.react_privacy.nobody')" value="private" />
+        <el-option :label="t('diaryInfo.form.fields.react_privacy.nobody')" value="only me" />
       </el-select>
     </el-form-item>
   </el-form>
@@ -89,11 +89,27 @@ const submitForm = (form: FormInstance | undefined) => {
   form.validate(async (valid) => {
     if (valid) {
       const accessGroups = await getBasicAccessGroups("EN")
+      // {
+      //   "content": {
+      //   "everyone": "e056c1a9-447b-425b-989b-e0592ba6db5d",
+      //       "registered": "5ccc5271-fd29-436d-b991-5f6f39dd5614",
+      //       "friends": "974735d7-6931-46a1-82e0-a66078b6f97f",
+      //       "private": "f169c5ab-c10f-4133-aa19-f205d6846e67"
+      // }
+      // }
       if (accessGroups.type === 'ok') {
         const dictionary = accessGroups.data
+        console.log("dictionary:")
+        console.log(dictionary)
+        console.log("diaryInfoForm.read:", diaryInfoForm.read)
         const read = dictionary[diaryInfoForm.read]!!
+        console.log("read:", read)
+        console.log("diaryInfoForm.comment:", diaryInfoForm.comment)
         const comment = dictionary[diaryInfoForm.comment]!!
+        console.log("comment:", comment)
+        console.log("diaryInfoForm.react:", diaryInfoForm.react)
         const react = dictionary[diaryInfoForm.react]!!
+        console.log("react:", react)
         const diaryInfo = {
           name: diaryInfoForm.name,
           subtitle: diaryInfoForm.description,

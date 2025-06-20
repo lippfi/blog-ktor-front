@@ -163,11 +163,6 @@ const handleFileUpload = async (event: Event) => {
       <el-icon class="loading-icon"><i class="el-icon-loading"></i></el-icon>
       <span>{{ t('avatars.loading') }}</span>
     </div>
-
-    <div v-else-if="avatars.length === 0" class="no-avatars">
-      {{ t('avatars.noAvatarsAvailable') }}
-    </div>
-
     <div v-else>
       <div class="avatar-grid">
         <transition-group name="avatar-transition" tag="div" class="avatar-grid-container">

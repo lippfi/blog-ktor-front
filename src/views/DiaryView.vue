@@ -42,7 +42,7 @@ onMounted(async () => {
 
   isLoaded.value = true;
   if (searchResult.type === 'ok') {
-    posts.value = searchResult.data.content.map((c) => mapPostDtoToPost(c));
+    posts.value = searchResult.data.posts.content.map((c) => mapPostDtoToPost(c));
   }
 });
 

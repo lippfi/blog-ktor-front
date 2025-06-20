@@ -5,7 +5,7 @@ import type {
     CommentUpdateRequest, PostCreateDto,
     PostViewDto,
     PostEditDto, PostSearchResult,
-    SearchPostsParamsDto
+    SearchPostsParamsDto, DiaryPageDto, PostPageDto
 } from "@/api/dto/postServiceDto.ts";
 import {authenticatedRequest} from "@/api/userService.ts";
 
@@ -14,10 +14,9 @@ export type Result<T> =
     | { type: 'error'; message: string };
 
 export interface IPostClient {
-    getDiaryPosts(diary: string, page: number): Promise<Result<PostSearchResult>>;
-    getDiaryPreface(diary: string): Promise<Result<PostViewDto>>;
-    getPost(login: string, uri: string): Promise<Result<PostViewDto>>;
-    searchPosts(params: SearchPostsParamsDto): Promise<Result<PostSearchResult>>;
+    getDiaryPosts(diary: string, page: number): Promise<Result<DiaryPageDto>>;
+    getPost(login: string, uri: string): Promise<Result<PostPageDto>>;
+    searchDiaryPosts(params: SearchPostsParamsDto): Promise<Result<DiaryPageDto>>;
     getLatestPosts(page?: number): Promise<Result<PostSearchResult>>;
     getDiscussedPosts(page?: number, size?: number): Promise<Result<PostSearchResult>>;
     getFollowedPosts(page?: number, size?: number): Promise<Result<PostSearchResult>>;
@@ -58,25 +57,10 @@ class PostClientImpl implements IPostClient {
         return fetch(`${backendURL}${endpoint}`, { ...options, headers });
     }
 
-    public async getDiaryPosts(diary: string, page: number): Promise<Result<PostSearchResult>> {
+    public async getDiaryPosts(diary: string, page: number): Promise<Result<DiaryPageDto>> {
         try {
-            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/search?diary=${encodeURIComponent(diary)}&page=${encodeURIComponent(page.toString())}`);
+            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/diary?diary=${encodeURIComponent(diary)}&page=${encodeURIComponent(page.toString())}`);
 
-            if (response.ok) {
-                const data = await response.json();
-                return { type: 'ok', data };
-            } else {
-                const message = await response.text();
-                return { type: 'error', message };
-            }
-        } catch (error) {
-            return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
-        }
-    }
-
-    public async getDiaryPreface(diary: string): Promise<Result<PostViewDto>> {
-        try {
-            const response = await fetch(`${backendURL}/posts/preface?diary=${encodeURIComponent(diary)}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
@@ -111,7 +95,7 @@ class PostClientImpl implements IPostClient {
         }
     }
 
-    public async getPost(login: string, uri: string): Promise<Result<PostViewDto>> {
+    public async getPost(login: string, uri: string): Promise<Result<PostPageDto>> {
         try {
             const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}`);
             if (response.ok) {
@@ -126,10 +110,9 @@ class PostClientImpl implements IPostClient {
         }
     }
 
-    public async searchPosts(params: SearchPostsParamsDto): Promise<Result<PostSearchResult>> {
+    public async searchDiaryPosts(params: SearchPostsParamsDto): Promise<Result<DiaryPageDto>> {
         try {
             const queryParams = new URLSearchParams();
-            if (params.author) queryParams.set('author', params.author);
             if (params.diary) queryParams.set('diary', params.diary);
             if (params.text) queryParams.set('text', params.text);
             if (params.tags) queryParams.set('tags', params.tags.join(','));
@@ -139,7 +122,7 @@ class PostClientImpl implements IPostClient {
             if (params.page !== undefined) queryParams.set('page', params.page.toString());
             if (params.sort) queryParams.set('sort', params.sort.toLowerCase() === 'asc' ? 'asc' : 'desc');
 
-            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/search?${queryParams.toString()}`);
+            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/diary?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
