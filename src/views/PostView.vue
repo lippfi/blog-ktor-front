@@ -34,7 +34,7 @@ onMounted(() => {
   document.title = post.value.title;
 
   if (props.commentId) {
-    setTimeout(() => scrollToComment(), 1000);
+    setTimeout(() => scrollToComment(), 500);
   }
 })
 
@@ -42,7 +42,7 @@ onMounted(() => {
 const scrollToComment = () => {
   const commentElement = document.getElementById(`comment-${props.commentId}`);
   if (commentElement) {
-    commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    commentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 };
 
@@ -91,6 +91,7 @@ const cancelReply = () => {
                :post="post"
                :is-reactable="true"
                :avatars="avatars"
+               :is-selected="props.commentId === comment.id"
                @update-avatars="emit('update-avatars')"
                :basic-reactions="basicReactions"
                :recent-reactions="recentReactions"

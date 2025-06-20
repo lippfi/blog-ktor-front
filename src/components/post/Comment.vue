@@ -19,6 +19,7 @@ const props = defineProps<{
   avatars: string[],
   basicReactions: ReactionPackDto[],
   recentReactions: BasicReactionResponse[],
+  isSelected?: boolean,
 }>();
 
 const emit = defineEmits<{
@@ -52,7 +53,7 @@ const reply = () => {
 </script>
 
 <template>
-  <div :id="'comment-' + comment.id" class="comment" v-if="!isEditing">
+  <div :id="'comment-' + comment.id" class="comment" :class="{ 'selected-comment': isSelected }" v-if="!isEditing">
     <UserAvatarComponent 
       avatar-size="80px"
       :avatar-url="comment.avatar" 
@@ -115,5 +116,13 @@ const reply = () => {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+.selected-comment {
+  background-color: #fafaff;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
 }
 </style>
