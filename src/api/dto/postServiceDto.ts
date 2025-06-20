@@ -14,10 +14,12 @@ export interface ReactionSender {
 }
 
 export interface CommentDto {
-    id?: string;
+    id: string;
     avatar: string;
     authorLogin: string;
     authorNickname: string;
+    diaryLogin: string;
+    postUri: string;
     text: string;
     creationTime: string;
     isReactable: boolean;
@@ -52,6 +54,7 @@ export interface PostViewDto {
     avatar: string;
     authorLogin: string;
     authorNickname: string;
+    diaryLogin: string;
     title: string;
     text: string;
     creationTime: string;

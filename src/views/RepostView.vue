@@ -27,16 +27,17 @@ const { t } = useI18n();
 
 const error = ref('')
 
-const post = computed(() => route.meta.post as PostViewDto);
-const comment = computed(() => route.meta.comment as CommentDto);
+const post = route.meta.post as PostViewDto
+const comment = route.meta.comment as CommentDto
 
-const authorLogin = computed(() => props.type === 'post' ? post.value.authorLogin : comment.value.authorLogin)
-const postLink = computed(() => authorLogin + '/post-' + post.value.uri)
-const origin = computed(() => props.type === 'post' ? postLink : `${postLink}?comment=${comment.value.id}`)
-const content = computed(() => props.type === 'post' ? post.value.text : comment.value.text)
+const authorLogin = props.type === 'post' ? post.authorLogin : comment.authorLogin
+const diaryLogin = props.type === 'post' ? post.diaryLogin : comment.diaryLogin
+const postLink = diaryLogin + '/post-' + (props.type === 'post' ? post.uri : comment.postUri)
+const origin = props.type === 'post' ? postLink : `${postLink}?comment=${comment.id}`
+const content = props.type === 'post' ? post.text : comment.text
 
-const repostTitle = computed(() => props.type === 'post' ? t('post.form.title.repostTemplate') + ' ' + post.value.title : t('post.form.title.repostCommentTemplate'))
-const wrappedContent = computed(() => `[repost${props.type === 'comment' ? ' comment' : '' } author="${authorLogin.value}" origin="${origin.value}" collapsed="false"]\n${content.value}\n[/repost]`)
+const repostTitle = props.type === 'post' ? t('post.form.title.repostTemplate') + ' ' + post.title : t('post.form.title.repostCommentTemplate')
+const wrappedContent = `[repost${props.type === 'comment' ? ' comment' : '' } author="${authorLogin}" origin="${origin}" collapsed="false"]\n${content}\n[/repost]`
 </script>
 
 <template>

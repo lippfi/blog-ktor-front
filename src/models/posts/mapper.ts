@@ -10,7 +10,7 @@ const mapCommentDtoToComment = (dto: CommentDto): Comment => ({
     text: dto.text,
     creationTime: new Date(dto.creationTime), // Преобразуем строку в Date
     isReactable: dto.isReactable,
-    reactions: dto.reactions?.map(mapDtoToReaction),
+    reactions: dto.reactions?.map(mapDtoToReaction) || [],
     reactionGroupId: dto.reactionGroupId,
 });
 

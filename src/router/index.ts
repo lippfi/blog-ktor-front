@@ -257,6 +257,9 @@ const router = createRouter({
       path: "/repost",
       name: "repost",
       component: RepostView,
+      props: {
+        type: 'post',
+      },
       beforeEnter: async (to, _, next) => {
         const diaryLogin = to.query.diary as string;
         const postUri = to.query.postUri as string;
@@ -284,6 +287,9 @@ const router = createRouter({
       path: "/repost-comment",
       name: "repost comment",
       component: RepostView,
+      props: {
+        type: 'comment',
+      },
       beforeEnter: async (to, _, next) => {
         const commentId = to.query.commentId as string;
 

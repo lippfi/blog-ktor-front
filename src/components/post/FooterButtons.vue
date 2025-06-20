@@ -29,13 +29,22 @@ function reply() {
 }
 
 function handleRepost() {
-  router.push({
-    name: 'repost',
-    query: {
-      diary: props.post.authorLogin,
-      postUri: props.post.uri,
-    }
-  });
+  if (props.comment) {
+    router.push({
+      name: 'repost comment',
+      query: {
+        commentId: props.comment.id,
+      }
+    });
+  } else {
+    router.push({
+      name: 'repost',
+      query: {
+        diary: props.post.authorLogin,
+        postUri: props.post.uri,
+      }
+    });
+  }
 }
 
 const showHiddenButtons = ref(false);
