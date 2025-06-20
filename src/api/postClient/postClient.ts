@@ -24,6 +24,7 @@ export interface IPostClient {
     updatePost(post: PostEditDto): Promise<Result<PostViewDto>>;
     deletePost(postId: string): Promise<Result<string>>;
     addPost(post: PostViewDto): Promise<Result<PostViewDto>>
+    getComment(commentId: string): Promise<Result<CommentDto>>;
     addComment(comment: CommentCreateRequest): Promise<Result<CommentDto>>;
     updateComment(comment: CommentUpdateRequest): Promise<Result<CommentDto>>;
     deleteComment(commentId: string): Promise<Result<string>>;
@@ -98,6 +99,21 @@ class PostClientImpl implements IPostClient {
     public async getPost(login: string, uri: string): Promise<Result<PostPageDto>> {
         try {
             const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}`);
+            if (response.ok) {
+                const data = await response.json();
+                return { type: 'ok', data };
+            } else {
+                const message = await response.text();
+                return { type: 'error', message };
+            }
+        } catch (error) {
+            return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        }
+    }
+
+    public async getComment(commentId: string): Promise<Result<CommentDto>> {
+        try {
+            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/comment?commentId=${encodeURIComponent(commentId)}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };

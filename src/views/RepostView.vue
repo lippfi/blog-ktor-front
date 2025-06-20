@@ -5,9 +5,11 @@ import PostEdit from '@/components/post/PostEdit.vue';
 import { getCurrentUserLogin } from '@/api/userService.ts';
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
+import { useI18n } from 'vue-i18n';
+import type {CommentDto, PostViewDto} from "@/api/dto/postServiceDto.ts";
 
 const props = defineProps<{
-  login: string;
+  type: 'comment' | 'post';
   postUri: string;
   avatars: string[];
   basicReactions: ReactionPackDto[],
@@ -21,19 +23,20 @@ const emit = defineEmits<{
 
 const route = useRoute();
 const currentUserLogin = ref(getCurrentUserLogin()!!);
+const { t } = useI18n();
 
-// Get data from route meta (set by router beforeEnter hook)
-const authorLogin = computed(() => route.meta.authorLogin as string);
-const postUri = computed(() => route.meta.postUri as string);
-const postTitle = computed(() => route.meta.postTitle as string);
-const postContent = computed(() => route.meta.postContent as string);
-const error = computed(() => route.meta.error as string);
+const error = ref('')
 
-// Compute wrapped content for repost
-const wrappedContent = computed(() => {
-  if (!postContent.value) return '';
-  return `[repost author="${authorLogin.value}" origin="${authorLogin.value}/post-${postUri.value}" collapsed="false"]\n${postContent.value}\n[/repost]`;
-});
+const post = computed(() => route.meta.post as PostViewDto);
+const comment = computed(() => route.meta.comment as CommentDto);
+
+const authorLogin = computed(() => props.type === 'post' ? post.value.authorLogin : comment.value.authorLogin)
+const postLink = computed(() => authorLogin + '/post-' + post.value.uri)
+const origin = computed(() => props.type === 'post' ? postLink : `${postLink}?comment=${comment.value.id}`)
+const content = computed(() => props.type === 'post' ? post.value.text : comment.value.text)
+
+const repostTitle = computed(() => props.type === 'post' ? t('post.form.title.repostTemplate') + ' ' + post.value.title : t('post.form.title.repostCommentTemplate'))
+const wrappedContent = computed(() => `[repost${props.type === 'comment' ? ' comment' : '' } author="${authorLogin.value}" origin="${origin.value}" collapsed="false"]\n${content.value}\n[/repost]`)
 </script>
 
 <template>
@@ -44,7 +47,7 @@ const wrappedContent = computed(() => {
       :type="'repost'"
       :diaryLogin="currentUserLogin"
       :content="wrappedContent"
-      :title="'Repost: ' + postTitle"
+      :title="repostTitle"
       :avatars="avatars"
       :basic-reactions="basicReactions"
       :recent-reactions="recentReactions"

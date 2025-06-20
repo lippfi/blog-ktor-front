@@ -258,24 +258,47 @@ const router = createRouter({
       name: "repost",
       component: RepostView,
       beforeEnter: async (to, _, next) => {
-        const authorLogin = to.query.authorLogin as string;
+        const diaryLogin = to.query.diary as string;
         const postUri = to.query.postUri as string;
-        const postTitle = to.query.postTitle as string;
 
-        if (!authorLogin || !postUri) {
-          to.meta.error = 'Missing required query parameters: authorLogin and postUri';
+        if (!diaryLogin || !postUri) {
+          to.meta.error = 'Missing required query parameters: diaryLogin and postUri';
           next();
           return;
         }
 
         const postClient = new PostClientImpl();
-        const result = await postClient.getPost(authorLogin, postUri);
+        const result = await postClient.getPost(diaryLogin, postUri);
 
         if (result.type === 'ok') {
-          to.meta.postContent = result.data.post.text;
-          to.meta.authorLogin = authorLogin;
-          to.meta.postUri = postUri;
-          to.meta.postTitle = postTitle
+          to.meta.type = 'post'
+          to.meta.post = result.data.post;
+          next();
+        } else {
+          to.meta.error = result.message || 'Failed to fetch post content';
+          next();
+        }
+      }
+    },
+    {
+      path: "/repost-comment",
+      name: "repost comment",
+      component: RepostView,
+      beforeEnter: async (to, _, next) => {
+        const commentId = to.query.commentId as string;
+
+        if (!commentId) {
+          to.meta.error = 'Missing required query parameter: commentId';
+          next();
+          return;
+        }
+
+        const postClient = new PostClientImpl();
+        const result = await postClient.getComment(commentId);
+
+        if (result.type === 'ok') {
+          to.meta.type = 'comment'
+          to.meta.comment = result.data;
           next();
         } else {
           to.meta.error = result.message || 'Failed to fetch post content';

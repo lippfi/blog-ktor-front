@@ -321,6 +321,8 @@ export default {
                 add: 'New post:',
                 edit: 'Edit:',
                 repost: 'Repost:',
+                repostTemplate: 'Repost:',
+                repostCommentTemplate: 'Repost comment'
             },
             fields: {
                 title: {

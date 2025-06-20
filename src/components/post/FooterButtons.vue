@@ -32,9 +32,8 @@ function handleRepost() {
   router.push({
     name: 'repost',
     query: {
+      diary: props.post.authorLogin,
       postUri: props.post.uri,
-      postTitle: props.post.title,
-      authorLogin: props.post.authorLogin
     }
   });
 }
