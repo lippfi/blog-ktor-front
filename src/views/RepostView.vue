@@ -32,12 +32,12 @@ const comment = route.meta.comment as CommentDto
 
 const authorLogin = props.type === 'post' ? post.authorLogin : comment.authorLogin
 const diaryLogin = props.type === 'post' ? post.diaryLogin : comment.diaryLogin
-const postLink = diaryLogin + '/post-' + (props.type === 'post' ? post.uri : comment.postUri)
+const postLink = '/' + diaryLogin + '/post-' + (props.type === 'post' ? post.uri : comment.postUri)
 const origin = props.type === 'post' ? postLink : `${postLink}?comment=${comment.id}`
 const content = props.type === 'post' ? post.text : comment.text
 
 const repostTitle = props.type === 'post' ? t('post.form.title.repostTemplate') + ' ' + post.title : t('post.form.title.repostCommentTemplate')
-const wrappedContent = `[repost${props.type === 'comment' ? ' comment' : '' } author="${authorLogin}" origin="${origin}" collapsed="false"]\n${content}\n[/repost]`
+const wrappedContent = `[repost author="${authorLogin}" origin="${origin}" collapsed="false"]\n${content}\n[/repost]`
 </script>
 
 <template>
