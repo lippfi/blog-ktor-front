@@ -224,7 +224,11 @@ const router = createRouter({
       path: "/:login/post-:postUri",
       name: "post",
       component: PostView,
-      props: true,
+      props: route => ({
+        login: route.params.login,
+        postUri: route.params.postUri,
+        commentId: route.query.comment
+      }),
       beforeEnter: async (to, _, next) => {
         const postClient = new PostClientImpl();
         const postDto = await postClient.getPost(to.params.login as string, to.params.postUri as string);

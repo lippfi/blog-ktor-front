@@ -52,7 +52,7 @@ const reply = () => {
 </script>
 
 <template>
-  <div class="comment" v-if="!isEditing">
+  <div :id="'comment-' + comment.id" class="comment" v-if="!isEditing">
     <UserAvatarComponent 
       avatar-size="80px"
       :avatar-url="comment.avatar" 

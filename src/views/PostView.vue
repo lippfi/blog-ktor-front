@@ -13,6 +13,7 @@ import PostEdit from "@/components/post/PostEdit.vue";
 const props = defineProps<{
   login: string;
   postUri: string;
+  commentId?: string;
   avatars: string[];
   basicReactions: ReactionPackDto[],
   recentReactions: BasicReactionResponse[],
@@ -31,7 +32,19 @@ const post: ComputedRef<Post> = computed(() => route.meta.post as Post);
 
 onMounted(() => {
   document.title = post.value.title;
+
+  if (props.commentId) {
+    setTimeout(() => scrollToComment(), 1000);
+  }
 })
+
+// Function to scroll to the comment
+const scrollToComment = () => {
+  const commentElement = document.getElementById(`comment-${props.commentId}`);
+  if (commentElement) {
+    commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+};
 
 const startReply = (comment: any) => {
   parentCommentId.value = comment.id;
