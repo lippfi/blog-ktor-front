@@ -86,7 +86,6 @@ async function deletePost() {
 async function deleteComment() {
   const result = await postClient.deleteComment(props.comment!!.id);
   if (result.type === 'ok') {
-    router.go(0);
   } else {
     ElMessage({
       message: result.message || 'Failed to delete comment',
