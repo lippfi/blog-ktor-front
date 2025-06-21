@@ -2,7 +2,7 @@ import type {CommentDto, PostViewDto, ReactionDto, PostEditDto, SearchPostsParam
 import type {Comment, Post, Reaction, PostEdit, SearchPostsParams} from "@/models/posts/post.ts";
 import {mapDtoToReaction} from "@/api/dto/mapper.ts";
 
-const mapCommentDtoToComment = (dto: CommentDto): Comment => ({
+export const mapCommentDtoToComment = (dto: CommentDto): Comment => ({
     id: dto.id,
     avatar: dto.avatar,
     authorLogin: dto.authorLogin,

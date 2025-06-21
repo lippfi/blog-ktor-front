@@ -28,6 +28,7 @@ export interface IPostClient {
     addComment(comment: CommentCreateRequest): Promise<Result<CommentDto>>;
     updateComment(comment: CommentUpdateRequest): Promise<Result<CommentDto>>;
     deleteComment(commentId: string): Promise<Result<string>>;
+    connectToCommentsWebSocket(postId: string): WebSocket;
 }
 
 class PostClientImpl implements IPostClient {
@@ -311,6 +312,25 @@ class PostClientImpl implements IPostClient {
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
         }
+    }
+
+    public connectToCommentsWebSocket(postId: string): WebSocket {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const host = backendURL.replace(/^https?:\/\//, '');
+        const wsUrl = `${protocol}//${host}/posts/comments`;
+
+        const socket = new WebSocket(wsUrl);
+
+        socket.onopen = () => {
+            // Send subscribe message when connection is established
+            const subscribeMessage = JSON.stringify({
+                postId: postId,
+                type: "Subscribe",
+            });
+            socket.send(subscribeMessage);
+        };
+
+        return socket;
     }
 }
 
