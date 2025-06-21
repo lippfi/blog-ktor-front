@@ -117,6 +117,7 @@ const scrollToComment = (commentId: string) => {
 
 <style scoped>
 .comment {
+  scroll-margin-top: 25px;
   display: flex;
   width: calc(100% - 20px);
   gap: 10px;
