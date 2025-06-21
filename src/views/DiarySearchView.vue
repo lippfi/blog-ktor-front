@@ -41,6 +41,8 @@ import PostClientImpl from '@/api/postClient/postClient';
 import type { Post } from '@/models/posts/post';
 import { mapPostDtoToPost } from '@/models/posts/mapper';
 import PostSearchComponent from '@/components/PostSearchComponent.vue';
+import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
+import type {BasicReactionResponse} from "@/api/reactionService.ts";
 
 const route = useRoute();
 const postClient = new PostClientImpl();
@@ -50,6 +52,17 @@ const error = ref<string | null>(null);
 const currentPage = ref(0);
 const totalPages = ref(0);
 const login = ref('');
+
+const props = defineProps<{
+  avatars: string[];
+  basicReactions: ReactionPackDto[],
+  recentReactions: BasicReactionResponse[],
+}>();
+
+const emit = defineEmits<{
+  (e: 'update-avatars'): void
+  (e: 'reaction-added', reaction: BasicReactionResponse): void
+}>();
 
 const fetchPosts = async () => {
   loading.value = true;
@@ -64,11 +77,11 @@ const fetchPosts = async () => {
   }
 
   try {
-    const result = await postClient.searchPosts(params);
+    const result = await postClient.searchDiaryPosts(params);
     if (result.type === 'ok') {
-      posts.value = result.data.content.map(mapPostDtoToPost);
-      currentPage.value = result.data.currentPage;
-      totalPages.value = result.data.totalPages;
+      posts.value = result.data.posts.content.map(mapPostDtoToPost);
+      currentPage.value = result.data.posts.currentPage;
+      totalPages.value = result.data.posts.totalPages;
     } else {
       error.value = result.message;
     }
@@ -116,7 +129,16 @@ watch(() => route.params, fetchPosts, { deep: true });
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else-if="posts.length === 0" class="no-results">No posts found</div>
     <div v-else class="posts-container">
-      <PostComponent v-for="post in posts" :key="post.id" :login="login" :post="post" :show-comments-count="true" />
+      <PostComponent v-for="post in posts"
+                     :key="post.id" :login="login"
+                     :post="post"
+                     :show-comments-count="true"
+                     :avatars="avatars"
+                     @update-avatars="emit('update-avatars')"
+                     :basic-reactions="basicReactions"
+                     :recent-reactions="recentReactions"
+                     @reaction-added="emit('reaction-added', $event)"
+      />
     </div>
 
     <!-- Pagination could be added here if needed -->
