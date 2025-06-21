@@ -224,7 +224,7 @@ async function updateComment() {
 
 <template>
   <div class="comment-edit" :class="{ 'reply-mode': isReply }">
-    <h3 v-if="!isReply">{{ $t('comment.form.title') }}</h3>
+    <h3 v-if="!isReply && !isEdit">{{ $t('comment.form.title') }}</h3>
     <div v-if="isReply && replyingToComment" class="replying-to" @click="togglePreview">
       {{ $t('comment.form.replying-to') }} <strong>{{ replyingToComment.authorNickname }}</strong>
       <span class="preview-toggle">

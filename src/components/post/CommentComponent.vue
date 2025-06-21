@@ -107,19 +107,19 @@ const scrollToComment = (commentId: string) => {
         </div>
       </div>
     </div>
+    <CommentEdit v-if="isEditing"
+                 :id="comment.id"
+                 :avatar="comment.avatar"
+                 :content="comment.text"
+                 :post-id="props.post.id"
+                 :replying-to-comment="undefined"
+                 :avatars="avatars"
+                 :basic-reactions="basicReactions"
+                 :recent-reactions="recentReactions"
+                 @cancel-edit="cancelEditing"
+                 :is-edit="true"
+    />
   </div>
-  <CommentEdit v-if="isEditing"
-               :id="comment.id"
-               :avatar="comment.avatar"
-               :content="comment.text"
-               :post-id="props.post.id"
-               :replying-to-comment="undefined"
-               :avatars="avatars"
-               :basic-reactions="basicReactions"
-               :recent-reactions="recentReactions"
-               @cancel-edit="cancelEditing"
-               :is-edit="true"
-   />
 </template>
 
 <style scoped>
