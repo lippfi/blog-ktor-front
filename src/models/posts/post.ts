@@ -35,6 +35,7 @@ export interface Post {
     avatar: string;
     authorLogin: string;
     authorNickname: string;
+    diaryLogin: string;
     title: string;
     text: string;
     creationTime: Date;

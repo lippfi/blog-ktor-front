@@ -21,6 +21,7 @@ export const mapPostDtoToPost = (dto: PostViewDto): Post => ({
     avatar: dto.avatar,
     authorLogin: dto.authorLogin,
     authorNickname: dto.authorNickname,
+    diaryLogin: dto.diaryLogin,
     title: dto.title,
     text: dto.text,
     creationTime: new Date(dto.creationTime), // Преобразуем строку в Date

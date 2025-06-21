@@ -55,7 +55,9 @@ const reply = () => {
 <template>
   <div class="comment-container">
     <div v-if="comment.inReplyTo" class="reply-info">
-      {{ $t('comment.form.replying-to') + ' ' + comment.inReplyTo.nickname}}
+      <a :href="`?comment=${comment.inReplyTo.id}`">
+        {{ $t('comment.form.replying-to') + ' ' + comment.inReplyTo.nickname}}
+      </a>
     </div>
     <div :id="'comment-' + comment.id" class="comment" :class="{ 'selected-comment': isSelected }" v-if="!isEditing">
       <UserAvatarComponent
