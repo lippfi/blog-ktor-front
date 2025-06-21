@@ -176,7 +176,7 @@ async function processTextAsync(text: string): Promise<string> {
   result = replaceReadMore(result);
   result = replaceCode(result);
   result = replaceQuote(result);
-  result = replaceRepost(result);
+  result = await replaceRepost(result);
   result = processWhiteSpaces(result);
 
   // Process reactions
@@ -491,17 +491,46 @@ function replaceQuote(text: string): string {
   return result;
 }
 
-function replaceRepost(text: string): string {
+async function replaceRepost(text: string): Promise<string> {
   let result = text;
   const pattern = /\n?\[repost author="(.*?)" origin="(.*?)"( collapsed="(.*?)")?\]\n?([\s\S]*?)\n?\[\/repost\]\n?/;
   let match = result.match(pattern);
 
+  if (match === null) {
+    return result;
+  }
+
+  // Collect all author logins
+  const matches = [...result.matchAll(new RegExp(pattern, 'g'))];
+  const authorLogins = [...new Set(matches.map(m => m[1]))];
+
+  // Fetch user data for all authors
+  const usersResult = await getUsers(authorLogins);
+
+  if (usersResult.type === 'error') {
+    console.error('Failed to fetch users:', usersResult.message);
+    return result;
+  }
+
+  const users = usersResult.data;
+
+  // Create a map of login to user data
+  const userMap = new Map<string, { login: string, nickname: string }>();
+  users.forEach(user => {
+    userMap.set(user.login, { login: user.login, nickname: user.nickname });
+  });
+
+  // Process each repost
+  match = result.match(pattern);
   while (match !== null) {
-    const author = match[1];
+    const authorLogin = match[1];
     const origin = match[2];
     const collapsed = match[4] ? match[4].toLowerCase() : 'false';
     const content = match[5];
     const repostId = `repost-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+
+    // Get author nickname from the map, fallback to login if not found
+    const authorNickname = userMap.has(authorLogin) ? userMap.get(authorLogin)!!.nickname : authorLogin;
 
     // Determine if the repost should be initially collapsed
     const isCollapsed = collapsed === 'true';
@@ -516,7 +545,7 @@ function replaceRepost(text: string): string {
       '<div class="repost-block">' +
         '<div class="repost-header clickable" onclick="window.toggleRepostCollapse(\'' + repostId + '\')">' +
           '<span class="repost-icon">↻</span>' +
-          '<span class="repost-info">' + t('post.repost.from') + ' <a href="' + origin + '" class="repost-link" onclick="event.stopPropagation()">' + author + '</a></span>' +
+          '<span class="repost-info">' + t('post.repost.from') + ' <a href="' + origin + '" class="repost-link" onclick="event.stopPropagation()">' + authorNickname + '</a></span>' +
           '<span class="' + indicatorClasses + '" id="indicator-' + repostId + '">▼</span>' +
         '</div>' +
         '<div class="' + contentClasses + '" id="content-' + repostId + '" style="' + contentStyle + '">' + content + '</div>' +
