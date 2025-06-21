@@ -27,6 +27,7 @@ const emit = defineEmits<{
   (e: 'comment-deleted'): void
   (e: 'reaction-added', reaction: BasicReactionResponse): void
   (e: 'reply', comment: Comment): void
+  (e: 'select-comment', commentId: string): void
 }>();
 
 const formattedCreationTime = computed(() => {
@@ -50,12 +51,23 @@ const finishEditing = () => {
 const reply = () => {
   emit('reply', props.comment);
 };
+
+const scrollToComment = (commentId: string) => {
+  // Emit event to update selected comment in PostView
+  emit('select-comment', commentId);
+
+  // Scroll to the comment
+  const commentElement = document.getElementById(`comment-${commentId}`);
+  if (commentElement) {
+    commentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+};
 </script>
 
 <template>
   <div class="comment-container">
     <div v-if="comment.inReplyTo" class="reply-info">
-      <a :href="`?comment=${comment.inReplyTo.id}`">
+      <a href="#" @click.prevent="scrollToComment(comment.inReplyTo.id)">
         {{ $t('comment.form.replying-to') + ' ' + comment.inReplyTo.nickname}}
       </a>
     </div>
@@ -142,6 +154,12 @@ const reply = () => {
   color: #606060;
   border-radius: 4px;
   padding-bottom: 8px;
+}
+
+.reply-info a {
+  cursor: pointer;
+  text-decoration: underline;
+  color: var(--el-color-primary);
 }
 
 .selected-comment {

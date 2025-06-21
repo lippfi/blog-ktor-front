@@ -26,9 +26,25 @@ const emit = defineEmits<{
 
 const parentCommentId = ref<string | null>(null);
 const replyingToComment = ref<any | null>(null);
+const selectedCommentId = ref<string | undefined>(props.commentId);
 
 const route = useRoute();
 const post: ComputedRef<Post> = computed(() => route.meta.post as Post);
+
+const scrollToComment = (commentId?: string) => {
+  const id = commentId || selectedCommentId.value;
+  if (!id) return;
+
+  const commentElement = document.getElementById(`comment-${id}`);
+  if (commentElement) {
+    commentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+};
+
+// Expose the scrollToComment function to be used by other components
+defineExpose({
+  scrollToComment
+});
 
 onMounted(() => {
   document.title = post.value.title;
@@ -36,15 +52,7 @@ onMounted(() => {
   if (props.commentId) {
     setTimeout(() => scrollToComment(), 500);
   }
-})
-
-// Function to scroll to the comment
-const scrollToComment = () => {
-  const commentElement = document.getElementById(`comment-${props.commentId}`);
-  if (commentElement) {
-    commentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-};
+});
 
 const startReply = (comment: any) => {
   parentCommentId.value = comment.id;
@@ -91,12 +99,13 @@ const cancelReply = () => {
                :post="post"
                :is-reactable="true"
                :avatars="avatars"
-               :is-selected="props.commentId === comment.id"
+               :is-selected="selectedCommentId === comment.id"
                @update-avatars="emit('update-avatars')"
                :basic-reactions="basicReactions"
                :recent-reactions="recentReactions"
                @reaction-added="emit('reaction-added', $event)"
                @reply="startReply(comment)"
+               @select-comment="(commentId) => { selectedCommentId = commentId; scrollToComment(commentId); }"
       />
     </div>
     <CommentEdit v-if="post.isCommentable && parentCommentId" 
