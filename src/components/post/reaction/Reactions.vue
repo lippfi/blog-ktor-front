@@ -47,7 +47,7 @@ async function handleReactionRemove(reactionToRemove: ReactionModel) {
         await reactionClient.removePostReaction(props.postLogin, props.postUri, reactionToRemove.name)
       } else {
         if (!props.commentId) {
-          throw new Error('Comment ID is required for comment reactions')
+          throw new Error('CommentComponent ID is required for comment reactions')
         }
         await reactionClient.removeCommentReaction(props.commentId, reactionToRemove.name)
       }
@@ -80,7 +80,7 @@ async function handleReactionSelect(reaction: BasicReactionResponse) {
         await reactionClient.addPostReaction(props.postLogin, props.postUri, existingReaction.name)
       } else {
         if (!props.commentId) {
-          throw new Error('Comment ID is required for comment reactions')
+          throw new Error('CommentComponent ID is required for comment reactions')
         }
         await reactionClient.addCommentReaction(props.commentId, existingReaction.name)
       }
@@ -112,7 +112,7 @@ async function handleReactionSelect(reaction: BasicReactionResponse) {
       await reactionClient.addPostReaction(props.postLogin, props.postUri, newReaction.name)
     } else {
       if (!props.commentId) {
-        throw new Error('Comment ID is required for comment reactions')
+        throw new Error('CommentComponent ID is required for comment reactions')
       }
       await reactionClient.addCommentReaction(props.commentId, newReaction.name)
     }

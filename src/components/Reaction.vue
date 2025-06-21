@@ -66,7 +66,7 @@ async function toggleReaction() {
       }
     } else {
       if (!props.commentId) {
-        throw new Error('Comment ID is required for comment reactions')
+        throw new Error('CommentComponent ID is required for comment reactions')
       }
       if (localReaction.value.userReacted) {
         await reactionClient.addCommentReaction(props.commentId, props.reaction.name)

@@ -15,15 +15,14 @@ const props = defineProps<{
   avatar?: string;
   content?: string;
   postId: string;
-  parentCommentId?: string | null;
-  replyingToComment?: any | null;
+  replyingToComment?: CommentDto;
   avatars: string[];
   basicReactions: ReactionPackDto[],
   recentReactions: BasicReactionResponse[],
   isEdit: boolean;
-  isReply?: boolean;
 }>();
 
+const isReply = ref(!!props.replyingToComment);
 const postClient = new PostClientImpl();
 const isLoading = ref(false);
 const errorMessage = ref('');
@@ -173,7 +172,7 @@ async function addComment() {
     postId: props.postId,
     text: localContent.value,
     avatar: localAvatar.value,
-    parentCommentId: props.parentCommentId || undefined,
+    parentCommentId: props.replyingToComment?.id || undefined,
   };
 
   try {
@@ -181,7 +180,7 @@ async function addComment() {
     if (result.type === 'ok') {
       localContent.value = '';
       emit('commentAdded', result.data);
-      if (props.isReply) {
+      if (props.replyingToComment) {
         emit('cancel-reply');
       }
     } else {

@@ -431,7 +431,7 @@ export default {
     },
     comment: {
         form: {
-            title: 'Comment post:',
+            title: 'CommentComponent post:',
             button: {
                 send: 'add comment',
                 cancel: 'cancel',

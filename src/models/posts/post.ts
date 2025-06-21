@@ -20,6 +20,13 @@ export interface Comment {
     isReactable: boolean;
     reactions: Reaction[];
     reactionGroupId?: string;
+    inReplyTo?: ReplyInfo;
+}
+
+export interface ReplyInfo {
+    id: string;
+    login: string;
+    nickname: string;
 }
 
 export interface Post {

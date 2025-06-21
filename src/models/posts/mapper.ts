@@ -12,6 +12,7 @@ const mapCommentDtoToComment = (dto: CommentDto): Comment => ({
     isReactable: dto.isReactable,
     reactions: dto.reactions?.map(mapDtoToReaction) || [],
     reactionGroupId: dto.reactionGroupId,
+    inReplyTo: dto.inReplyTo,
 });
 
 export const mapPostDtoToPost = (dto: PostViewDto): Post => ({

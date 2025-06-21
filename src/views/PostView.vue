@@ -3,7 +3,7 @@ import {RouterView, useRoute} from "vue-router";
 import {computed, type ComputedRef, ref, nextTick, onMounted} from "vue";
 
 import CommentEdit from "@/components/post/CommentEdit.vue";
-import Comment from "@/components/post/Comment.vue";
+import CommentComponent from "@/components/post/CommentComponent.vue";
 import PostComponent from "@/components/post/PostComponent.vue";
 import type {Post} from "@/models/posts/post.ts";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
@@ -86,7 +86,7 @@ const cancelReply = () => {
                  :is-edit="false"
                  @reaction-added="emit('reaction-added', $event)"/>
     <div class="comments_block">
-      <Comment v-for="comment in post.comments" :key="comment.id"
+      <CommentComponent v-for="comment in post.comments" :key="comment.id"
                :comment="comment"
                :post="post"
                :is-reactable="true"

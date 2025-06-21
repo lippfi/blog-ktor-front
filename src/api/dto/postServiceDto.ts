@@ -1,3 +1,5 @@
+import type {ReplyInfo} from "@/models/posts/post.ts";
+
 type TagPolicyDto = 'UNION' | 'INTERSECTION';
 
 export interface ReactionDto {
@@ -25,6 +27,8 @@ export interface CommentDto {
     isReactable: boolean;
     reactions?: ReactionDto[];
     reactionGroupId?: string;
+    parentCommentId?: string;
+    inReplyTo?: ReplyInfo;
 }
 
 export interface PostSearchResult {

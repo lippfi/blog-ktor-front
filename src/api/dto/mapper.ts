@@ -75,7 +75,8 @@ export function mapCommentToDto(comment: Comment): CommentDto {
         creationTime: comment.creationTime.toISOString(),
         isReactable: comment.isReactable,
         reactions: comment.reactions?.map(reaction => mapReactionToDto(reaction)),
-        reactionGroupId: comment.reactionGroupId
+        reactionGroupId: comment.reactionGroupId,
+        inReplyTo: comment.inReplyTo,
     };
 }
 

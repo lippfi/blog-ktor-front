@@ -53,36 +53,52 @@ const reply = () => {
 </script>
 
 <template>
-  <div :id="'comment-' + comment.id" class="comment" :class="{ 'selected-comment': isSelected }" v-if="!isEditing">
-    <UserAvatarComponent 
-      avatar-size="80px"
-      :avatar-url="comment.avatar" 
-      :login="comment.authorLogin" 
-      :label="comment.authorNickname"
-      :nickname="comment.authorNickname"
-    />
-    <div class="right">
-      <div class="header">
-        <NicknameComponent :nickname="comment.authorNickname" :login="comment.authorLogin"/>
-        <span class="date">{{ formattedCreationTime }}</span>
-      </div>
-      <ProcessedText :text="comment.text" :avatars="avatars" @update-avatars="emit('update-avatars')"/>
-      <div class="footer">
-<!--        todo reaction added-->
-        <Reactions
-            :reactions="comment.reactions"
-            :is-reactable="isReactable"
-            type="comment"
-            :comment-id="comment.id"
-            :basic-reactions="props.basicReactions"
-            :recent-reactions="props.recentReactions"
-            @reaction-added="emit('reaction-added', $event)"
-        />
-        <FooterButtons :post="post" :comment="comment" :show-comments-count="false" @startEdit="startEditing" @reply="reply"/>
+  <div class="comment-container">
+    <div v-if="comment.inReplyTo" class="reply-info">
+      {{ $t('comment.form.replying-to') + ' ' + comment.inReplyTo.nickname}}
+    </div>
+    <div :id="'comment-' + comment.id" class="comment" :class="{ 'selected-comment': isSelected }" v-if="!isEditing">
+      <UserAvatarComponent
+          avatar-size="80px"
+          :avatar-url="comment.avatar"
+          :login="comment.authorLogin"
+          :label="comment.authorNickname"
+          :nickname="comment.authorNickname"
+      />
+      <div class="right">
+        <div class="header">
+          <NicknameComponent :nickname="comment.authorNickname" :login="comment.authorLogin"/>
+          <span class="date">{{ formattedCreationTime }}</span>
+        </div>
+        <ProcessedText :text="comment.text" :avatars="avatars" @update-avatars="emit('update-avatars')"/>
+        <div class="footer">
+          <!--        todo reaction added-->
+          <Reactions
+              :reactions="comment.reactions"
+              :is-reactable="isReactable"
+              type="comment"
+              :comment-id="comment.id"
+              :basic-reactions="props.basicReactions"
+              :recent-reactions="props.recentReactions"
+              @reaction-added="emit('reaction-added', $event)"
+          />
+          <FooterButtons :post="post" :comment="comment" :show-comments-count="false" @startEdit="startEditing" @reply="reply"/>
+        </div>
       </div>
     </div>
   </div>
-  <CommentEdit :post-id="props.post.id" :content="comment.text" :avatar="comment.avatar" :avatars="avatars" :id="comment.id" @cancel-edit="cancelEditing" v-if="isEditing" :is-edit="true"/>
+  <CommentEdit v-if="isEditing"
+               :id="comment.id"
+               :avatar="comment.avatar"
+               :content="comment.text"
+               :post-id="props.post.id"
+               :replying-to-comment="undefined"
+               :avatars="avatars"
+               :basic-reactions="basicReactions"
+               :recent-reactions="recentReactions"
+               @cancel-edit="cancelEditing"
+               :is-edit="true"
+   />
 </template>
 
 <style scoped>
@@ -116,6 +132,14 @@ const reply = () => {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+.reply-info {
+  float: right;
+  font-size: 14px;
+  color: #606060;
+  border-radius: 4px;
+  padding-bottom: 8px;
 }
 
 .selected-comment {
