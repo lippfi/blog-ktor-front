@@ -8,7 +8,6 @@ import PostComponent from "@/components/post/PostComponent.vue";
 import type {Post, Comment} from "@/models/posts/post.ts";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
-import PostEdit from "@/components/post/PostEdit.vue";
 import PostClientImpl from "@/api/postClient/postClient.ts";
 import {mapCommentDtoToComment} from "@/models/posts/mapper.ts";
 
@@ -35,6 +34,8 @@ const post: ComputedRef<Post> = computed(() => route.meta.post as Post);
 const postClient = new PostClientImpl();
 let commentsSocket: WebSocket | null = null;
 
+const comments = ref<Comment[]>([]);
+
 const scrollToComment = (commentId?: string) => {
   const id = commentId || selectedCommentId.value;
   if (!id) return;
@@ -51,29 +52,23 @@ defineExpose({
 });
 
 const handleWebSocketMessage = (event: MessageEvent) => {
-  console.log('Received message from WebSocket:', event.data);
   try {
     const message = JSON.parse(event.data);
 
     switch (message.type) {
       case 'CommentAdded':
-        console.log('Comment added:', message.comment);
         handleCommentAdded(message.comment);
         break;
       case 'CommentUpdated':
-        console.log('Comment updated:', message.comment);
         handleCommentUpdated(message.comment);
         break;
       case 'CommentDeleted':
-        console.log('Comment deleted:', message.commentId);
         handleCommentDeleted(message.commentId);
         break;
       case 'Error':
-        console.log('Error:', message.message);
         console.error('WebSocket error:', message.message);
         break;
       default:
-        console.log('Unknown message type:', message.type);
         console.warn('Unknown message type:', message.type);
     }
   } catch (error) {
@@ -84,35 +79,35 @@ const handleWebSocketMessage = (event: MessageEvent) => {
 // Handle comment added message
 const handleCommentAdded = (commentDto: any) => {
   const comment = mapCommentDtoToComment(commentDto);
-  post.value.comments.push(comment);
+  comments.value.push(comment);
 };
 
 // Handle comment updated message
 const handleCommentUpdated = (commentDto: any) => {
   const updatedComment = mapCommentDtoToComment(commentDto);
-  const index = post.value.comments.findIndex(c => c.id === updatedComment.id);
+  const index = comments.value.findIndex(c => c.id === updatedComment.id);
   if (index !== -1) {
-    post.value.comments[index] = updatedComment;
+    comments.value[index] = updatedComment;
   }
 };
 
 // Handle comment deleted message
 const handleCommentDeleted = (commentId: string) => {
-  const index = post.value.comments.findIndex(c => c.id === commentId);
+  const index = comments.value.findIndex(c => c.id === commentId);
   if (index !== -1) {
-    post.value.comments.splice(index, 1);
+    comments.value.splice(index, 1);
   }
 };
 
 onMounted(() => {
   document.title = post.value.title;
+  comments.value = post.value.comments;
 
   if (props.commentId) {
     setTimeout(() => scrollToComment(), 500);
   }
 
   if (post.value && post.value.id) {
-    console.log('Connecting to WebSocket for post', post.value.id);
     commentsSocket = postClient.connectToCommentsWebSocket(post.value.id);
     commentsSocket.onmessage = handleWebSocketMessage;
 
@@ -174,7 +169,7 @@ const cancelReply = () => {
                  :is-edit="false"
                  @reaction-added="emit('reaction-added', $event)"/>
     <div class="comments_block">
-      <CommentComponent v-for="comment in post.comments" :key="comment.id"
+      <CommentComponent v-for="comment in comments" :key="comment.id"
                :comment="comment"
                :post="post"
                :is-reactable="true"
