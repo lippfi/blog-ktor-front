@@ -125,7 +125,7 @@ async function handleReactionSelect(reaction: BasicReactionResponse) {
 </script>
 
 <template>
-  <div v-if="isReactable || reactions.length > 0" style="display: flex; align-items: center;">
+  <div v-if="isReactable || localReactions.length > 0" style="display: flex; align-items: center;">
     <template v-for="(reaction, index) in localReactions" :key="reaction.name">
       <Reaction 
         :reaction="reaction"

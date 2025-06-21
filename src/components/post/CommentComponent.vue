@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import UserAvatarComponent from "@/components/post/UserAvatarComponent.vue";
 import {type Comment, type Post} from "@/models/posts/post.ts";
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
 import {backendURL} from "@/main.ts";
 import Reactions from "@/components/post/reaction/Reactions.vue";
 import FooterButtons from "@/components/post/FooterButtons.vue";
@@ -11,6 +11,7 @@ import NicknameComponent from "@/components/NicknameComponent.vue";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import ProcessedText from "@/components/post/ProcessedText.vue";
+import type {Reaction} from "@/models/posts/post.ts";
 
 const props = defineProps<{
   comment: Comment,
@@ -35,6 +36,12 @@ const formattedCreationTime = computed(() => {
 });
 
 let isEditing = ref(false);
+const reactions = ref<Reaction[]>([...props.comment.reactions]);
+
+// Keep reactions in sync with props
+watch(() => props.comment.reactions, (newReactions) => {
+  reactions.value = [...newReactions];
+});
 
 const startEditing = () => {
   isEditing.value = true;
@@ -88,7 +95,7 @@ const scrollToComment = (commentId: string) => {
         <div class="footer">
           <!--        todo reaction added-->
           <Reactions
-              :reactions="comment.reactions"
+              :reactions="reactions"
               :is-reactable="isReactable"
               type="comment"
               :comment-id="comment.id"

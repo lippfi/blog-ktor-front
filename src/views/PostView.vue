@@ -10,6 +10,7 @@ import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import PostClientImpl from "@/api/postClient/postClient.ts";
 import {mapCommentDtoToComment} from "@/models/posts/mapper.ts";
+import {mapDtoToReaction} from "@/api/dto/mapper.ts";
 
 const props = defineProps<{
   login: string;
@@ -65,6 +66,13 @@ const handleWebSocketMessage = (event: MessageEvent) => {
       case 'CommentDeleted':
         handleCommentDeleted(message.commentId);
         break;
+      case 'ReactionAdded':
+        console.log('Reaction added:', message.reaction);
+        handleReactionAdded(message.commentId, message.reaction);
+        break;
+      case 'ReactionRemoved':
+        handleReactionRemoved(message.commentId, message.reaction);
+        break;
       case 'Error':
         console.error('WebSocket error:', message.message);
         break;
@@ -96,6 +104,52 @@ const handleCommentDeleted = (commentId: string) => {
   const index = comments.value.findIndex(c => c.id === commentId);
   if (index !== -1) {
     comments.value.splice(index, 1);
+  }
+};
+
+// Handle reaction added message
+const handleReactionAdded = (commentId: string, reactionDto: any) => {
+  const index = comments.value.findIndex(c => c.id === commentId);
+  if (index !== -1) {
+    const comment = comments.value[index];
+    const reaction = mapDtoToReaction(reactionDto);
+
+    // Create a new reactions array to ensure reactivity
+    const newReactions = [...comment.reactions];
+
+    // Check if the reaction already exists
+    const existingReactionIndex = newReactions.findIndex(r => r.name === reaction.name);
+    if (existingReactionIndex !== -1) {
+      // Update existing reaction
+      newReactions[existingReactionIndex] = reaction;
+    } else {
+      // Add new reaction
+      newReactions.push(reaction);
+    }
+
+    // Update the comment with the new reactions array
+    comments.value[index] = { ...comment, reactions: newReactions };
+  }
+};
+
+// Handle reaction removed message
+const handleReactionRemoved = (commentId: string, reactionDto: any) => {
+  const index = comments.value.findIndex(c => c.id === commentId);
+  if (index !== -1) {
+    const comment = comments.value[index];
+    const reactionName = reactionDto.name;
+
+    // Create a new reactions array to ensure reactivity
+    const newReactions = [...comment.reactions];
+
+    // Remove the reaction
+    const reactionIndex = newReactions.findIndex(r => r.name === reactionName);
+    if (reactionIndex !== -1) {
+      newReactions.splice(reactionIndex, 1);
+    }
+
+    // Update the comment with the new reactions array
+    comments.value[index] = { ...comment, reactions: newReactions };
   }
 };
 
