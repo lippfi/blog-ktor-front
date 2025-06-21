@@ -30,6 +30,14 @@ const isReactionPopoverVisible = ref(false);
 const showUserPopover = ref(false);
 const userSearchQuery = ref('');
 const tooltipDelay = 300;
+const mentionRef = ref<InstanceType<typeof import('element-plus')['ElMention']> | null>(null);
+
+// Function to get the textarea element from the ref
+const getTextarea = (): HTMLTextAreaElement | null => {
+  if (!mentionRef.value) return null;
+  const el = mentionRef.value.$el.querySelector('.el-textarea__inner') as HTMLTextAreaElement;
+  return el;
+};
 
 // State for storing search results from backend
 const searchedUsers = ref<Array<{login: string, nickname: string, avatarUri?: string}>>([]);
@@ -66,7 +74,7 @@ const filteredUsers = computed(() => {
 });
 
 const handleReactionSelect = (reaction: BasicReactionResponse) => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement;
+  const textarea = getTextarea();
   if (!textarea) return;
 
   const reactionText = `:${reaction.name}:`;
@@ -98,7 +106,7 @@ const handleReactionSelect = (reaction: BasicReactionResponse) => {
 };
 
 const focusTextarea = () => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement;
+  const textarea = getTextarea();
   if (textarea) {
     textarea.focus();
   }
@@ -110,7 +118,7 @@ const selectUser = (user: UserMention) => {
 }
 
 const insertMention = (user: UserMention) => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement;
+  const textarea = getTextarea();
   if (!textarea) return;
 
   const mention = `@${user.login} `;
@@ -149,7 +157,7 @@ const insertMention = (user: UserMention) => {
 }
 
 const handleReactionSelectAndHideCompletion = (reaction: BasicReactionResponse) => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement;
+  const textarea = getTextarea();
   if (!textarea) return;
   emit("reaction-added", reaction)
 
@@ -246,7 +254,7 @@ const observer = new MutationObserver((mutations) => {
 const content = defineModel<string>('content', { default: ""})
 
 const wrapSelectedText = (prefix: string, suffix: string) => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  const textarea = getTextarea()
   if (!textarea) return
 
   const start = textarea.selectionStart
@@ -289,7 +297,7 @@ const wrapSelectedText = (prefix: string, suffix: string) => {
 }
 
 const wrapSelectedTextFromPage = (prefix: string, suffix: string) => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement;
+  const textarea = getTextarea();
   if (!textarea) return;
 
   const selection = window.getSelection();
@@ -325,7 +333,7 @@ const wrapSelectedTextFromPage = (prefix: string, suffix: string) => {
 };
 
 const wrapWithClasses = () => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  const textarea = getTextarea()
   if (!textarea) return
 
   const start = textarea.selectionStart
@@ -367,7 +375,7 @@ const wrapWithClasses = () => {
 }
 
 const wrapWithImage = async () => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  const textarea = getTextarea()
   if (!textarea) return
 
   const start = textarea.selectionStart
@@ -474,7 +482,7 @@ const wrapWithImage = async () => {
 }
 
 const wrapWithCode = () => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  const textarea = getTextarea()
   if (!textarea) return
 
   const start = textarea.selectionStart
@@ -516,7 +524,7 @@ const wrapWithCode = () => {
 }
 
 const wrapWithSlider = () => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  const textarea = getTextarea()
   if (!textarea) return
 
   const start = textarea.selectionStart
@@ -561,7 +569,7 @@ const wrapWithSlider = () => {
 }
 
 const wrapWithExpandable = () => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  const textarea = getTextarea()
   if (!textarea) return
 
   const start = textarea.selectionStart
@@ -604,7 +612,7 @@ const wrapWithExpandable = () => {
 }
 
 const wrapWithLink = () => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  const textarea = getTextarea()
   if (!textarea) return
 
   const start = textarea.selectionStart
@@ -711,7 +719,7 @@ const processSpans = () => {
 }
 
 const handleMentionSearch = async (query: string, prefix: MentionPrefix) => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  const textarea = getTextarea()
   if (!textarea) return
 
   const cursorPos = textarea.selectionStart
@@ -791,7 +799,7 @@ function handleKeyDown(event: KeyboardEvent) {
 
 // Set up event listener when component is mounted
 onMounted(() => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  const textarea = getTextarea()
   if (textarea) {
     textarea.addEventListener('keydown', handleKeyDown, true)  // Use capture phase
   }
@@ -799,14 +807,14 @@ onMounted(() => {
 
 // Clean up event listener when component is unmounted
 onBeforeUnmount(() => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  const textarea = getTextarea()
   if (textarea) {
     textarea.removeEventListener('keydown', handleKeyDown, true)  // Match capture phase in cleanup
   }
 })
 
 const handleMentionSelect = (option: MentionOption) => {
-  const textarea = document.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+  const textarea = getTextarea()
   if (!textarea) return
 
   // Get the current cursor position
@@ -954,6 +962,7 @@ const handleMentionSelect = (option: MentionOption) => {
       </el-tooltip>
     </div>
     <el-mention
+      ref="mentionRef"
       type="textarea"
       :prefix="['@', ':']"
       :options="options"
