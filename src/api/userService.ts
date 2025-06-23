@@ -340,18 +340,21 @@ export async function resetPassword(code: string, newPassword: string): Promise<
         : { type: 'error', message: await response.text() };
 }
 
+interface WrappedDictionary {
+    content: Record<string, string>;
+}
+
 export async function getAvatars(): Promise<Record<string, string>> {
     const response = await authenticatedRequest('/user/avatars');
     if (!response.ok) throw new Error(await response.text());
-    return response.json();
+    return (await response.json() as WrappedDictionary).content;
 }
 
 export async function reorderAvatars(avatarIds: string[]): Promise<Result> {
-    const uuids = avatarIds.map(id => extractUUID(id));
     const response = await authenticatedRequest('/user/reorder-avatars', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(uuids)
+        body: JSON.stringify(avatarIds)
     });
 
     return response.ok 
@@ -377,7 +380,7 @@ export async function addAvatarByUrl(url: string): Promise<Result> {
     return { type: 'ok' };
 }
 
-export async function addAvatars(files: File[]): Promise<Result<string[]>> {
+export async function addAvatars(files: File[]): Promise<Result<Record<string, string>>> {
     const formData = new FormData();
     for (const file of files) {
         formData.append('file', file);
@@ -392,9 +395,8 @@ export async function addAvatars(files: File[]): Promise<Result<string[]>> {
         return { type: 'error', message: await response.text() };
     }
 
-    // Parse the response to get the URLs of the uploaded avatars
-    const uploadedUrls: string[] = await response.json();
-    return { type: 'ok', data: uploadedUrls };
+    const idsToUrls: Record<string, string> = (await response.json() as WrappedDictionary).content;
+    return { type: 'ok', data: idsToUrls };
 }
 
 export async function deleteAvatar(uri: string): Promise<Result> {

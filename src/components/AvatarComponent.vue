@@ -5,20 +5,23 @@ import { ElMessage } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 import { Close, Plus } from '@element-plus/icons-vue';
 
+
 const { t } = useI18n();
-const avatars = ref<Record<string, string>>([]);
-const originalAvatars = ref<string[]>([]);
+const avatars = ref<Record<string, string>>({});
+const originalAvatars = ref<Record<string, string>>({});
 const loading = ref(false);
-const draggedAvatar = ref<string | null>(null);
-const draggedOverAvatar = ref<string | null>(null);
+const draggedAvatarId = ref<string | null>(null);
+const draggedOverAvatarId = ref<string | null>(null);
 const hasChanges = ref(false);
+const avatarOrder = ref<string[]>([]);
 
 // Fetch avatars on component mount
 onMounted(async () => {
   try {
     loading.value = true;
     avatars.value = await getAvatars();
-    originalAvatars.value = [...avatars.value]; // Store the original order
+    originalAvatars.value = { ...avatars.value };
+    avatarOrder.value = Object.keys(avatars.value);
   } catch (error) {
     console.error('Failed to fetch avatars:', error);
     ElMessage.error(t('errors.failedToLoadAvatars'));
@@ -28,15 +31,15 @@ onMounted(async () => {
 });
 
 // Handle drag start
-const handleDragStart = (avatar: string) => {
-  draggedAvatar.value = avatar;
+const handleDragStart = (avatarId: string) => {
+  draggedAvatarId.value = avatarId;
 };
 
 // Handle drag over
-const handleDragOver = (event: DragEvent, avatar: string) => {
+const handleDragOver = (event: DragEvent, avatarId: string) => {
   event.preventDefault();
-  if (avatar !== draggedAvatar.value) {
-    draggedOverAvatar.value = avatar;
+  if (avatarId !== draggedAvatarId.value) {
+    draggedOverAvatarId.value = avatarId;
   }
 };
 
@@ -44,47 +47,47 @@ const handleDragOver = (event: DragEvent, avatar: string) => {
 const handleDrop = (event: DragEvent) => {
   event.preventDefault();
 
-  if (draggedAvatar.value && draggedOverAvatar.value && draggedAvatar.value !== draggedOverAvatar.value) {
-    const newAvatars = [...avatars.value];
-    const draggedIndex = newAvatars.indexOf(draggedAvatar.value);
-    const dropIndex = newAvatars.indexOf(draggedOverAvatar.value);
+  if (draggedAvatarId.value && draggedOverAvatarId.value && draggedAvatarId.value !== draggedOverAvatarId.value) {
+    const newAvatarOrder = [...avatarOrder.value];
+    const draggedIndex = newAvatarOrder.indexOf(draggedAvatarId.value);
+    const dropIndex = newAvatarOrder.indexOf(draggedOverAvatarId.value);
 
     // Remove the dragged avatar from its original position
-    newAvatars.splice(draggedIndex, 1);
+    newAvatarOrder.splice(draggedIndex, 1);
 
     // Insert it at the new position
-    newAvatars.splice(dropIndex, 0, draggedAvatar.value);
+    newAvatarOrder.splice(dropIndex, 0, draggedAvatarId.value);
 
     // Update the local state
-    avatars.value = newAvatars;
+    avatarOrder.value = newAvatarOrder;
 
     // Mark that changes have been made
     hasChanges.value = true;
   }
 
   // Reset drag state
-  draggedAvatar.value = null;
-  draggedOverAvatar.value = null;
+  draggedAvatarId.value = null;
+  draggedOverAvatarId.value = null;
 };
 
 // Handle drag end
 const handleDragEnd = () => {
-  draggedAvatar.value = null;
-  draggedOverAvatar.value = null;
+  draggedAvatarId.value = null;
+  draggedOverAvatarId.value = null;
 };
 
-// Save changes to the backend
 const saveChanges = async () => {
   try {
     loading.value = true;
-    const result = await reorderAvatars(avatars.value);
+    // Pass avatar IDs directly to the backend
+    const result = await reorderAvatars(avatarOrder.value);
     if (result.type === 'error') {
       ElMessage.error(result.message || t('errors.failedToReorderAvatars'));
       // Revert to original order if there was an error
-      avatars.value = [...originalAvatars.value];
+      avatarOrder.value = Object.keys(originalAvatars.value);
     } else {
       // Update the original order after successful save
-      originalAvatars.value = [...avatars.value];
+      originalAvatars.value = { ...avatars.value };
       hasChanges.value = false;
       ElMessage.success(t('avatars.changesSaved'));
     }
@@ -92,7 +95,7 @@ const saveChanges = async () => {
     console.error('Failed to reorder avatars:', error);
     ElMessage.error(t('errors.failedToReorderAvatars'));
     // Revert to original order if there was an error
-    avatars.value = [...originalAvatars.value];
+    avatarOrder.value = Object.keys(originalAvatars.value);
   } finally {
     loading.value = false;
   }
@@ -100,19 +103,23 @@ const saveChanges = async () => {
 
 // Cancel changes and revert to original order
 const cancelChanges = () => {
-  avatars.value = [...originalAvatars.value];
+  avatars.value = { ...originalAvatars.value };
+  avatarOrder.value = Object.keys(originalAvatars.value);
   hasChanges.value = false;
 };
 
 // Remove avatar from the grid (locally only)
-const removeAvatar = (avatar: string) => {
-  const newAvatars = [...avatars.value];
-  const index = newAvatars.indexOf(avatar);
-  if (index !== -1) {
-    newAvatars.splice(index, 1);
-    avatars.value = newAvatars;
-    hasChanges.value = true;
-  }
+const removeAvatar = (avatarId: string) => {
+  // Create a new avatars object without the removed avatar
+  const newAvatars = { ...avatars.value };
+  delete newAvatars[avatarId];
+  avatars.value = newAvatars;
+
+  // Remove the avatar ID from the order array
+  const newAvatarOrder = avatarOrder.value.filter(id => id !== avatarId);
+  avatarOrder.value = newAvatarOrder;
+
+  hasChanges.value = true;
 };
 
 // File input reference for uploading avatars
@@ -138,10 +145,25 @@ const handleFileUpload = async (event: Event) => {
     if (result.type === 'error') {
       ElMessage.error(result.message || t('errors.failedToUploadAvatars'));
     } else if (result.data) {
-      // Append new avatars to the end of the grid
-      avatars.value = [...avatars.value, ...result.data];
+      // Create new avatar entries for each uploaded avatar
+      const newAvatars = { ...avatars.value };
+      const newAvatarIds: string[] = [];
+
+      // Iterate over the avatar ID to URI mapping
+      Object.entries(result.data).forEach(([avatarId, avatarUri]) => {
+        newAvatars[avatarId] = avatarUri;
+        newAvatarIds.push(avatarId);
+      });
+
+      // Update avatars object
+      avatars.value = newAvatars;
+
+      // Append new avatar IDs to the order array
+      avatarOrder.value = [...avatarOrder.value, ...newAvatarIds];
+
       // Update original avatars to include the new ones
-      originalAvatars.value = [...avatars.value];
+      originalAvatars.value = { ...newAvatars };
+
       ElMessage.success(t('avatars.uploadSuccess'));
     }
   } catch (error) {
@@ -167,20 +189,20 @@ const handleFileUpload = async (event: Event) => {
       <div class="avatar-grid">
         <transition-group name="avatar-transition" tag="div" class="avatar-grid-container">
           <div
-            v-for="avatar in avatars"
-            :key="avatar"
+            v-for="avatarId in avatarOrder"
+            :key="avatarId"
             class="avatar-item"
-            :class="{ 'dragged': avatar === draggedAvatar, 'drag-over': avatar === draggedOverAvatar }"
+            :class="{ 'dragged': avatarId === draggedAvatarId, 'drag-over': avatarId === draggedOverAvatarId }"
             draggable="true"
-            @dragstart="handleDragStart(avatar)"
-            @dragover="handleDragOver($event, avatar)"
+            @dragstart="handleDragStart(avatarId)"
+            @dragover="handleDragOver($event, avatarId)"
             @drop="handleDrop($event)"
             @dragend="handleDragEnd"
           >
-            <el-icon class="avatar-close-icon" @click.stop="removeAvatar(avatar)">
+            <el-icon class="avatar-close-icon" @click.stop="removeAvatar(avatarId)">
               <Close />
             </el-icon>
-            <img :src="avatar" alt="Avatar" class="avatar-image" />
+            <img :src="avatars[avatarId]" alt="Avatar" class="avatar-image" />
           </div>
 
           <!-- Add avatar block -->
