@@ -2,25 +2,27 @@ import {backendURL} from "@/main.ts";
 
 export interface DiaryStyle {
     id: string,
+    authorLogin: string,
+    authorNickname: string,
     name: string,
-    enabled: boolean,
+    description?: string,
     styleContent: string,
-    previewPictureUri?: string,
+    enabled: boolean,
 }
 
 export interface DiaryStyleTextCreate {
     name: string,
-    enabled: boolean,
+    description?: string,
     styleContent: string,
-    previewPictureUri?: string,
+    enabled: boolean,
 }
 
 export interface DiaryStyleTextUpdate {
     id: string,
     name: string,
-    enabled: boolean,
+    description?: string,
     styleContent: string,
-    previewPictureUri?: string,
+    enabled: boolean,
 }
 
 export interface IDiaryClient {

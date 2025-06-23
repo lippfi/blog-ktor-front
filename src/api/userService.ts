@@ -340,7 +340,7 @@ export async function resetPassword(code: string, newPassword: string): Promise<
         : { type: 'error', message: await response.text() };
 }
 
-export async function getAvatars(): Promise<string[]> {
+export async function getAvatars(): Promise<Record<string, string>> {
     const response = await authenticatedRequest('/user/avatars');
     if (!response.ok) throw new Error(await response.text());
     return response.json();

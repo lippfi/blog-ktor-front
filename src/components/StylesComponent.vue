@@ -38,7 +38,6 @@ const newStyle = ref<DiaryStyleTextCreate>({
   name: '',
   enabled: true,
   styleContent: '',
-  previewPictureUri: ''
 });
 
 // Edit mode for styles
@@ -89,18 +88,13 @@ const startEditing = async (style: DiaryStyle) => {
   editModeIds.value.add(style.id);
 
   try {
-    // Get the style content from the server
-    const styleContent = await diaryClient.getDiaryStyleText(style.id);
-
-    // Initialize the URI input for this style
     editUriInputs.value[style.id] = '';
 
-    // Set the edited style with the content from the server
-    editedStyles.value.set(style.id, { 
+    editedStyles.value.set(style.id, {
       id: style.id,
       name: style.name,
       enabled: style.enabled,
-      styleContent: styleContent,
+      styleContent: style.styleContent,
       previewPictureUri: style.previewPictureUri
     });
   } catch (error) {

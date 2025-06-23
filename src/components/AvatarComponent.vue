@@ -6,7 +6,7 @@ import { useI18n } from 'vue-i18n';
 import { Close, Plus } from '@element-plus/icons-vue';
 
 const { t } = useI18n();
-const avatars = ref<string[]>([]);
+const avatars = ref<Record<string, string>>([]);
 const originalAvatars = ref<string[]>([]);
 const loading = ref(false);
 const draggedAvatar = ref<string | null>(null);
