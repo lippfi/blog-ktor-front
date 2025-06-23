@@ -278,7 +278,7 @@ export default {
         cancel: 'Ozgeristerden bas tartu',
         add: 'Qosu',
         name: 'Atauy',
-        styleFileUri: 'Stil faylynyn URI',
+        styleContent: 'CSS stil mazmuny',
         enabled: 'Qosuly',
         previewImage: 'Aldyn ala qarau sureti',
         confirmDelete: 'Bul stildi joyuga senimdesiz be?',
@@ -292,6 +292,7 @@ export default {
         saveSuccess: 'Ozgerister satti saqtaldy',
         saveError: 'Ozgeristerdi saqtau satsiz ayaqtaldy',
         changesCancelled: 'Ozgerister boldyrylmady',
-        requiredFields: 'Atauy jane stil faylynyn URI mindetti'
+        requiredFields: 'Atauy jane CSS stil mazmuny mindetti',
+        previewUrlApplied: 'Aldyn ala qarau suretinin URL mekenjayy satti qoldanyldy'
     }
 }

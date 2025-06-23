@@ -278,7 +278,7 @@ export default {
         cancel: 'Өзгерістерден бас тарту',
         add: 'Қосу',
         name: 'Атауы',
-        styleFileUri: 'Стиль файлының URI',
+        styleContent: 'CSS стиль мазмұны',
         enabled: 'Қосулы',
         previewImage: 'Алдын ала қарау суреті',
         confirmDelete: 'Бұл стильді жоюға сенімдісіз бе?',
@@ -292,6 +292,7 @@ export default {
         saveSuccess: 'Өзгерістер сәтті сақталды',
         saveError: 'Өзгерістерді сақтау сәтсіз аяқталды',
         changesCancelled: 'Өзгерістер болдырылмады',
-        requiredFields: 'Атауы және стиль файлының URI міндетті'
+        requiredFields: 'Атауы және CSS стиль мазмұны міндетті',
+        previewUrlApplied: 'Алдын ала қарау суретінің URL мекенжайы сәтті қолданылды'
     }
 }

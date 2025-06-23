@@ -570,7 +570,7 @@ export default {
         cancel: 'Cancel Changes',
         add: 'Add',
         name: 'Name',
-        styleFileUri: 'Style File URI',
+        styleContent: 'CSS Style Content',
         enabled: 'Enabled',
         previewImage: 'Preview Image',
         confirmDelete: 'Are you sure you want to delete this style?',
@@ -584,6 +584,7 @@ export default {
         saveSuccess: 'Changes saved successfully',
         saveError: 'Failed to save changes',
         changesCancelled: 'Changes cancelled',
-        requiredFields: 'Name and Style File URI are required'
+        requiredFields: 'Name and CSS Style Content are required',
+        previewUrlApplied: 'Preview image URL applied successfully'
     }
 }

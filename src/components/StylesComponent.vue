@@ -2,8 +2,9 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { ElMessage } from 'element-plus';
 import { diaryClient, type DiaryStyle, type DiaryStyleTextCreate, type DiaryStyleTextUpdate } from '@/api/diaryClient';
-import { Plus, Edit, Delete, Check, Close, Picture } from '@element-plus/icons-vue';
+import { Plus, Edit, Delete, Check, Close, Picture, Upload } from '@element-plus/icons-vue';
 import { useI18n } from 'vue-i18n';
+import { uploadFiles } from '@/api/storageService';
 
 const props = defineProps<{
   diaryLogin: string;
@@ -17,6 +18,8 @@ const originalStyles = ref<DiaryStyle[]>([]);
 const loading = ref(false);
 const showAddForm = ref(false);
 const dragging = ref(false);
+const previewUriInput = ref('');
+const editUriInputs = ref<Record<string, string>>({});
 const hasChanges = computed(() => {
   if (styles.value.length !== originalStyles.value.length) return true;
 
@@ -34,7 +37,7 @@ const hasChanges = computed(() => {
 const newStyle = ref<DiaryStyleTextCreate>({
   name: '',
   enabled: true,
-  styleFileUri: '',
+  styleContent: '',
   previewPictureUri: ''
 });
 
@@ -82,9 +85,37 @@ const toggleStyleEnabled = (style: DiaryStyle) => {
 };
 
 // Start editing a style
-const startEditing = (style: DiaryStyle) => {
+const startEditing = async (style: DiaryStyle) => {
   editModeIds.value.add(style.id);
-  editedStyles.value.set(style.id, { ...style });
+
+  try {
+    // Get the style content from the server
+    const styleContent = await diaryClient.getDiaryStyleText(style.id);
+
+    // Initialize the URI input for this style
+    editUriInputs.value[style.id] = '';
+
+    // Set the edited style with the content from the server
+    editedStyles.value.set(style.id, { 
+      id: style.id,
+      name: style.name,
+      enabled: style.enabled,
+      styleContent: styleContent,
+      previewPictureUri: style.previewPictureUri
+    });
+  } catch (error) {
+    console.error('Failed to get style content:', error);
+    ElMessage.error('Failed to load style content');
+
+    // If we can't get the content, just use an empty string
+    editedStyles.value.set(style.id, { 
+      id: style.id,
+      name: style.name,
+      enabled: style.enabled,
+      styleContent: '',
+      previewPictureUri: style.previewPictureUri
+    });
+  }
 };
 
 // Cancel editing a style
@@ -97,6 +128,12 @@ const cancelEditing = (id: string) => {
 const saveEditedStyle = async (id: string) => {
   const editedStyle = editedStyles.value.get(id);
   if (!editedStyle) return;
+
+  // Validate required fields
+  if (!editedStyle.name || !editedStyle.styleContent) {
+    ElMessage.warning(t('styles.requiredFields'));
+    return;
+  }
 
   try {
     const updatedStyle = await diaryClient.updateDiaryStyle(props.diaryLogin, editedStyle);
@@ -123,7 +160,7 @@ const updateEditedStyle = (id: string, field: keyof DiaryStyleTextUpdate, value:
 
 // Add new style
 const addNewStyle = async () => {
-  if (!newStyle.value.name || !newStyle.value.styleFileUri) {
+  if (!newStyle.value.name || !newStyle.value.styleContent) {
     ElMessage.warning(t('styles.requiredFields'));
     return;
   }
@@ -135,7 +172,7 @@ const addNewStyle = async () => {
     newStyle.value = {
       name: '',
       enabled: true,
-      styleFileUri: '',
+      styleContent: '',
       previewPictureUri: ''
     };
     ElMessage.success(t('styles.addSuccess'));
@@ -211,28 +248,59 @@ const cancelChanges = () => {
 };
 
 // Handle file upload for preview image
-const handleFileUpload = (event: Event, id?: string) => {
+const handleFileUpload = async (event: Event, id?: string) => {
   const input = event.target as HTMLInputElement;
   if (!input.files || input.files.length === 0) return;
 
   const file = input.files[0];
-  const reader = new FileReader();
 
-  reader.onload = (e) => {
-    const result = e.target?.result as string;
+  try {
+    // Upload file to server using storageService
+    const result = await uploadFiles([file]);
+
+    if (result.type === 'ok' && result.data.length > 0) {
+      const imageUrl = result.data[0];
+
+      if (id) {
+        // Update existing style
+        const style = editedStyles.value.get(id);
+        if (style) {
+          editedStyles.value.set(id, { ...style, previewPictureUri: imageUrl });
+        }
+      } else {
+        // Update new style
+        newStyle.value.previewPictureUri = imageUrl;
+      }
+    } else {
+      ElMessage.error(result.type === 'error' ? result.message : 'Failed to upload image');
+    }
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    ElMessage.error('Failed to upload image');
+  }
+};
+
+// Handle direct URI input for preview image
+const handlePreviewUriInput = (uri: string, id?: string) => {
+  if (uri.trim()) {
     if (id) {
       // Update existing style
       const style = editedStyles.value.get(id);
       if (style) {
-        editedStyles.value.set(id, { ...style, previewPictureUri: result });
+        editedStyles.value.set(id, { ...style, previewPictureUri: uri });
+        // Clear the input field after applying
+        editUriInputs.value[id] = '';
       }
     } else {
       // Update new style
-      newStyle.value.previewPictureUri = result;
+      newStyle.value.previewPictureUri = uri;
+      // Clear the input field after applying
+      previewUriInput.value = '';
     }
-  };
 
-  reader.readAsDataURL(file);
+    // Show success message
+    ElMessage.success(t('styles.previewUrlApplied'));
+  }
 };
 </script>
 
@@ -313,22 +381,59 @@ const handleFileUpload = (event: Event, id?: string) => {
                 size="small"
                 placeholder="Style name"
               />
-              <div class="preview-upload">
-                <img
-                  v-if="editedStyles.get(style.id)!.previewPictureUri"
-                  :src="editedStyles.get(style.id)!.previewPictureUri"
-                  alt="Preview"
-                  class="preview-image"
-                />
-                <div v-else class="no-preview">
-                  <el-icon><Picture /></el-icon>
+
+              <!-- Get style content from server and show in textarea -->
+              <el-input
+                v-model="editedStyles.get(style.id)!.styleContent"
+                @input="updateEditedStyle(style.id, 'styleContent', editedStyles.get(style.id)!.styleContent)"
+                type="textarea"
+                :rows="5"
+                placeholder="Enter CSS style content"
+                class="style-content-textarea"
+              />
+
+              <div class="preview-section">
+                <div class="preview-upload">
+                  <img
+                    v-if="editedStyles.get(style.id)!.previewPictureUri"
+                    :src="editedStyles.get(style.id)!.previewPictureUri"
+                    alt="Preview"
+                    class="preview-image"
+                  />
+                  <div v-else class="no-preview">
+                    <el-icon><Picture /></el-icon>
+                  </div>
                 </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  @change="(e) => handleFileUpload(e, style.id)"
-                  class="file-input"
-                />
+
+                <div class="preview-actions">
+                  <div class="upload-button">
+                    <el-button size="small" type="primary">
+                      <el-icon><Upload /></el-icon>
+                      Upload Image
+                    </el-button>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      @change="(e) => handleFileUpload(e, style.id)"
+                      class="file-input"
+                    />
+                  </div>
+
+                  <div class="uri-input">
+                    <el-input
+                      v-model="editUriInputs[style.id]"
+                      placeholder="Or paste image URL here"
+                      size="small"
+                      clearable
+                    >
+                      <template #append>
+                        <el-button @click="handlePreviewUriInput(editUriInputs[style.id], style.id)">
+                          Apply
+                        </el-button>
+                      </template>
+                    </el-input>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="style-actions">
@@ -397,8 +502,13 @@ const handleFileUpload = (event: Event, id?: string) => {
             <el-input v-model="newStyle.name" />
           </el-form-item>
 
-          <el-form-item :label="t('styles.styleFileUri')">
-            <el-input v-model="newStyle.styleFileUri" />
+          <el-form-item :label="t('styles.styleContent')">
+            <el-input 
+              v-model="newStyle.styleContent" 
+              type="textarea" 
+              :rows="5"
+              placeholder="Enter CSS style content"
+            />
           </el-form-item>
 
           <el-form-item :label="t('styles.enabled')">
@@ -406,22 +516,48 @@ const handleFileUpload = (event: Event, id?: string) => {
           </el-form-item>
 
           <el-form-item :label="t('styles.previewImage')">
-            <div class="preview-upload">
-              <img
-                v-if="newStyle.previewPictureUri"
-                :src="newStyle.previewPictureUri"
-                alt="Preview"
-                class="preview-image"
-              />
-              <div v-else class="no-preview">
-                <el-icon><Picture /></el-icon>
+            <div class="preview-section">
+              <div class="preview-upload">
+                <img
+                  v-if="newStyle.previewPictureUri"
+                  :src="newStyle.previewPictureUri"
+                  alt="Preview"
+                  class="preview-image"
+                />
+                <div v-else class="no-preview">
+                  <el-icon><Picture /></el-icon>
+                </div>
               </div>
-              <input
-                type="file"
-                accept="image/*"
-                @change="handleFileUpload"
-                class="file-input"
-              />
+
+              <div class="preview-actions">
+                <div class="upload-button">
+                  <el-button size="small" type="primary">
+                    <el-icon><Upload /></el-icon>
+                    Upload Image
+                  </el-button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    @change="handleFileUpload"
+                    class="file-input"
+                  />
+                </div>
+
+                <div class="uri-input">
+                  <el-input
+                    v-model="previewUriInput"
+                    placeholder="Or paste image URL here"
+                    size="small"
+                    clearable
+                  >
+                    <template #append>
+                      <el-button @click="handlePreviewUriInput(previewUriInput)">
+                        Apply
+                      </el-button>
+                    </template>
+                  </el-input>
+                </div>
+              </div>
             </div>
           </el-form-item>
 
@@ -514,9 +650,27 @@ const handleFileUpload = (event: Event, id?: string) => {
   color: #909399;
 }
 
+.preview-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .preview-upload {
   position: relative;
   cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.preview-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.upload-button {
+  position: relative;
+  display: inline-block;
 }
 
 .file-input {
@@ -527,6 +681,15 @@ const handleFileUpload = (event: Event, id?: string) => {
   height: 100%;
   opacity: 0;
   cursor: pointer;
+}
+
+.uri-input {
+  margin-top: 5px;
+}
+
+.style-content-textarea {
+  width: 100%;
+  margin: 10px 0;
 }
 
 .action-buttons {

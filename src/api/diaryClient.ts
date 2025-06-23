@@ -4,7 +4,7 @@ export interface DiaryStyle {
     id: string,
     name: string,
     enabled: boolean,
-    styleFileUri: string,
+    styleContent: string,
     previewPictureUri?: string,
 }
 
@@ -19,7 +19,7 @@ export interface DiaryStyleTextUpdate {
     id: string,
     name: string,
     enabled: boolean,
-    styleFileUri: string,
+    styleContent: string,
     previewPictureUri?: string,
 }
 
@@ -52,7 +52,8 @@ class DiaryClientImpl implements IDiaryClient {
     }
 
     async getDiaryStyleText(styleId: string): Promise<string> {
-        const response = await fetch(`${backendURL}/diary/styles/${styleId}`);
+        console.log(`Getting diary style text for ${styleId}`);
+        const response = await DiaryClientImpl.authenticatedRequest(`/diary/styles/${styleId}`);
         if (!response.ok) {
             throw new Error(`Failed to get diary style text: ${response.statusText}`);
         }
@@ -60,12 +61,11 @@ class DiaryClientImpl implements IDiaryClient {
     }
 
     async getDiaryStyleUris(diaryLogin: string): Promise<string[]> {
-        const response = await fetch(`${backendURL}/diary/styles?login=${diaryLogin}`);
+        const response = await fetch(`${backendURL}/diary/styles/enabled?login=${diaryLogin}`);
         if (!response.ok) {
             throw new Error(`Failed to get diary style URIs: ${response.statusText}`);
         }
-        const styles = await response.json() as DiaryStyle[];
-        return styles.map(style => style.styleFileUri);
+        return await response.json()
     }
 
     async getDiaryStyleCollection(diaryLogin: string): Promise<DiaryStyle[]> {

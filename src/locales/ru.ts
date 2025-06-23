@@ -293,7 +293,7 @@ export default {
         cancel: 'Отменить изменения',
         add: 'Добавить',
         name: 'Название',
-        styleFileUri: 'URI файла стиля',
+        styleContent: 'Содержимое CSS стиля',
         enabled: 'Включен',
         previewImage: 'Изображение предпросмотра',
         confirmDelete: 'Вы уверены, что хотите удалить этот стиль?',
@@ -307,6 +307,7 @@ export default {
         saveSuccess: 'Изменения успешно сохранены',
         saveError: 'Не удалось сохранить изменения',
         changesCancelled: 'Изменения отменены',
-        requiredFields: 'Название и URI файла стиля обязательны'
+        requiredFields: 'Название и содержимое CSS стиля обязательны',
+        previewUrlApplied: 'URL изображения предпросмотра успешно применен'
     }
 }
