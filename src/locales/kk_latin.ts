@@ -269,5 +269,29 @@ export default {
                 label: 'tek men',
             },
         }
+    },
+    styles: {
+        title: 'Kundelik stilderi',
+        addNew: 'Jana stil qosu',
+        addNewStyle: 'Jana stil qosu',
+        save: 'Ozgeristerdi saqtau',
+        cancel: 'Ozgeristerden bas tartu',
+        add: 'Qosu',
+        name: 'Atauy',
+        styleFileUri: 'Stil faylynyn URI',
+        enabled: 'Qosuly',
+        previewImage: 'Aldyn ala qarau sureti',
+        confirmDelete: 'Bul stildi joyuga senimdesiz be?',
+        loadError: 'Stilderdi jukteu satsiz ayaqtaldy',
+        updateSuccess: 'Stil satti janartydy',
+        updateError: 'Stildi janartu satsiz ayaqtaldy',
+        addSuccess: 'Stil satti qosyldy',
+        addError: 'Stildi qosu satsiz ayaqtaldy',
+        deleteSuccess: 'Stil satti joyyldy',
+        deleteError: 'Stildi joyu satsiz ayaqtaldy',
+        saveSuccess: 'Ozgerister satti saqtaldy',
+        saveError: 'Ozgeristerdi saqtau satsiz ayaqtaldy',
+        changesCancelled: 'Ozgerister boldyrylmady',
+        requiredFields: 'Atauy jane stil faylynyn URI mindetti'
     }
 }

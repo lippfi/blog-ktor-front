@@ -11,7 +11,7 @@ export interface DiaryStyle {
 export interface DiaryStyleTextCreate {
     name: string,
     enabled: boolean,
-    styleFileUri: string,
+    styleContent: string,
     previewPictureUri?: string,
 }
 
@@ -28,8 +28,8 @@ export interface IDiaryClient {
     getDiaryStyleUris(diaryLogin: string): Promise<string[]>;
     getDiaryStyleCollection(diaryLogin: string): Promise<DiaryStyle[]>;
 
-    addDiaryStyle(diaryLogin: string, styleId: string): Promise<DiaryStyle>;
     addDiaryStyle(diaryLogin: string, style: DiaryStyleTextCreate): Promise<DiaryStyle>;
+    addDiaryStyleById(diaryLogin: string, styleId: string, enable: boolean): Promise<DiaryStyle>;
     updateDiaryStyle(diaryLogin: string, style: DiaryStyleTextUpdate): Promise<DiaryStyle>;
 
     deleteDiaryStyle(styleId: string): Promise<void>;
@@ -50,4 +50,106 @@ class DiaryClientImpl implements IDiaryClient {
 
         return fetch(`${backendURL}${endpoint}`, { ...options, headers });
     }
+
+    async getDiaryStyleText(styleId: string): Promise<string> {
+        const response = await fetch(`${backendURL}/diary/styles/${styleId}`);
+        if (!response.ok) {
+            throw new Error(`Failed to get diary style text: ${response.statusText}`);
+        }
+        return await response.text();
+    }
+
+    async getDiaryStyleUris(diaryLogin: string): Promise<string[]> {
+        const response = await fetch(`${backendURL}/diary/styles?login=${diaryLogin}`);
+        if (!response.ok) {
+            throw new Error(`Failed to get diary style URIs: ${response.statusText}`);
+        }
+        const styles = await response.json() as DiaryStyle[];
+        return styles.map(style => style.styleFileUri);
+    }
+
+    async getDiaryStyleCollection(diaryLogin: string): Promise<DiaryStyle[]> {
+        const response = await DiaryClientImpl.authenticatedRequest(`/diary/styles?login=${diaryLogin}`);
+        if (!response.ok) {
+            throw new Error(`Failed to get diary style collection: ${response.statusText}`);
+        }
+        return await response.json() as DiaryStyle[];
+    }
+
+    async addDiaryStyleById(diaryLogin: string, styleId: string, enable: boolean): Promise<DiaryStyle> {
+        const response = await DiaryClientImpl.authenticatedRequest(
+            `/diary/styles/add-style-by-id?login=${diaryLogin}&styleId=${styleId}&enable=${enable.toString()}`,
+            {
+                method: 'POST'
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`Failed to add diary style by ID: ${response.statusText}`);
+        }
+        return await response.json() as DiaryStyle;
+    }
+
+    async addDiaryStyle(diaryLogin: string, style: DiaryStyleTextCreate): Promise<DiaryStyle> {
+        const response = await DiaryClientImpl.authenticatedRequest(
+            `/diary/styles?login=${diaryLogin}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(style)
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`Failed to add diary style: ${response.statusText}`);
+        }
+        return await response.json() as DiaryStyle;
+    }
+
+    async updateDiaryStyle(diaryLogin: string, style: DiaryStyleTextUpdate): Promise<DiaryStyle> {
+        const response = await DiaryClientImpl.authenticatedRequest(
+            `/diary/styles/${style.id}?login=${diaryLogin}`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(style)
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`Failed to update diary style: ${response.statusText}`);
+        }
+        return await response.json() as DiaryStyle;
+    }
+
+    async deleteDiaryStyle(styleId: string): Promise<void> {
+        const response = await DiaryClientImpl.authenticatedRequest(
+            `/diary/styles/${styleId}`,
+            {
+                method: 'DELETE'
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`Failed to delete diary style: ${response.statusText}`);
+        }
+    }
+
+    async reorderDiaryStyles(diaryLogin: string, styleIds: string[]): Promise<void> {
+        const response = await DiaryClientImpl.authenticatedRequest(
+            `/diary/styles/reorder?login=${diaryLogin}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(styleIds)
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`Failed to reorder diary styles: ${response.statusText}`);
+        }
+    }
 }
+
+export const diaryClient: IDiaryClient = new DiaryClientImpl();

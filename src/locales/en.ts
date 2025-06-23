@@ -561,5 +561,29 @@ export default {
         failedToLoadAvatars: 'Failed to load avatars',
         failedToReorderAvatars: 'Failed to reorder avatars',
         failedToUploadAvatars: 'Failed to upload avatars'
+    },
+    styles: {
+        title: 'Diary Styles',
+        addNew: 'Add New Style',
+        addNewStyle: 'Add New Style',
+        save: 'Save Changes',
+        cancel: 'Cancel Changes',
+        add: 'Add',
+        name: 'Name',
+        styleFileUri: 'Style File URI',
+        enabled: 'Enabled',
+        previewImage: 'Preview Image',
+        confirmDelete: 'Are you sure you want to delete this style?',
+        loadError: 'Failed to load styles',
+        updateSuccess: 'Style updated successfully',
+        updateError: 'Failed to update style',
+        addSuccess: 'Style added successfully',
+        addError: 'Failed to add style',
+        deleteSuccess: 'Style deleted successfully',
+        deleteError: 'Failed to delete style',
+        saveSuccess: 'Changes saved successfully',
+        saveError: 'Failed to save changes',
+        changesCancelled: 'Changes cancelled',
+        requiredFields: 'Name and Style File URI are required'
     }
 }

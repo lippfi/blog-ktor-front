@@ -15,6 +15,7 @@ import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import DiarySearchView, { extractSearchParams } from "@/views/DiarySearchView.vue";
 import RepostView from "@/views/RepostView.vue";
+import StylesComponent from "@/components/StylesComponent.vue";
 
 export const profileStub = {
   text: "Hi there! Welcome to my webpage.\n" +
@@ -192,6 +193,14 @@ const router = createRouter({
         const {login} = to.params;
         return `${login}/diary/1`;
       }
+    },
+    {
+      path: '/:login/styles',
+      name: 'styles',
+      component: StylesComponent,
+      props: (route) => ({
+        diaryLogin: route.params.login,
+      })
     },
     {
       path: "/:login/diary/:page?",
