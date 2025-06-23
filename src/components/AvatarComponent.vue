@@ -10,6 +10,8 @@ const { t } = useI18n();
 const avatars = ref<Record<string, string>>({});
 const originalAvatars = ref<Record<string, string>>({});
 const loading = ref(false);
+const saveLoading = ref(false);
+const uploadLoading = ref(false);
 const draggedAvatarId = ref<string | null>(null);
 const draggedOverAvatarId = ref<string | null>(null);
 const hasChanges = ref(false);
@@ -78,7 +80,7 @@ const handleDragEnd = () => {
 
 const saveChanges = async () => {
   try {
-    loading.value = true;
+    saveLoading.value = true;
     // Pass avatar IDs directly to the backend
     const result = await reorderAvatars(avatarOrder.value);
     if (result.type === 'error') {
@@ -89,7 +91,6 @@ const saveChanges = async () => {
       // Update the original order after successful save
       originalAvatars.value = { ...avatars.value };
       hasChanges.value = false;
-      ElMessage.success(t('avatars.changesSaved'));
     }
   } catch (error) {
     console.error('Failed to reorder avatars:', error);
@@ -97,7 +98,7 @@ const saveChanges = async () => {
     // Revert to original order if there was an error
     avatarOrder.value = Object.keys(originalAvatars.value);
   } finally {
-    loading.value = false;
+    saveLoading.value = false;
   }
 };
 
@@ -138,7 +139,7 @@ const handleFileUpload = async (event: Event) => {
   if (!target.files || target.files.length === 0) return;
 
   try {
-    loading.value = true;
+    uploadLoading.value = true;
     const files = Array.from(target.files);
     const result = await addAvatars(files);
 
@@ -170,7 +171,7 @@ const handleFileUpload = async (event: Event) => {
     console.error('Failed to upload avatars:', error);
     ElMessage.error(t('errors.failedToUploadAvatars'));
   } finally {
-    loading.value = false;
+    uploadLoading.value = false;
     // Reset file input
     if (fileInput.value) {
       fileInput.value.value = '';
@@ -209,12 +210,16 @@ const handleFileUpload = async (event: Event) => {
           <div
             key="add-avatar"
             class="avatar-item add-avatar-item"
-            @click="triggerFileUpload"
+            @click="!uploadLoading && triggerFileUpload"
+            :class="{ 'disabled': uploadLoading }"
           >
-            <el-icon class="add-avatar-icon">
+            <el-icon class="add-avatar-icon" v-if="!uploadLoading">
               <Plus />
             </el-icon>
-            <div class="add-avatar-text">{{ t('avatars.addAvatar') }}</div>
+            <el-icon class="add-avatar-icon loading-icon" v-else>
+              <i class="el-icon-loading"></i>
+            </el-icon>
+            <div class="add-avatar-text">{{ uploadLoading ? t('avatars.uploading', 'Uploading...') : t('avatars.addAvatar') }}</div>
           </div>
         </transition-group>
 
@@ -230,8 +235,8 @@ const handleFileUpload = async (event: Event) => {
       </div>
 
       <div v-if="hasChanges" class="action-buttons">
-        <el-button type="primary" @click="saveChanges">{{ t('avatars.save') }}</el-button>
-        <el-button @click="cancelChanges">{{ t('avatars.cancel') }}</el-button>
+        <el-button type="primary" @click="saveChanges" :loading="saveLoading">{{ t('avatars.save') }}</el-button>
+        <el-button @click="cancelChanges" :disabled="saveLoading">{{ t('avatars.cancel') }}</el-button>
       </div>
     </div>
   </div>
@@ -378,9 +383,14 @@ const handleFileUpload = async (event: Event) => {
   cursor: pointer;
 }
 
-.add-avatar-item:hover {
+.add-avatar-item:hover:not(.disabled) {
   background-color: #e6e8eb;
   border-color: #c0c4cc;
+}
+
+.add-avatar-item.disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .add-avatar-icon {
@@ -389,9 +399,22 @@ const handleFileUpload = async (event: Event) => {
   margin-bottom: 8px;
 }
 
+.add-avatar-icon.loading-icon {
+  animation: rotating 2s linear infinite;
+}
+
 .add-avatar-text {
   font-size: 14px;
   color: #909399;
+}
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Hidden file input */
