@@ -16,6 +16,7 @@ import "nprogress/nprogress.css";
 import DiarySearchView, { extractSearchParams } from "@/views/DiarySearchView.vue";
 import RepostView from "@/views/RepostView.vue";
 import StylesComponent from "@/components/styles/StylesComponent.vue";
+import {diaryClient} from "@/api/diaryClient.ts";
 
 export const profileStub = {
   text: "Hi there! Welcome to my webpage.\n" +
@@ -200,13 +201,51 @@ const router = createRouter({
       component: StylesComponent,
       props: (route) => ({
         login: route.params.login,
-      })
+      }),
+      beforeEnter: async (to, _, next) => {
+        if (!to.params.login) {
+          next();
+          return;
+        }
+
+        try {
+          const styles = await diaryClient.getDiaryStyleCollection(to.params.login as string);
+          to.meta.styles = styles;
+          next();
+        } catch (error) {
+          console.error('Failed to fetch styles:', error);
+          to.meta.error = 'Failed to fetch styles';
+          next();
+        }
+      }
     },
     {
       path: "/:login/diary/:page?",
       name: "diary",
       component: DiaryView,
-      props: true
+      props: true,
+      beforeEnter: async (to, _, next) => {
+        const postClient = new PostClientImpl();
+        let page = 1;
+        if (to.params.page) {
+          page = parseInt(to.params.page as string);
+        }
+        if (!to.params.login) {
+          next();
+          return;
+        }
+
+        const searchResult = await postClient.getDiaryPosts(to.params.login as string, page - 1);
+
+        if (searchResult.type === 'ok') {
+          to.meta.posts = searchResult.data.posts.content.map(mapPostDtoToPost);
+          to.meta.styles = searchResult.data.diary.styles;
+          next();
+        } else {
+          to.meta.error = searchResult.message;
+          next();
+        }
+      }
     },
     {
       path: "/:diary/search",

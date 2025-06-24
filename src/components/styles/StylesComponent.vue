@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import StyleComponent from "@/components/styles/StyleComponent.vue";
 import type {DiaryStyle} from "@/api/diaryClient.ts";
-import {diaryClient} from "@/api/diaryClient.ts";
 import {Plus} from "@element-plus/icons-vue";
-import {ref, onMounted} from "vue";
+import {ref, computed} from "vue";
 import AddOrEditStyleForm from "@/components/styles/AddOrEditStyleForm.vue";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
+import {useRoute} from "vue-router";
 
+const route = useRoute();
 const props = defineProps<{
   login: string,
   avatars: string[],
@@ -21,19 +22,7 @@ const emit = defineEmits<{
 
 const isEditing = ref(false);
 const isAdding = ref(false);
-const styles = ref<DiaryStyle[]>([]);
-
-const fetchStyles = async () => {
-  try {
-    styles.value = await diaryClient.getDiaryStyleCollection(props.login);
-  } catch (error) {
-    console.error('Failed to fetch styles:', error);
-  }
-};
-
-onMounted(() => {
-  fetchStyles();
-});
+const styles = computed<DiaryStyle[]>(() => route.meta.styles as DiaryStyle[] || []);
 </script>
 
 <template>
