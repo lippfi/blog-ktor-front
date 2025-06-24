@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import ProcessedText from "@/components/post/ProcessedText.vue";
 import type {DiaryStyle} from "@/api/diaryClient.ts";
+import {diaryClient} from "@/api/diaryClient.ts";
 import {Delete, Edit, EditPen, Link} from "@element-plus/icons-vue";
-import {ref} from "vue";
+import {ref, watch} from "vue";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import AddOrEditStyleForm from "@/components/styles/AddOrEditStyleForm.vue";
+import {updateStyles} from "@/styles/stylesManager";
 
 const props = defineProps<{
   style: DiaryStyle,
@@ -15,6 +17,14 @@ const props = defineProps<{
   recentReactions: BasicReactionResponse[],
 }>();
 
+// Create a local state for the switch
+const isEnabled = ref(props.style.enabled);
+
+// Watch for changes to the prop and update local state
+watch(() => props.style.enabled, (newValue) => {
+  isEnabled.value = newValue;
+});
+
 const emit = defineEmits<{
   (e: 'reaction-added', reaction: BasicReactionResponse): void
 }>();
@@ -23,6 +33,31 @@ const showShare = ref(false);
 const shareCode = '[style ' + props.style.id + ']';
 
 const isEditing = ref(false);
+
+// Handle switch toggle
+const handleSwitchChange = async () => {
+  try {
+    // Update the prop to keep it in sync with local state
+    props.style.enabled = isEnabled.value;
+
+    // Update the style in the backend
+    const styleData = {
+      id: props.style.id,
+      name: props.style.name,
+      description: props.style.description,
+      styleContent: props.style.styleContent,
+      enabled: isEnabled.value
+    };
+
+    await diaryClient.updateDiaryStyle(props.diaryLogin, styleData);
+
+    // Get updated style URLs and update global styles
+    const styleUrls = await diaryClient.getDiaryStyleUris(props.diaryLogin);
+    updateStyles(styleUrls);
+  } catch (error) {
+    console.error('Error updating style:', error);
+  }
+};
 </script>
 
 <template>
@@ -30,7 +65,7 @@ const isEditing = ref(false);
   <div class="style-block">
     <div v-if="!isEditing" class="view">
       <div class="left">
-        <el-switch v-model="props.style.enabled"/>
+        <el-switch v-model="isEnabled" @change="handleSwitchChange"/>
       </div>
       <div class="right">
         <div class="header">
