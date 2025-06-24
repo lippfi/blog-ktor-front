@@ -42,7 +42,7 @@ onMounted(async () => {
   }
 
   const avatarsResponse = await getAvatars();
-  avatars.value = avatarsResponse
+  avatars.value = Object.values(avatarsResponse)
   console.log('Avatars:', avatars.value);
 
   const basicReactionsResponse = await reactionClient.getBasicReactions();
@@ -77,7 +77,7 @@ const reactionAdded = (reaction: BasicReactionResponse) => {
 const updateAvatars = async () => {
   console.log('Updating avatars');
   const avatarsResponse = await getAvatars();
-  avatars.value = avatarsResponse;
+  avatars.value = Object.values(avatarsResponse);
 }
 </script>
 
