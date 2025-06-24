@@ -563,6 +563,9 @@ export default {
         failedToUploadAvatars: 'Failed to upload avatars'
     },
     styles: {
+        preview: {
+            save: 'Add to my collection',
+        },
         title: 'Diary Styles',
         addNew: 'Add New Style',
         addNewStyle: 'Add New Style',

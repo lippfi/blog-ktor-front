@@ -1,5 +1,11 @@
 import {backendURL} from "@/main.ts";
 
+export interface DiaryStylePreview {
+    id: string,
+    name: string,
+    enabled: boolean,
+}
+
 export interface DiaryStyle {
     id: string,
     authorLogin: string,
@@ -26,6 +32,7 @@ export interface DiaryStyleTextUpdate {
 }
 
 export interface IDiaryClient {
+    getDiaryStyle(styleId: string): Promise<DiaryStylePreview>;
     getDiaryStyleText(styleId: string): Promise<string>;
     getDiaryStyleUris(diaryLogin: string): Promise<string[]>;
     getDiaryStyleCollection(diaryLogin: string): Promise<DiaryStyle[]>;
@@ -135,6 +142,14 @@ class DiaryClientImpl implements IDiaryClient {
         if (!response.ok) {
             throw new Error(`Failed to delete diary style: ${response.statusText}`);
         }
+    }
+
+    async getDiaryStyle(styleId: string): Promise<DiaryStylePreview> {
+        const response = await fetch(`${backendURL}/diary/styles/${styleId}`);
+        if (!response.ok) {
+            throw new Error(`Failed to get diary style URIs: ${response.statusText}`);
+        }
+        return await response.json()
     }
 
     async reorderDiaryStyles(diaryLogin: string, styleIds: string[]): Promise<void> {
