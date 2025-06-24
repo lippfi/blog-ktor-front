@@ -15,7 +15,7 @@ import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import DiarySearchView, { extractSearchParams } from "@/views/DiarySearchView.vue";
 import RepostView from "@/views/RepostView.vue";
-import StylesComponent from "@/components/StylesComponent.vue";
+import StylesComponent from "@/components/styles/StylesComponent.vue";
 
 export const profileStub = {
   text: "Hi there! Welcome to my webpage.\n" +
