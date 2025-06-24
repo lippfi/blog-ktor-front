@@ -10,4 +10,4 @@ export const updateStyles = (newStyles: string[]) => {
 }
 
 // Function to get styles
-export const getStyles = () => styles;
+export const getStyles = () => styles.value;
