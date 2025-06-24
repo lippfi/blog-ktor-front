@@ -118,6 +118,7 @@ h3 {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
 }
 
 .form-item {

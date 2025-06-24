@@ -34,6 +34,7 @@ const styles = computed<DiaryStyle[]>(() => route.meta.styles as DiaryStyle[] ||
         v-for="style in styles"
         :key="style.id"
         :style="style"
+        :diary-login="login"
         :avatars="avatars"
         :basic-reactions="basicReactions"
         :recent-reactions="recentReactions"
