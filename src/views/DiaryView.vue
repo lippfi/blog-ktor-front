@@ -28,14 +28,11 @@ const emit = defineEmits<{
 
 const loggedIn: boolean = isSignedIn();
 const posts = computed<PostModel[]>(() => route.meta.posts as PostModel[] || []);
-const styles = computed<string[]>(() => route.meta.styles as string[] || []);
 
 </script>
 
 <template>
   <div>
-    <link v-for="style in styles" :key="style" rel="stylesheet" :href="style" />
-
     <div class="centralized_block">
       <PostComponent
           v-for="post in posts"

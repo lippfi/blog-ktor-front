@@ -1,5 +1,7 @@
 <template>
   <MenuComponent v-if="signedIn && $route.name !== 'register'"/>
+  <!-- Apply all styles globally -->
+  <link v-for="style in getStyles()" :key="style" rel="stylesheet" :href="style" data-diary-style="true" />
   <router-view v-if="isLoaded"
                :avatars="avatars"
                @update-avatars="updateAvatars"
@@ -16,6 +18,7 @@ import { ref, onMounted, watch, onUnmounted } from 'vue'
 import {reactionClient} from "@/api/postClient/reactionClient.ts";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
+import { getStyles } from "@/styles/stylesManager";
 
 const router = useRouter()
 const signedIn = ref(isSignedIn())

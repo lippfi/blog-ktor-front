@@ -17,6 +17,7 @@ import DiarySearchView, { extractSearchParams } from "@/views/DiarySearchView.vu
 import RepostView from "@/views/RepostView.vue";
 import StylesComponent from "@/components/styles/StylesComponent.vue";
 import {diaryClient} from "@/api/diaryClient.ts";
+import {updateStyles} from "@/styles/stylesManager";
 
 export const profileStub = {
   text: "Hi there! Welcome to my webpage.\n" +
@@ -211,6 +212,11 @@ const router = createRouter({
         try {
           const styles = await diaryClient.getDiaryStyleCollection(to.params.login as string);
           to.meta.styles = styles;
+
+          // Get style URIs for global application
+          const styleUrls = await diaryClient.getDiaryStyleUris(to.params.login as string);
+          updateStyles(styleUrls);
+
           next();
         } catch (error) {
           console.error('Failed to fetch styles:', error);
@@ -240,6 +246,10 @@ const router = createRouter({
         if (searchResult.type === 'ok') {
           to.meta.posts = searchResult.data.posts.content.map(mapPostDtoToPost);
           to.meta.styles = searchResult.data.diary.styles;
+
+          // Update global styles
+          updateStyles(searchResult.data.diary.styles);
+
           next();
         } else {
           to.meta.error = searchResult.message;
@@ -283,6 +293,7 @@ const router = createRouter({
 
         if (postDto.type === 'ok') {
           to.meta.post = mapPostDtoToPost(postDto.data.post);
+          updateStyles(postDto.data.diary.styles);
           next();
         } else {
           to.meta.post = null;
