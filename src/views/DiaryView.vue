@@ -29,6 +29,7 @@ const emit = defineEmits<{
 const loggedIn: boolean = isSignedIn();
 const isLoaded = ref(false);
 const posts = ref<PostModel[]>([]);
+const styles = ref<string[]>([])
 
 onMounted(async () => {
   const postsClient = new PostClientImpl();
@@ -43,34 +44,40 @@ onMounted(async () => {
   isLoaded.value = true;
   if (searchResult.type === 'ok') {
     posts.value = searchResult.data.posts.content.map((c) => mapPostDtoToPost(c));
+    console.log(searchResult.data.diary)
+    styles.value = searchResult.data.diary.styles
   }
 });
 
 </script>
 
 <template>
-  <div v-if="isLoaded" class="centralized_block">
-    <PostComponent
-        v-for="post in posts"
-        :key="post.id"
-        :login="login"
-        :post="post"
-        :show-comments-count="true"
-        :avatars="avatars"
-        @update-avatars="emit('update-avatars')"
-        :basic-reactions="basicReactions"
-        :recent-reactions="recentReactions"
-        @reaction-added="emit('reaction-added', $event)"
-    />
-    <PostEdit
-        v-if="loggedIn"
-        :type="'post'"
-        :diary-login="props.login"
-        :avatars="avatars"
-        :basic-reactions="basicReactions"
-        :recent-reactions="recentReactions"
-        @reaction-added="emit('reaction-added', $event)"
-    />
+  <div>
+    <link v-for="style in styles" :key="style" rel="stylesheet" :href="style" />
+
+    <div v-if="isLoaded" class="centralized_block">
+      <PostComponent
+          v-for="post in posts"
+          :key="post.id"
+          :login="login"
+          :post="post"
+          :show-comments-count="true"
+          :avatars="avatars"
+          @update-avatars="emit('update-avatars')"
+          :basic-reactions="basicReactions"
+          :recent-reactions="recentReactions"
+          @reaction-added="emit('reaction-added', $event)"
+      />
+      <PostEdit
+          v-if="loggedIn"
+          :type="'post'"
+          :diary-login="props.login"
+          :avatars="avatars"
+          :basic-reactions="basicReactions"
+          :recent-reactions="recentReactions"
+          @reaction-added="emit('reaction-added', $event)"
+      />
+    </div>
   </div>
 </template>
 

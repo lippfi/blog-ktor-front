@@ -84,7 +84,7 @@ export interface DiaryPageDto {
 export interface DiaryViewDto {
     name: string;
     subtitle: string;
-    style?: string;
+    styles: string[];
     defaultGroups: Record<string, string>;
 }
 
