@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import StyleComponent from "@/components/styles/StyleComponent.vue";
 import type {DiaryStyle} from "@/api/diaryClient.ts";
+import {diaryClient} from "@/api/diaryClient.ts";
 import {Plus} from "@element-plus/icons-vue";
-import {ref} from "vue";
+import {ref, onMounted} from "vue";
 import AddOrEditStyleForm from "@/components/styles/AddOrEditStyleForm.vue";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
@@ -20,22 +21,30 @@ const emit = defineEmits<{
 
 const isEditing = ref(false);
 const isAdding = ref(false);
+const styles = ref<DiaryStyle[]>([]);
 
-const styleStub: DiaryStyle = {
-  id: "550e8400-e29b-41d4-a716-446655440000",
-  name: "avatar mask - ramen",
-  description: "test",
-  authorLogin: "lippfi",
-  authorNickname: "детектив шимпански",
-  styleContent: "body {\n  background-color: #000000;\n}\n",
-  enabled: true,
-}
+const fetchStyles = async () => {
+  try {
+    styles.value = await diaryClient.getDiaryStyleCollection(props.login);
+  } catch (error) {
+    console.error('Failed to fetch styles:', error);
+  }
+};
+
+onMounted(() => {
+  fetchStyles();
+});
 </script>
 
 <template>
   <div class="centralized_block">
+    <div v-if="styles.length === 0" class="no-styles">
+      No styles found. Add a new style below.
+    </div>
     <StyleComponent
-        :style="styleStub"
+        v-for="style in styles"
+        :key="style.id"
+        :style="style"
         :avatars="avatars"
         :basic-reactions="basicReactions"
         :recent-reactions="recentReactions"
@@ -83,5 +92,12 @@ const styleStub: DiaryStyle = {
   gap: 10px;
   padding: 10px;
   cursor: pointer;
+}
+.no-styles {
+  text-align: center;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  color: #666;
 }
 </style>

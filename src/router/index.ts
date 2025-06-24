@@ -199,7 +199,7 @@ const router = createRouter({
       name: 'styles',
       component: StylesComponent,
       props: (route) => ({
-        diaryLogin: route.params.login,
+        login: route.params.login,
       })
     },
     {
