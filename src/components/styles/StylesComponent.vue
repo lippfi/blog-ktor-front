@@ -4,9 +4,18 @@ import type {DiaryStyle} from "@/api/diaryClient.ts";
 import {Plus} from "@element-plus/icons-vue";
 import {ref} from "vue";
 import AddOrEditStyleForm from "@/components/styles/AddOrEditStyleForm.vue";
+import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
+import type {BasicReactionResponse} from "@/api/reactionService.ts";
 
 const props = defineProps<{
+  login: string,
   avatars: string[],
+  basicReactions: ReactionPackDto[],
+  recentReactions: BasicReactionResponse[],
+}>();
+
+const emit = defineEmits<{
+  (e: 'reaction-added', reaction: BasicReactionResponse): void
 }>();
 
 const isEditing = ref(false);
@@ -25,13 +34,26 @@ const styleStub: DiaryStyle = {
 
 <template>
   <div class="centralized_block">
-    <StyleComponent :style="styleStub" :avatars="avatars"/>
+    <StyleComponent
+        :style="styleStub"
+        :avatars="avatars"
+        :basic-reactions="basicReactions"
+        :recent-reactions="recentReactions"
+        @reaction-added="emit('reaction-added', $event)"
+    />
     <div v-if="!isEditing" class="add-style">
       <div v-if="!isAdding" class="button" @click="isAdding = !isAdding">
-        <el-icon><Plus/></el-icon>
-        <p>add style</p>
+          <el-icon><Plus/></el-icon>
+          <p>add style</p>
       </div>
-      <AddOrEditStyleForm v-if="isAdding"/>
+      <AddOrEditStyleForm
+          v-if="isAdding"
+          :diary-login="login"
+          :basic-reactions="basicReactions"
+          :recent-reactions="recentReactions"
+          @reaction-added="emit('reaction-added', $event)"
+          type="add"
+      />
     </div>
   </div>
 </template>
@@ -47,13 +69,14 @@ const styleStub: DiaryStyle = {
   gap: 20px;
 }
 .add-style {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 20px;
   border-radius: 10px;
   border: 1px solid #ccc;
 }
 .button {
+  width: fit-content;
+  margin: auto;
+
   display: flex;
   flex-direction: row;
   align-items: center;

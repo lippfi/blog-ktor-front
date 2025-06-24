@@ -15,6 +15,7 @@ const { t } = useI18n()
 
 const props = defineProps<{
   content?: string;
+  placeholder?: string;
   basicReactions: ReactionPackDto[],
   recentReactions: BasicReactionResponse[],
 }>();
@@ -964,6 +965,7 @@ const handleMentionSelect = (option: MentionOption) => {
     <el-mention
       ref="mentionRef"
       type="textarea"
+      :placeholder="placeholder || ''"
       :prefix="['@', ':']"
       :options="options"
       :rows="7"

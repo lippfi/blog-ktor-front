@@ -3,10 +3,18 @@ import ProcessedText from "@/components/post/ProcessedText.vue";
 import type {DiaryStyle} from "@/api/diaryClient.ts";
 import {Delete, Edit, EditPen, Link} from "@element-plus/icons-vue";
 import {ref} from "vue";
+import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
+import type {BasicReactionResponse} from "@/api/reactionService.ts";
 
 const props = defineProps<{
   style: DiaryStyle,
   avatars: string[],
+  basicReactions: ReactionPackDto[],
+  recentReactions: BasicReactionResponse[],
+}>();
+
+const emit = defineEmits<{
+  (e: 'reaction-added', reaction: BasicReactionResponse): void
 }>();
 
 const showShare = ref(false);
