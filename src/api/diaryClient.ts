@@ -41,7 +41,7 @@ export interface IDiaryClient {
     addDiaryStyleById(diaryLogin: string, styleId: string, enable: boolean): Promise<DiaryStyle>;
     updateDiaryStyle(diaryLogin: string, style: DiaryStyleTextUpdate): Promise<DiaryStyle>;
 
-    deleteDiaryStyle(styleId: string): Promise<void>;
+    deleteDiaryStyle(styleId: string, diaryLogin: string): Promise<void>;
     reorderDiaryStyles(diaryLogin: string, styleIds: string[]): Promise<void>;
 }
 
@@ -132,9 +132,9 @@ class DiaryClientImpl implements IDiaryClient {
         return await response.json() as DiaryStyle;
     }
 
-    async deleteDiaryStyle(styleId: string): Promise<void> {
+    async deleteDiaryStyle(styleId: string, diaryLogin: string): Promise<void> {
         const response = await DiaryClientImpl.authenticatedRequest(
-            `/diary/styles/${styleId}`,
+            `/diary/styles/${styleId}?login=${diaryLogin}`,
             {
                 method: 'DELETE'
             }

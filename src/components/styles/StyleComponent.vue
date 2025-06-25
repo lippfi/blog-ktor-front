@@ -26,13 +26,36 @@ watch(() => props.style.enabled, (newValue) => {
 });
 
 const emit = defineEmits<{
-  (e: 'reaction-added', reaction: BasicReactionResponse): void
+  (e: 'reaction-added', reaction: BasicReactionResponse): void,
+  (e: 'style-deleted', styleId: string): void
 }>();
 
 const showShare = ref(false);
 const shareCode = '[style ' + props.style.id + ']';
 
 const isEditing = ref(false);
+
+// Handle delete operation
+const handleDelete = async () => {
+  try {
+    // Confirm deletion with the user
+    if (!confirm(`Are you sure you want to delete the style "${props.style.name}"?`)) {
+      return;
+    }
+
+    // Delete the style in the backend
+    await diaryClient.deleteDiaryStyle(props.style.id, props.diaryLogin);
+
+    // Get updated style URLs and update global styles
+    const styleUrls = await diaryClient.getDiaryStyleUris(props.diaryLogin);
+    updateStyles(styleUrls);
+
+    // Emit event to notify parent component
+    emit('style-deleted', props.style.id);
+  } catch (error) {
+    console.error('Error deleting style:', error);
+  }
+};
 
 // Handle switch toggle
 const handleSwitchChange = async () => {
@@ -81,7 +104,7 @@ const handleSwitchChange = async () => {
           <el-icon size="20" @click="isEditing = !isEditing">
             <EditPen/>
           </el-icon>
-          <el-icon size="20">
+          <el-icon size="20" @click="handleDelete">
             <Delete/>
           </el-icon>
         </div>

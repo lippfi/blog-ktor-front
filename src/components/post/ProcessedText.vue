@@ -8,7 +8,7 @@
 import { ref, onMounted, watch } from 'vue'
 import RuntimeTemplate from 'vue3-runtime-template';
 import { getReactions} from '@/api/reactionService';
-import { getUsers, isSignedIn, addAvatarByUrl } from '@/api/userService';
+import {getUsers, isSignedIn, addAvatarByUrl, getCurrentUserLogin} from '@/api/userService';
 import { useI18n } from 'vue-i18n';
 import { diaryClient } from '@/api/diaryClient';
 import { updateStyles } from '@/styles/stylesManager';
@@ -312,22 +312,28 @@ async function replaceMentions(text: string): Promise<string> {
 // Define the addStyleToCollection function and make it available globally
 declare global {
   interface Window {
-    addStyleToCollection: (styleId: string, diaryLogin: string, enable: boolean) => void;
+    addStyleToCollection: (styleId: string, enable: boolean) => void;
   }
 }
 
 // Define the addStyleToCollection function
-async function addStyleToCollection(styleId: string, diaryLogin: string, enable: boolean) {
+async function addStyleToCollection(styleId: string, enable: boolean) {
   try {
+    const userLogin = getCurrentUserLogin();
+    if (!userLogin) {
+      console.error('User not logged in');
+      return;
+    }
+
     styleStates.value.set(styleId, 'loading');
 
     // Force re-render by creating a new Map with the same entries
     styleStates.value = new Map(styleStates.value);
 
-    const result = await diaryClient.addDiaryStyleById(diaryLogin, styleId, enable);
+    const result = await diaryClient.addDiaryStyleById(userLogin, styleId, enable);
 
     // Update global styles
-    const stylesResult = await diaryClient.getDiaryStyleUris(diaryLogin);
+    const stylesResult = await diaryClient.getDiaryStyleUris(userLogin);
     updateStyles(stylesResult);
 
     // Set state to success
@@ -375,6 +381,7 @@ async function replaceStyleReferences(text: string): Promise<string> {
   }
 
   const styleIds = [...new Set(matches.map(match => match[1]))];
+  const userLogin = getCurrentUserLogin();
 
   for (const styleId of styleIds) {
     try {
@@ -390,6 +397,20 @@ async function replaceStyleReferences(text: string): Promise<string> {
 
       // Get current state
       const currentState = styleStates.value.get(styleId) || 'idle';
+
+      // If user is not logged in, just show the style name without preview controls
+      if (!userLogin) {
+        let styleHtml = `<div class="style-preview" id="${previewId}">`;
+        styleHtml += `<div class="style-preview-header">`;
+        styleHtml += `<span class="style-preview-name">${stylePreview.name}</span>`;
+        styleHtml += `</div>`;
+        styleHtml += `</div>`;
+
+        // Replace all occurrences of this style reference
+        const styleRegex = new RegExp(`\\[style ${styleId}\\]`, 'g');
+        result = result.replace(styleRegex, styleHtml);
+        continue;
+      }
 
       // Create the HTML for the style preview
       let styleHtml = `<div class="style-preview" id="${previewId}">`;
@@ -419,8 +440,8 @@ async function replaceStyleReferences(text: string): Promise<string> {
       styleHtml += `<div class="overlay-text">${t('styles.error')}</div>`;
       styleHtml += `</div>`;
 
-      // Add save button
-      styleHtml += `<button class="style-save-btn" onclick="window.addStyleToCollection('${styleId}', '${isSignedIn() ? JSON.parse(localStorage.getItem('user') || '{}').login : ''}', document.getElementById('switch-${styleId}').checked)" style="display: ${currentState === 'idle' ? 'block' : 'none'}">`;
+      // Add save button with updated function call
+      styleHtml += `<button class="style-save-btn" onclick="window.addStyleToCollection('${styleId}', document.getElementById('switch-${styleId}').checked)" style="display: ${currentState === 'idle' ? 'block' : 'none'}">`;
       styleHtml += `${t('styles.preview.save')}`;
       styleHtml += `</button>`;
 
