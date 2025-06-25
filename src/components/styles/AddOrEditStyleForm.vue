@@ -38,7 +38,7 @@ const handleSubmit = async () => {
     if (props.type === 'add') {
       const styleData: DiaryStyleTextCreate = {
         name: name.value,
-        description: description.value || undefined,
+        description: description.value || null,
         styleContent: styleContent.value,
         enabled: true
       };
