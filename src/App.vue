@@ -151,7 +151,6 @@ button {
 }
 
 textarea {
-  overflow: hidden;
   resize: none !important;
 }
 
