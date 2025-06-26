@@ -150,6 +150,20 @@ const handleStyleAdded = async (newStyle: DiaryStyle) => {
     console.error('Error updating global styles:', error);
   }
 };
+
+// Handle style deleted event from StyleComponent
+const handleStyleDeleted = (styleId: string) => {
+  // Remove the deleted style from both arrays
+  if (route.meta.styles) {
+    // Filter out the deleted style
+    const updatedStyles = styles.value.filter(style => style.id !== styleId);
+    route.meta.styles = updatedStyles;
+    // Update our reactive reference directly
+    stylesRef.value = updatedStyles;
+    // Force reactivity by creating a new array for reorderedStyles
+    reorderedStyles.value = [...updatedStyles];
+  }
+};
 </script>
 
 <template>
@@ -176,6 +190,7 @@ const handleStyleAdded = async (newStyle: DiaryStyle) => {
           :basic-reactions="basicReactions"
           :recent-reactions="recentReactions"
           @reaction-added="emit('reaction-added', $event)"
+          @style-deleted="handleStyleDeleted"
       />
     </div>
 
