@@ -12,6 +12,7 @@ export interface DiaryStyle {
     authorNickname: string,
     name: string,
     description?: string,
+    styleUri: string,
     styleContent: string,
     enabled: boolean,
 }

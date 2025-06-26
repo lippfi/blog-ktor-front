@@ -24,15 +24,22 @@ const emit = defineEmits<{
 
 const isEditing = ref(false);
 const isAdding = ref(false);
-const isReordering = ref(false);
 const styles = computed<DiaryStyle[]>(() => route.meta.styles as DiaryStyle[] || []);
 const reorderedStyles = ref<DiaryStyle[]>([...styles.value]);
 
-// Keep reorderedStyles in sync with styles when they change, but only when not in reordering mode
+// Computed property to check if the order has changed
+// This also serves as our "isReordering" flag - we're in reordering mode if the order has changed
+const orderChanged = computed(() => {
+  if (styles.value.length !== reorderedStyles.value.length) return true;
+
+  return styles.value.some((style, index) => {
+    return style.id !== reorderedStyles.value[index].id;
+  });
+});
+
+// Keep reorderedStyles in sync with styles when they change
 watch(styles, (newStyles) => {
-  if (!isReordering.value) {
-    reorderedStyles.value = [...newStyles];
-  }
+  reorderedStyles.value = [...newStyles];
 });
 
 // Handle drag start event
@@ -41,11 +48,7 @@ const dragStart = (event: DragEvent, index: number) => {
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.dropEffect = 'move';
     event.dataTransfer.setData('text/plain', index.toString());
-
-    // Start reordering mode automatically if not already in that mode
-    if (!isReordering.value) {
-      isReordering.value = true;
-    }
+    // No need to explicitly start reordering mode - it will start automatically when order changes
   }
 };
 
@@ -72,10 +75,8 @@ const dragLeave = (event: DragEvent) => {
   }
 };
 
-// Handle drop event
 const drop = (event: DragEvent, dropIndex: number) => {
   event.preventDefault();
-  // Remove the drag-over class
   if (event.currentTarget instanceof HTMLElement) {
     event.currentTarget.classList.remove('drag-over');
   }
@@ -83,13 +84,11 @@ const drop = (event: DragEvent, dropIndex: number) => {
   if (event.dataTransfer) {
     const dragIndex = parseInt(event.dataTransfer.getData('text/plain'));
     if (dragIndex !== dropIndex) {
-      // Reorder the styles
       const draggedStyle = reorderedStyles.value[dragIndex];
       reorderedStyles.value.splice(dragIndex, 1);
       reorderedStyles.value.splice(dropIndex, 0, draggedStyle);
 
-      // Preview the changes
-      const styleUrls = reorderedStyles.value.filter(style => style.enabled).map(style => style.id);
+      const styleUrls = reorderedStyles.value.filter(style => style.enabled).map(style => style.styleUri);
       updateStyles(styleUrls);
     }
   }
@@ -106,25 +105,23 @@ const saveReordering = async () => {
       route.meta.styles = [...reorderedStyles.value];
     }
 
-    isReordering.value = false;
+    // No need to set isReordering to false as we're using orderChanged
   } catch (error) {
     console.error('Error saving reordered styles:', error);
   }
 };
 
-// Cancel reordering and revert to original order
 const cancelReordering = () => {
-  // Revert to original styles order
-  const styleUrls = styles.value.filter(style => style.enabled).map(style => style.id);
-  updateStyles(styleUrls);
+  reorderedStyles.value = [...styles.value];
 
-  isReordering.value = false;
+  const styleUrls = styles.value.filter(style => style.enabled).map(style => style.styleUri);
+  updateStyles(styleUrls);
 };
 </script>
 
 <template>
   <div class="centralized_block">
-    <div v-if="reorderedStyles.length === 0 && !isReordering" class="no-styles">
+    <div v-if="reorderedStyles.length === 0" class="no-styles">
       No styles found. Add a new style below.
     </div>
 
@@ -149,7 +146,8 @@ const cancelReordering = () => {
       />
     </div>
 
-    <template v-if="isReordering">
+    <!-- Show reordering controls only when order has changed -->
+    <template v-if="orderChanged">
       <div class="reordering-controls">
         <el-button type="primary" @click="saveReordering">
           <el-icon><Check /></el-icon>
@@ -162,7 +160,7 @@ const cancelReordering = () => {
       </div>
     </template>
 
-    <div v-if="!isEditing && !isReordering" class="add-style">
+    <div v-if="!isEditing && !orderChanged" class="add-style">
       <div v-if="!isAdding" class="button-row">
         <div class="button" @click="isAdding = !isAdding">
           <el-icon><Plus/></el-icon>
