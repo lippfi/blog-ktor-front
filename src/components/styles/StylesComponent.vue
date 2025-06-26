@@ -24,12 +24,17 @@ const emit = defineEmits<{
 
 const isEditing = ref(false);
 const isAdding = ref(false);
-const styles = computed<DiaryStyle[]>(() => route.meta.styles as DiaryStyle[] || []);
+
+const stylesRef = ref<DiaryStyle[]>(route.meta.styles as DiaryStyle[] || []);
+const styles = computed<DiaryStyle[]>(() => stylesRef.value);
 const reorderedStyles = ref<DiaryStyle[]>([...styles.value]);
 
 // Computed property to check if the order has changed
 // This also serves as our "isReordering" flag - we're in reordering mode if the order has changed
 const orderChanged = computed(() => {
+  console.log('comparing')
+  console.log('styles.value', styles.value);
+  console.log('reordered.value', reorderedStyles.value);
   if (styles.value.length !== reorderedStyles.value.length) return true;
 
   return styles.value.some((style, index) => {
@@ -100,9 +105,10 @@ const saveReordering = async () => {
     const styleIds = reorderedStyles.value.map(style => style.id);
     await diaryClient.reorderDiaryStyles(props.login, styleIds);
 
-    // Update the route meta to reflect the new order
+    // Update both the route meta and our reactive reference
     if (route.meta.styles) {
       route.meta.styles = [...reorderedStyles.value];
+      stylesRef.value = [...reorderedStyles.value];
     }
 
     // No need to set isReordering to false as we're using orderChanged
@@ -112,8 +118,10 @@ const saveReordering = async () => {
 };
 
 const cancelReordering = () => {
+  // Reset reorderedStyles to match styles
   reorderedStyles.value = [...styles.value];
 
+  // Update the styles in the DOM
   const styleUrls = styles.value.filter(style => style.enabled).map(style => style.styleUri);
   updateStyles(styleUrls);
 };
@@ -123,14 +131,16 @@ const handleStyleAdded = async (newStyle: DiaryStyle) => {
   // Hide the add form
   isAdding.value = false;
 
-  // Update the route meta to include the new style
+  // Update both the route meta and our reactive reference
   if (route.meta.styles) {
-    // Add the new style to the beginning of the array
-    route.meta.styles = [newStyle, ...styles.value];
+    // Append the new style to the end of the array
+    const updatedStyles = [...styles.value, newStyle];
+    route.meta.styles = updatedStyles;
+    // Update our reactive reference directly
+    stylesRef.value = updatedStyles;
+    // Force reactivity by creating a new array for reorderedStyles
+    reorderedStyles.value = [...updatedStyles];
   }
-
-  // Update the reorderedStyles to match
-  reorderedStyles.value = [...styles.value];
 
   // Get updated style URLs and update global styles
   try {
