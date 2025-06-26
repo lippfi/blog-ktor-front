@@ -27,13 +27,19 @@ watch(() => props.style.enabled, (newValue) => {
 
 const emit = defineEmits<{
   (e: 'reaction-added', reaction: BasicReactionResponse): void,
-  (e: 'style-deleted', styleId: string): void
+  (e: 'style-deleted', styleId: string): void,
+  (e: 'editing-changed', isEditing: boolean): void
 }>();
 
 const showShare = ref(false);
 const shareCode = '[style ' + props.style.id + ']';
 
 const isEditing = ref(false);
+
+// Watch for changes to isEditing and emit event
+watch(isEditing, (newValue) => {
+  emit('editing-changed', newValue);
+});
 
 // Handle delete operation
 const handleDelete = async () => {

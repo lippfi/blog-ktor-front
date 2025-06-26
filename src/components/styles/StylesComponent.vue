@@ -24,6 +24,8 @@ const emit = defineEmits<{
 
 const isEditing = ref(false);
 const isAdding = ref(false);
+// Track which styles are being edited
+const editingStyleIds = ref<Set<string>>(new Set());
 
 const stylesRef = ref<DiaryStyle[]>(route.meta.styles as DiaryStyle[] || []);
 const styles = computed<DiaryStyle[]>(() => stylesRef.value);
@@ -162,6 +164,20 @@ const handleStyleDeleted = (styleId: string) => {
     stylesRef.value = updatedStyles;
     // Force reactivity by creating a new array for reorderedStyles
     reorderedStyles.value = [...updatedStyles];
+
+    // Remove from editing styles if it was being edited
+    if (editingStyleIds.value.has(styleId)) {
+      editingStyleIds.value.delete(styleId);
+    }
+  }
+};
+
+// Handle editing-changed event from StyleComponent
+const handleEditingChanged = (styleId: string, isEditing: boolean) => {
+  if (isEditing) {
+    editingStyleIds.value.add(styleId);
+  } else {
+    editingStyleIds.value.delete(styleId);
   }
 };
 </script>
@@ -176,7 +192,7 @@ const handleStyleDeleted = (styleId: string) => {
       v-for="(style, index) in reorderedStyles" 
       :key="style.id"
       class="draggable-style"
-      draggable="true"
+      :draggable="!editingStyleIds.has(style.id)"
       @dragstart="dragStart($event, index)"
       @dragover="dragOver($event)"
       @dragenter="dragEnter($event)"
@@ -191,6 +207,7 @@ const handleStyleDeleted = (styleId: string) => {
           :recent-reactions="recentReactions"
           @reaction-added="emit('reaction-added', $event)"
           @style-deleted="handleStyleDeleted"
+          @editing-changed="(isEditing) => handleEditingChanged(style.id, isEditing)"
       />
     </div>
 
