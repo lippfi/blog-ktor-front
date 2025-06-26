@@ -3,7 +3,7 @@ import StyleComponent from "@/components/styles/StyleComponent.vue";
 import type {DiaryStyle} from "@/api/diaryClient.ts";
 import {diaryClient} from "@/api/diaryClient.ts";
 import {Plus, Check, Close} from "@element-plus/icons-vue";
-import {ref, computed} from "vue";
+import {ref, computed, watch} from "vue";
 import AddOrEditStyleForm from "@/components/styles/AddOrEditStyleForm.vue";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
@@ -26,13 +26,14 @@ const isEditing = ref(false);
 const isAdding = ref(false);
 const isReordering = ref(false);
 const styles = computed<DiaryStyle[]>(() => route.meta.styles as DiaryStyle[] || []);
-const reorderedStyles = ref<DiaryStyle[]>([]);
+const reorderedStyles = ref<DiaryStyle[]>([...styles.value]);
 
-// Initialize reorderedStyles with the current styles when reordering starts
-const startReordering = () => {
-  reorderedStyles.value = [...styles.value];
-  isReordering.value = true;
-};
+// Keep reorderedStyles in sync with styles when they change, but only when not in reordering mode
+watch(styles, (newStyles) => {
+  if (!isReordering.value) {
+    reorderedStyles.value = [...newStyles];
+  }
+});
 
 // Handle drag start event
 const dragStart = (event: DragEvent, index: number) => {
@@ -40,6 +41,11 @@ const dragStart = (event: DragEvent, index: number) => {
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.dropEffect = 'move';
     event.dataTransfer.setData('text/plain', index.toString());
+
+    // Start reordering mode automatically if not already in that mode
+    if (!isReordering.value) {
+      isReordering.value = true;
+    }
   }
 };
 
@@ -118,15 +124,22 @@ const cancelReordering = () => {
 
 <template>
   <div class="centralized_block">
-    <div v-if="styles.length === 0 && !isReordering" class="no-styles">
+    <div v-if="reorderedStyles.length === 0 && !isReordering" class="no-styles">
       No styles found. Add a new style below.
     </div>
 
-    <!-- Normal mode (not reordering) -->
-    <template v-if="!isReordering">
+    <div
+      v-for="(style, index) in reorderedStyles" 
+      :key="style.id"
+      class="draggable-style"
+      draggable="true"
+      @dragstart="dragStart($event, index)"
+      @dragover="dragOver($event)"
+      @dragenter="dragEnter($event)"
+      @dragleave="dragLeave($event)"
+      @drop="drop($event, index)"
+    >
       <StyleComponent
-          v-for="style in styles"
-          :key="style.id"
           :style="style"
           :diary-login="login"
           :avatars="avatars"
@@ -134,32 +147,9 @@ const cancelReordering = () => {
           :recent-reactions="recentReactions"
           @reaction-added="emit('reaction-added', $event)"
       />
-    </template>
+    </div>
 
-    <!-- Reordering mode -->
-    <template v-else>
-      <div 
-        v-for="(style, index) in reorderedStyles" 
-        :key="style.id"
-        class="draggable-style"
-        draggable="true"
-        @dragstart="dragStart($event, index)"
-        @dragover="dragOver($event)"
-        @dragenter="dragEnter($event)"
-        @dragleave="dragLeave($event)"
-        @drop="drop($event, index)"
-      >
-        <StyleComponent
-            :style="style"
-            :diary-login="login"
-            :avatars="avatars"
-            :basic-reactions="basicReactions"
-            :recent-reactions="recentReactions"
-            @reaction-added="emit('reaction-added', $event)"
-        />
-      </div>
-
-      <!-- Save and Cancel buttons for reordering -->
+    <template v-if="isReordering">
       <div class="reordering-controls">
         <el-button type="primary" @click="saveReordering">
           <el-icon><Check /></el-icon>
@@ -172,15 +162,11 @@ const cancelReordering = () => {
       </div>
     </template>
 
-    <!-- Add style section (hidden during reordering) -->
     <div v-if="!isEditing && !isReordering" class="add-style">
       <div v-if="!isAdding" class="button-row">
         <div class="button" @click="isAdding = !isAdding">
           <el-icon><Plus/></el-icon>
           <p>add style</p>
-        </div>
-        <div v-if="styles.length > 1" class="button" @click="startReordering">
-          <p>reorder styles</p>
         </div>
       </div>
       <AddOrEditStyleForm
