@@ -117,6 +117,29 @@ const cancelReordering = () => {
   const styleUrls = styles.value.filter(style => style.enabled).map(style => style.styleUri);
   updateStyles(styleUrls);
 };
+
+// Handle style added event from AddOrEditStyleForm
+const handleStyleAdded = async (newStyle: DiaryStyle) => {
+  // Hide the add form
+  isAdding.value = false;
+
+  // Update the route meta to include the new style
+  if (route.meta.styles) {
+    // Add the new style to the beginning of the array
+    route.meta.styles = [newStyle, ...styles.value];
+  }
+
+  // Update the reorderedStyles to match
+  reorderedStyles.value = [...styles.value];
+
+  // Get updated style URLs and update global styles
+  try {
+    const styleUrls = await diaryClient.getDiaryStyleUris(props.login);
+    updateStyles(styleUrls);
+  } catch (error) {
+    console.error('Error updating global styles:', error);
+  }
+};
 </script>
 
 <template>
@@ -173,6 +196,8 @@ const cancelReordering = () => {
           :basic-reactions="basicReactions"
           :recent-reactions="recentReactions"
           @reaction-added="emit('reaction-added', $event)"
+          @saved="handleStyleAdded"
+          @cancel="isAdding = false"
           type="add"
       />
     </div>

@@ -80,6 +80,23 @@ const handleSwitchChange = async () => {
     console.error('Error updating style:', error);
   }
 };
+
+// Handle style saved event from AddOrEditStyleForm
+const handleStyleSaved = async (updatedStyle: DiaryStyle) => {
+  // Update the local style data with the updated style
+  Object.assign(props.style, updatedStyle);
+
+  // Hide the edit form
+  isEditing.value = false;
+
+  // Get updated style URLs and update global styles
+  try {
+    const styleUrls = await diaryClient.getDiaryStyleUris(props.diaryLogin);
+    updateStyles(styleUrls);
+  } catch (error) {
+    console.error('Error updating global styles:', error);
+  }
+};
 </script>
 
 <template>
@@ -117,6 +134,8 @@ const handleSwitchChange = async () => {
         :basic-reactions="basicReactions"
         :recent-reactions="recentReactions"
         @reaction-added="emit('reaction-added', $event)"
+        @saved="handleStyleSaved"
+        @cancel="isEditing = false"
     />
   </div>
 </template>
