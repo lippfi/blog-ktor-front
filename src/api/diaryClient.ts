@@ -26,7 +26,7 @@ export interface DiaryStyleTextCreate {
 export interface DiaryStyleTextUpdate {
     id: string,
     name: string,
-    description?: string,
+    description: string | null,
     styleContent: string,
     enabled: boolean,
 }

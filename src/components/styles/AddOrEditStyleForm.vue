@@ -51,7 +51,7 @@ const handleSubmit = async () => {
       const styleData: DiaryStyleTextUpdate = {
         id: props.style.id,
         name: name.value,
-        description: description.value || undefined,
+        description: description.value || null,
         styleContent: styleContent.value,
         enabled: props.style.enabled // Preserve the existing enabled state
       };

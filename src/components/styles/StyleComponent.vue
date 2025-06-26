@@ -63,11 +63,10 @@ const handleSwitchChange = async () => {
     // Update the prop to keep it in sync with local state
     props.style.enabled = isEnabled.value;
 
-    // Update the style in the backend
     const styleData = {
       id: props.style.id,
       name: props.style.name,
-      description: props.style.description,
+      description: props.style.description || null,
       styleContent: props.style.styleContent,
       enabled: isEnabled.value
     };
