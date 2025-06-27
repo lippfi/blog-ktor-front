@@ -2,7 +2,7 @@
 import StyleComponent from "@/components/styles/StyleComponent.vue";
 import type {DiaryStyle} from "@/api/diaryClient.ts";
 import {diaryClient} from "@/api/diaryClient.ts";
-import {Plus, Check, Close} from "@element-plus/icons-vue";
+import {Plus, Check, Close, Rank} from "@element-plus/icons-vue";
 import {ref, computed, watch} from "vue";
 import AddOrEditStyleForm from "@/components/styles/AddOrEditStyleForm.vue";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
@@ -51,10 +51,19 @@ watch(styles, (newStyles) => {
 
 // Handle drag start event
 const dragStart = (event: DragEvent, index: number) => {
-  if (event.dataTransfer) {
+  if (event.dataTransfer && event.target instanceof HTMLElement) {
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.dropEffect = 'move';
     event.dataTransfer.setData('text/plain', index.toString());
+
+    // Find the parent draggable-style element to use as ghost image
+    const draggableElement = event.target.closest('.draggable-style');
+    if (draggableElement instanceof HTMLElement) {
+      // Set the draggable element as the ghost image
+      // The offset parameters (0,0) position the ghost image at the cursor
+      event.dataTransfer.setDragImage(draggableElement, 0, 0);
+    }
+
     // No need to explicitly start reordering mode - it will start automatically when order changes
   }
 };
@@ -192,13 +201,26 @@ const handleEditingChanged = (styleId: string, isEditing: boolean) => {
       v-for="(style, index) in reorderedStyles" 
       :key="style.id"
       class="draggable-style"
-      :draggable="!editingStyleIds.has(style.id)"
-      @dragstart="dragStart($event, index)"
       @dragover="dragOver($event)"
       @dragenter="dragEnter($event)"
       @dragleave="dragLeave($event)"
       @drop="drop($event, index)"
     >
+      <el-icon
+          size="20"
+          v-if="!editingStyleIds.has(style.id)"
+          class="drag-handle"
+          draggable="true"
+          @dragstart="dragStart($event, index)"
+      >
+        <Rank/>
+      </el-icon>
+<!--      <div -->
+<!--        v-if="!editingStyleIds.has(style.id)" -->
+<!--        class="drag-handle"-->
+<!--        draggable="true"-->
+<!--        @dragstart="dragStart($event, index)"-->
+<!--      ></div>-->
       <StyleComponent
           :style="style"
           :diary-login="login"
@@ -284,11 +306,23 @@ const handleEditingChanged = (styleId: string, isEditing: boolean) => {
   color: #666;
 }
 .draggable-style {
-  cursor: move;
   transition: background-color 0.2s;
   border: 2px solid transparent;
   border-radius: 10px;
   margin-bottom: 5px;
+  position: relative;
+}
+
+.drag-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background-color: #f0f0f0;
+  border-radius: 5px 0 5px 0;
+  cursor: move;
+  z-index: 1;
 }
 .draggable-style:hover {
   background-color: rgba(0, 0, 0, 0.02);

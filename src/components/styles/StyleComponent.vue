@@ -190,6 +190,10 @@ const handleStyleSaved = async (updatedStyle: DiaryStyle) => {
   align-items: center;
   height: 30px;
 }
+
+.footer .el-icon {
+  cursor: pointer;
+}
 .share-input {
   width: 330px;
 }
