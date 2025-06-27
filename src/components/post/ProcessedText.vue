@@ -1,6 +1,6 @@
 <template>
   <div class="text">
-    <runtime-template :template="processedText" />
+    <runtime-template :template="processedText" :components="components" />
   </div>
 </template>
 
@@ -11,7 +11,11 @@ import { getReactions} from '@/api/reactionService';
 import {getUsers, isSignedIn, addAvatarByUrl, getCurrentUserLogin} from '@/api/userService';
 import { useI18n } from 'vue-i18n';
 import { diaryClient } from '@/api/diaryClient';
-import { updateStyles } from '@/styles/stylesManager';
+
+// Register the StylePostComponent for use in the template
+const components = {
+  StylePostComponent,
+};
 
 // Initialize i18n
 const { t } = useI18n();
@@ -153,8 +157,7 @@ defineExpose({
   toggleRepostCollapse,
   addAvatarToCollection,
   avatarStates,
-  styleStates,
-  addStyleToCollection
+  styleStates
 });
 
 async function processTextAsync(text: string): Promise<string> {
@@ -309,66 +312,12 @@ async function replaceMentions(text: string): Promise<string> {
   return result;
 }
 
-// Define the addStyleToCollection function and make it available globally
+// The addStyleToCollection function has been moved to StylePostComponent.vue
 declare global {
   interface Window {
     addStyleToCollection: (styleId: string, enable: boolean) => void;
   }
 }
-
-// Define the addStyleToCollection function
-async function addStyleToCollection(styleId: string, enable: boolean) {
-  try {
-    const userLogin = getCurrentUserLogin();
-    if (!userLogin) {
-      console.error('User not logged in');
-      return;
-    }
-
-    styleStates.value.set(styleId, 'loading');
-
-    // Force re-render by creating a new Map with the same entries
-    styleStates.value = new Map(styleStates.value);
-
-    const result = await diaryClient.addDiaryStyleById(userLogin, styleId, enable);
-
-    // Update global styles
-    const stylesResult = await diaryClient.getDiaryStyleUris(userLogin);
-    updateStyles(stylesResult);
-
-    // Set state to success
-    styleStates.value.set(styleId, 'success');
-    // Force re-render
-    styleStates.value = new Map(styleStates.value);
-
-    // Reset to idle after 3 seconds
-    setTimeout(() => {
-      if (styleStates.value.get(styleId) === 'success') {
-        styleStates.value.set(styleId, 'idle');
-        // Force re-render
-        styleStates.value = new Map(styleStates.value);
-      }
-    }, 3000);
-  } catch (error) {
-    // Set state to error
-    styleStates.value.set(styleId, 'error');
-    // Force re-render
-    styleStates.value = new Map(styleStates.value);
-    console.error('Failed to add style:', error);
-
-    // Reset to idle after 3 seconds
-    setTimeout(() => {
-      if (styleStates.value.get(styleId) === 'error') {
-        styleStates.value.set(styleId, 'idle');
-        // Force re-render
-        styleStates.value = new Map(styleStates.value);
-      }
-    }, 3000);
-  }
-}
-
-// Make the function available on the window object
-window.addStyleToCollection = addStyleToCollection;
 
 async function replaceStyleReferences(text: string): Promise<string> {
   let result = text;
@@ -392,64 +341,22 @@ async function replaceStyleReferences(text: string): Promise<string> {
         styleStates.value.set(styleId, 'idle');
       }
 
-      // Create a unique ID for this style
-      const previewId = `style-${styleId}`;
-
       // Get current state
       const currentState = styleStates.value.get(styleId) || 'idle';
 
-      // If user is not logged in, just show the style name without preview controls
-      if (!userLogin) {
-        let styleHtml = `<div class="style-preview" id="${previewId}">`;
-        styleHtml += `<div class="style-preview-header">`;
-        styleHtml += `<span class="style-preview-name">${stylePreview.name}</span>`;
-        styleHtml += `</div>`;
-        styleHtml += `</div>`;
-
-        // Replace all occurrences of this style reference
-        const styleRegex = new RegExp(`\\[style ${styleId}\\]`, 'g');
-        result = result.replace(styleRegex, styleHtml);
-        continue;
-      }
-
-      // Create the HTML for the style preview
-      let styleHtml = `<div class="style-preview" id="${previewId}">`;
-      styleHtml += `<div class="style-preview-header">`;
-      styleHtml += `<span class="style-preview-name">${stylePreview.name}</span>`;
-      styleHtml += `<label class="style-preview-switch">`;
-      styleHtml += `<input type="checkbox" ${stylePreview.enabled ? 'checked' : ''} id="switch-${styleId}">`;
-      styleHtml += `<span class="slider round"></span>`;
-      styleHtml += `</label>`;
-      styleHtml += `</div>`;
-
-      // Add loading overlay
-      styleHtml += `<div class="style-overlay loading-overlay" data-style-id="${styleId}" style="display: ${currentState === 'loading' ? 'flex' : 'none'}">`;
-      styleHtml += `<div class="loading-spinner"></div>`;
-      styleHtml += `<div class="overlay-text">${t('styles.adding')}</div>`;
-      styleHtml += `</div>`;
-
-      // Add success overlay
-      styleHtml += `<div class="style-overlay success-overlay" data-style-id="${styleId}" style="display: ${currentState === 'success' ? 'flex' : 'none'}">`;
-      styleHtml += `<div class="success-icon">✓</div>`;
-      styleHtml += `<div class="overlay-text">${t('styles.added')}</div>`;
-      styleHtml += `</div>`;
-
-      // Add error overlay
-      styleHtml += `<div class="style-overlay error-overlay" data-style-id="${styleId}" style="display: ${currentState === 'error' ? 'flex' : 'none'}">`;
-      styleHtml += `<div class="error-icon">✗</div>`;
-      styleHtml += `<div class="overlay-text">${t('styles.error')}</div>`;
-      styleHtml += `</div>`;
-
-      // Add save button with updated function call
-      styleHtml += `<button class="style-save-btn" onclick="window.addStyleToCollection('${styleId}', document.getElementById('switch-${styleId}').checked)" style="display: ${currentState === 'idle' ? 'block' : 'none'}">`;
-      styleHtml += `${t('styles.preview.save')}`;
-      styleHtml += `</button>`;
-
-      styleHtml += `</div>`;
+      // Create the component template syntax (not HTML)
+      const styleComponent = `<StylePostComponent
+         :style-id="'${styleId}'"
+         :style-name="'${stylePreview.name}'"
+         :enabled="${stylePreview.enabled}"
+         :current-state="'${currentState}'"
+         :is-logged-in="${!!userLogin}"
+         @update-state="(id, state) => { styleStates.set(id, state); styleStates = new Map(styleStates); }"
+       />`;
 
       // Replace all occurrences of this style reference
       const styleRegex = new RegExp(`\\[style ${styleId}\\]`, 'g');
-      result = result.replace(styleRegex, styleHtml);
+      result = result.replace(styleRegex, styleComponent);
     } catch (error) {
       console.error(`Failed to fetch style preview for ${styleId}:`, error);
     }
@@ -715,6 +622,15 @@ async function replaceRepost(text: string): Promise<string> {
   return result;
 }
 </script>
+<script lang="ts">
+import StylePostComponent from '@/components/embeddable/StylePostComponent.vue';
+
+export default {
+  components: {
+    StylePostComponent,
+  }
+};
+</script>
 
 <style>
 .text {
@@ -919,147 +835,5 @@ async function replaceRepost(text: string): Promise<string> {
   opacity: 1;
 }
 
-/* Style Preview Styles */
-.style-preview {
-  position: relative;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 12px;
-  margin: 15px 0;
-  background-color: #f9f9f9;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.style-preview:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.style-preview-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.style-preview-name {
-  font-weight: 600;
-  font-size: 1.1em;
-  color: #333;
-}
-
-/* Switch styles */
-.style-preview-switch {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 24px;
-}
-
-.style-preview-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: .4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: .4s;
-}
-
-input:checked + .slider {
-  background-color: #2196F3;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-  transform: translateX(26px);
-}
-
-.slider.round {
-  border-radius: 24px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
-
-.style-save-btn {
-  display: block;
-  width: 100%;
-  padding: 8px 12px;
-  background-color: #595959;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background-color 0.3s ease;
-}
-
-.style-save-btn:hover {
-  background-color: #45a049;
-}
-
-.style-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  text-align: center;
-  padding: 10px;
-  border-radius: 8px;
-  z-index: 10;
-}
-
-.loading-overlay {
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
-.success-overlay {
-  background-color: rgba(76, 175, 80, 0.8);
-}
-
-.error-overlay {
-  background-color: rgba(244, 67, 54, 0.8);
-}
-
-.success-icon, .error-icon {
-  font-size: 2em;
-  margin-bottom: 10px;
-}
-
-.success-icon {
-  color: #fff;
-}
-
-.error-icon {
-  color: #fff;
-}
+/* Style-related CSS has been moved to StylePostComponent.vue */
 </style>
