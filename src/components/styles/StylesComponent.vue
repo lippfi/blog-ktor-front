@@ -240,12 +240,10 @@ const handleEditingChanged = (styleId: string, isEditing: boolean) => {
     <template v-if="orderChanged">
       <div class="reordering-controls">
         <el-button type="primary" @click="saveReordering">
-          <el-icon><Check /></el-icon>
-          Save Order
+          {{ t('styles.reorder.button.save') }}
         </el-button>
         <el-button @click="cancelReordering">
-          <el-icon><Close /></el-icon>
-          Cancel
+          {{ t('styles.reorder.button.cancel') }}
         </el-button>
       </div>
     </template>

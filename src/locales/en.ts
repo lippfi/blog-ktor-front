@@ -591,6 +591,12 @@ export default {
                 confirmation: 'Are you sure you want to delete this style?',
             },
         },
+        reorder: {
+            button: {
+                save: 'save order',
+                cancel: 'cancel',
+            },
+        },
         title: 'Diary Styles',
         addNew: 'Add New Style',
         addNewStyle: 'Add New Style',
