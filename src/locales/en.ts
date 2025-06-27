@@ -566,12 +566,37 @@ export default {
         preview: {
             save: 'Add to my collection',
         },
+        form: {
+            title: {
+                add: 'Add new style',
+                edit: 'Edit style',
+            },
+            name: {
+                placeholder: 'enter style name',
+            },
+            description: {
+                placeholder: 'enter style description',
+            },
+            css: {
+                placeholder: 'enter CSS style content',
+            },
+            button: {
+                add: 'add style',
+                update: 'update style',
+                cancel: 'cancel',
+            }
+        },
+        footer: {
+            delete: {
+                confirmation: 'Are you sure you want to delete this style?',
+            },
+        },
         title: 'Diary Styles',
         addNew: 'Add New Style',
         addNewStyle: 'Add New Style',
         save: 'Save Changes',
         cancel: 'Cancel Changes',
-        add: 'Add',
+        add: 'add style',
         name: 'Name',
         styleContent: 'CSS Style Content',
         enabled: 'Enabled',

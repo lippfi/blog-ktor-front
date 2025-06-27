@@ -9,6 +9,9 @@ import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import {useRoute} from "vue-router";
 import {updateStyles} from "@/styles/stylesManager";
+import {useI18n} from "vue-i18n";
+
+const { t } = useI18n();
 
 const route = useRoute();
 const props = defineProps<{
@@ -251,7 +254,7 @@ const handleEditingChanged = (styleId: string, isEditing: boolean) => {
       <div v-if="!isAdding" class="button-row">
         <div class="button" @click="isAdding = !isAdding">
           <el-icon><Plus/></el-icon>
-          <p>add style</p>
+          <p>{{ t('styles.add') }}</p>
         </div>
       </div>
       <AddOrEditStyleForm

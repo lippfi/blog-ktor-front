@@ -8,6 +8,9 @@ import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import AddOrEditStyleForm from "@/components/styles/AddOrEditStyleForm.vue";
 import {updateStyles} from "@/styles/stylesManager";
+import {useI18n} from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   style: DiaryStyle,
@@ -44,8 +47,8 @@ watch(isEditing, (newValue) => {
 // Handle delete operation
 const handleDelete = async () => {
   try {
-    // Confirm deletion with the user
-    if (!confirm(`Are you sure you want to delete the style "${props.style.name}"?`)) {
+    // TODO replace confirm with something else
+    if (!confirm(t('styles.footer.delete.confirmation'))) {
       return;
     }
 

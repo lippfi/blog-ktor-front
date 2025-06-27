@@ -6,6 +6,9 @@ import { diaryClient } from "@/api/diaryClient.ts";
 import SmartTextArea from "@/components/post/SmartTextArea.vue";
 import type { BasicReactionResponse } from "@/api/reactionService.ts";
 import type { ReactionPackDto } from "@/api/dto/reactionServiceDto.ts";
+import {useI18n} from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   type: 'add' | 'edit',
@@ -44,7 +47,6 @@ const handleSubmit = async () => {
       };
 
       const result: DiaryStyle = await diaryClient.addDiaryStyle(props.diaryLogin, styleData);
-      ElMessage.success('Style added successfully');
       emit('saved', result);
     } else if (props.type === 'edit' && props.style) {
       // Update existing style
@@ -57,7 +59,6 @@ const handleSubmit = async () => {
       };
 
       const result = await diaryClient.updateDiaryStyle(props.diaryLogin, styleData);
-      ElMessage.success('Style updated successfully');
       emit('saved', result);
     }
   } catch (error) {
@@ -74,17 +75,17 @@ const handleCancel = () => {
 
 <template>
   <div class="style-form">
-    <h3>{{ type === 'add' ? 'Add New Style' : 'Edit Style' }}</h3>
+    <h3>{{ type === 'add' ? t("styles.form.title.add") : t("styles.form.title.edit") }}</h3>
       <el-input
         id="name"
-        v-model="name" 
-        placeholder="Enter style name"
+        v-model="name"
+        :placeholder='t("styles.form.name.placeholder")'
         required
       />
       <SmartTextArea
         id="description"
         v-model:content="description"
-        :placeholder="'Add style description (optional)'"
+        :placeholder='t("styles.form.description.placeholder")'
         :basic-reactions="basicReactions"
         :recent-reactions="recentReactions"
         @reaction-added="emit('reaction-added', $event)"
@@ -96,15 +97,15 @@ const handleCancel = () => {
         v-model="styleContent"
         type="textarea"
         :rows="10"
-        placeholder="Enter CSS style content"
+        :placeholder='t("styles.form.css.placeholder")'
         required
       />
 
     <div class="form-actions">
       <el-button type="primary" @click="handleSubmit">
-        {{ type === 'add' ? 'Add Style' : 'Update Style' }}
+        {{ type === 'add' ? t('styles.form.button.add') : t('styles.form.button.update') }}
       </el-button>
-      <el-button @click="handleCancel">Cancel</el-button>
+      <el-button @click="handleCancel">{{ t('styles.form.button.cancel') }}</el-button>
     </div>
   </div>
 </template>
