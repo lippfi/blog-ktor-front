@@ -10,8 +10,8 @@ const emit = defineEmits<{
 }>();
 
 const props = defineProps<{
-  collectionAvatarUri: string, // avatar to display in collection
-  avatars: string[], // user avatars
+  collectionAvatarUri: string,
+  avatars: string[],
 }>();
 
 // Track avatar addition state
