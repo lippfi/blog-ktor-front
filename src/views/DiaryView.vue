@@ -1,16 +1,11 @@
 <script setup lang="ts">
 import PostComponent from "@/components/post/PostComponent.vue";
 import PostEdit from "@/components/post/PostEdit.vue";
-import PostClientMock from "@/api/postClient/postClientMock.ts";
-import type { Post as PostModel, Reaction as ReactionModel } from "@/models/posts/post.ts";
-import { mapPostDtoToPost } from "@/models/posts/mapper.ts";
-import { ref, computed } from 'vue';
-import {getDefaultAccessGroups} from "@/api/accessGroupService.ts";
-import {getCurrentSessionInfo, getCurrentUserLogin, isSignedIn} from "@/api/userService.ts";
-import { reactionClient } from "@/api/postClient/reactionClient.ts";
-import type { ReactionPackDto } from "@/api/dto/reactionServiceDto.ts";
-import type { BasicReactionResponse } from "@/api/reactionService.ts";
-import {RouterView, useRoute} from "vue-router";
+import type {Post as PostModel} from "@/models/posts/post.ts";
+import {computed, onMounted} from 'vue';
+import {isSignedIn} from "@/api/userService.ts";
+import {useRoute} from "vue-router";
+import type {DiaryHeaderInfo} from "@/api/dto/postServiceDto.ts";
 
 const route = useRoute();
 const props = defineProps<{
@@ -20,6 +15,10 @@ const props = defineProps<{
 
 const loggedIn: boolean = isSignedIn();
 const posts = computed<PostModel[]>(() => route.meta.posts as PostModel[] || []);
+
+onMounted(() => {
+  document.title = (route.meta.diaryHeaderInfo as DiaryHeaderInfo).name
+})
 
 </script>
 
