@@ -244,11 +244,16 @@ const router = createRouter({
         const searchResult = await postClient.getDiaryPosts(to.params.login as string, page - 1);
 
         if (searchResult.type === 'ok') {
-          to.meta.posts = searchResult.data.posts.content.map(mapPostDtoToPost);
-          to.meta.styles = searchResult.data.diary.styles;
+          const diaryPage = searchResult.data;
+          to.meta.diaryHeaderInfo = {
+            name: diaryPage.diary.name,
+            subtitle: diaryPage.diary.subtitle,
+          }
+          to.meta.posts = diaryPage.posts.content.map(mapPostDtoToPost);
+          to.meta.styles = diaryPage.diary.styles;
 
           // Update global styles
-          updateStyles(searchResult.data.diary.styles);
+          updateStyles(diaryPage.diary.styles);
 
           next();
         } else {
@@ -268,9 +273,14 @@ const router = createRouter({
         const result = await postClient.searchDiaryPosts(params);
 
         if (result.type === 'ok') {
-          to.meta.posts = result.data.posts.content.map(mapPostDtoToPost);
-          to.meta.currentPage = result.data.posts.currentPage;
-          to.meta.totalPages = result.data.posts.totalPages;
+          const diaryPage = result.data;
+          to.meta.diaryHeaderInfo = {
+            name: diaryPage.diary.name,
+            subtitle: diaryPage.diary.subtitle,
+          }
+          to.meta.posts = diaryPage.posts.content.map(mapPostDtoToPost);
+          to.meta.currentPage = diaryPage.posts.currentPage;
+          to.meta.totalPages = diaryPage.posts.totalPages;
           next();
         } else {
           to.meta.error = result.message;
@@ -289,11 +299,16 @@ const router = createRouter({
       }),
       beforeEnter: async (to, _, next) => {
         const postClient = new PostClientImpl();
-        const postDto = await postClient.getPost(to.params.login as string, to.params.postUri as string);
+        const result = await postClient.getPost(to.params.login as string, to.params.postUri as string);
 
-        if (postDto.type === 'ok') {
-          to.meta.post = mapPostDtoToPost(postDto.data.post);
-          updateStyles(postDto.data.diary.styles);
+        if (result.type === 'ok') {
+          const postPage = result.data;
+          to.meta.diaryHeaderInfo = {
+            name: postPage.diary.name,
+            subtitle: postPage.diary.subtitle,
+          }
+          to.meta.post = mapPostDtoToPost(postPage.post);
+          updateStyles(postPage.diary.styles);
           next();
         } else {
           to.meta.post = null;

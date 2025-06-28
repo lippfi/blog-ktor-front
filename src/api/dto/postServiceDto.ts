@@ -76,6 +76,12 @@ export interface PostViewDto {
     commentReactionGroupId: string;
 }
 
+export interface DiaryHeaderInfo {
+    name: string;
+    subtitle: string;
+}
+
+
 export interface DiaryPageDto {
     diary: DiaryViewDto;
     posts: PostSearchResult;

@@ -1,4 +1,5 @@
 <template>
+  <HeaderComponent/>
   <MenuComponent v-if="signedIn && $route.name !== 'register'"/>
   <!-- Apply all styles globally -->
   <link v-for="style in getStyles()" :key="style" rel="stylesheet" :href="style" data-diary-style="true" />
@@ -14,6 +15,7 @@ import {isSignedIn, authEvents} from "@/api/userService.ts";
 import { ref, onMounted, watch, onUnmounted } from 'vue'
 import { getStyles } from "@/styles/stylesManager";
 import { useReactionsStore } from "@/stores/reactionsStore";
+import HeaderComponent from "@/components/HeaderComponent.vue";
 
 const router = useRouter()
 const signedIn = ref(isSignedIn())
@@ -59,7 +61,6 @@ onMounted(async () => {
   --el-collapse-header-font-size: 16px !important;
   --el-collapse-content-font-size: 16px !important;
 }
-
 .el-popper,
 .el-popper.is-light,
 .el-popper.el-tooltip__popper {
