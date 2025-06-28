@@ -179,6 +179,7 @@ async function processTextAsync(text: string): Promise<string> {
   result = replaceLinks(result);
   result = replaceImages(result);
   result = replaceAvatar(result);
+  result = replaceAvatars(result);
   result = replaceAudio(result);
   result = replaceVideo(result);
 
@@ -312,7 +313,6 @@ async function replaceMentions(text: string): Promise<string> {
   return result;
 }
 
-// The addStyleToCollection function has been moved to StylePostComponent.vue
 declare global {
   interface Window {
     addStyleToCollection: (styleId: string, enable: boolean) => void;
@@ -489,6 +489,31 @@ function replaceVideo(text: string): string {
   return result;
 }
 
+function replaceAvatars(text: string): string {
+  let result = text;
+  const pattern = /\n?\[avatars\]([\s\S]*?)\[\/avatars\]\n?/;
+  let match = result.match(pattern);
+  console.log(match);
+
+  while (match !== null) {
+    const content = match[1];
+
+    const uris = content
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+
+    const avatarsJson = JSON.stringify(props.avatars);
+    const avatarCollectionJson = JSON.stringify(uris);
+    const avatarCollectionComponent = `<AvatarCollectionComponent avatar-collection-json='${avatarCollectionJson}' avatars-json='${avatarsJson}' @update-avatars="$emit('update-avatars')" />`;
+
+    result = result.replace(match[0], avatarCollectionComponent);
+    match = result.match(pattern);
+  }
+
+  return result;
+}
+
 function replaceSlider(text: string): string {
   let result = text;
   const sliderPattern = /\n?\[slider\]([\s\S]*?)\[\/slider\]\n?/;
@@ -624,10 +649,12 @@ async function replaceRepost(text: string): Promise<string> {
 </script>
 <script lang="ts">
 import StylePostComponent from '@/components/embeddable/StylePostComponent.vue';
+import AvatarCollectionComponent from '@/components/embeddable/AvatarCollectionComponent.vue';
 
 export default {
   components: {
     StylePostComponent,
+    AvatarCollectionComponent,
   }
 };
 </script>
