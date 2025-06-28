@@ -1,12 +1,12 @@
 <template>
-  <HeaderComponent/>
+  <HeaderComponent @toggleMenu="toggleMenuCollapse"/>
   <!-- Apply all styles globally -->
   <link v-for="style in getStyles()" :key="style" rel="stylesheet" :href="style" data-diary-style="true" />
   <div class="content-wrapper">
     <div class="centralized-block">
       <router-view v-if="isLoaded" @reaction-added="reactionsStore.addReaction"/>
     </div>
-    <MenuComponent v-if="signedIn && $route.name !== 'register'" class="right-menu"/>
+    <MenuComponent v-if="signedIn && $route.name !== 'register'" class="right-menu" :collapsed="menuCollapsed"/>
   </div>
 </template>
 
@@ -22,7 +22,12 @@ import HeaderComponent from "@/components/HeaderComponent.vue";
 const router = useRouter()
 const signedIn = ref(isSignedIn())
 const isLoaded = ref(false)
+const menuCollapsed = ref(false)
 const reactionsStore = useReactionsStore()
+
+const toggleMenuCollapse = () => {
+  menuCollapsed.value = !menuCollapsed.value;
+}
 
 // Update signedIn state when route changes
 watch(() => router.currentRoute.value, () => {

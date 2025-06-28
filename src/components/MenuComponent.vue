@@ -12,6 +12,14 @@ import {
 import {useI18n} from "vue-i18n";
 import {useRouter} from 'vue-router';
 import {getCurrentUserLogin, logOut} from "@/api/userService.ts";
+import { defineProps } from 'vue';
+
+const props = defineProps({
+  collapsed: {
+    type: Boolean,
+    default: false
+  }
+});
 
 const { t } = useI18n()
 const router = useRouter()
@@ -30,6 +38,7 @@ function signOut() {
 <template>
   <el-menu
     class="el-menu-vertical"
+    :collapse="props.collapsed"
   >
     <el-menu-item index="1" @click="navigateTo('/')">
       <el-icon><HomeFilled /></el-icon>
@@ -77,6 +86,11 @@ function signOut() {
 .el-menu-vertical {
   width: 240px;
   min-height: 100vh;
+  transition: width 0.3s ease;
+}
+
+.el-menu-vertical.el-menu--collapse {
+  width: 64px;
 }
 
 .el-menu-item {
