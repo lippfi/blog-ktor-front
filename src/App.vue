@@ -2,7 +2,9 @@
   <MenuComponent v-if="signedIn && $route.name !== 'register'"/>
   <!-- Apply all styles globally -->
   <link v-for="style in getStyles()" :key="style" rel="stylesheet" :href="style" data-diary-style="true" />
-  <router-view v-if="isLoaded" @reaction-added="reactionsStore.addReaction"/>
+  <div class="centralized-block">
+    <router-view v-if="isLoaded" @reaction-added="reactionsStore.addReaction"/>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -209,5 +211,15 @@ html {
   flex-direction: row;
   flex-wrap: wrap;
   gap: 4px;
+}
+
+.centralized-block {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1rem;
+  max-width: 850px;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 60px;
 }
 </style>

@@ -199,7 +199,6 @@ const cancelReply = () => {
 </script>
 
 <template>
-  <div v-if="post" class="centralized_block">
     <PostComponent
         :login="props.login"
         :post="post"
@@ -227,19 +226,16 @@ const cancelReply = () => {
                  :is-edit="false"
                  :is-reply="true"
                  @cancel-reply="cancelReply"/>
-  </div>
 </template>
 
-<style scoped>
-.centralized_block {
-  display: flex;
-  flex-direction: column;
-  padding: 2rem 1rem;
-  max-width: 850px;
-  width: 100%;
-  box-sizing: border-box;
+<style>
+.centralized-block {
   gap: 25px;
 }
+</style>
+
+<style scoped>
+
 .comments_block {
   width: 100%;
   box-sizing: border-box;

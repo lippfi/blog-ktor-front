@@ -191,7 +191,6 @@ const handleEditingChanged = (styleId: string, isEditing: boolean) => {
 </script>
 
 <template>
-  <div class="centralized_block">
     <div v-if="reorderedStyles.length === 0" class="no-styles">
       No styles found. Add a new style below.
     </div>
@@ -258,19 +257,15 @@ const handleEditingChanged = (styleId: string, isEditing: boolean) => {
           type="add"
       />
     </div>
-  </div>
 </template>
 
-<style scoped>
-.centralized_block {
-  display: flex;
-  flex-direction: column;
-  padding: 2rem 1rem;
-  max-width: 850px;
-  width: 100%;
-  box-sizing: border-box;
+<style>
+.centralized-block {
   gap: 20px;
 }
+</style>
+
+<style scoped>
 .add-style {
   padding: 20px;
   border-radius: 10px;

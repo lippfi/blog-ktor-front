@@ -31,29 +31,17 @@ const wrappedContent = `[repost author="${authorLogin}" origin="${origin}" colla
 </script>
 
 <template>
-  <div class="centralized_block">
-    <div v-if="error" class="error">{{ error }}</div>
-    <PostEdit
+  <div v-if="error" class="error">{{ error }}</div>
+  <PostEdit
       v-else
       :type="'repost'"
       :diaryLogin="currentUserLogin"
       :content="wrappedContent"
       :title="repostTitle"
-    />
-  </div>
+  />
 </template>
 
 <style scoped>
-.centralized_block {
-  display: flex;
-  flex-direction: column;
-  padding: 2rem 1rem;
-  max-width: 850px;
-  width: 100%;
-  box-sizing: border-box;
-  gap: 60px;
-}
-
 .error {
   text-align: center;
   padding: 2rem;

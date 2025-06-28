@@ -40,7 +40,6 @@ const messages = [
 </script>
 
 <template>
-  <div class="centralized_block">
     <div class="header">
       <h2 style="margin-left: 10px; margin-bottom: 0;">Dialogs:</h2>
       <div class="search">
@@ -52,20 +51,15 @@ const messages = [
       </div>
     </div>
     <MessagePreview v-for="message in messages" :message="message"/>
-  </div>
 </template>
 
-<style scoped>
-.centralized_block {
-  display: flex;
-  flex-direction: column;
-  padding: 2rem 1rem;
-  max-width: 850px;
-  width: 100%;
-  box-sizing: border-box;
+<style>
+.centralized-block {
   gap: 16px;
 }
+</style>
 
+<style scoped>
 .header {
   display: flex;
   flex-direction: row;

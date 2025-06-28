@@ -24,32 +24,19 @@ const posts = computed<PostModel[]>(() => route.meta.posts as PostModel[] || [])
 </script>
 
 <template>
-  <div>
-    <div class="centralized_block">
-      <PostComponent
-          v-for="post in posts"
-          :key="post.id"
-          :login="login"
-          :post="post"
-          :show-comments-count="true"
-      />
-      <PostEdit
-          v-if="loggedIn"
-          :type="'post'"
-          :diary-login="props.login"
-      />
-    </div>
-  </div>
+  <PostComponent
+      v-for="post in posts"
+      :key="post.id"
+      :login="login"
+      :post="post"
+      :show-comments-count="true"
+  />
+  <PostEdit
+      v-if="loggedIn"
+      :type="'post'"
+      :diary-login="props.login"
+  />
 </template>
 
 <style scoped>
-.centralized_block {
-  display: flex;
-  flex-direction: column;
-  padding: 2rem 1rem;
-  max-width: 850px;
-  width: 100%;
-  box-sizing: border-box;
-  gap: 60px;
-}
 </style>
