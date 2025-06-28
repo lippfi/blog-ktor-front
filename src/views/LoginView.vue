@@ -33,6 +33,7 @@ import {getCurrentSessionInfo, isEmailBusy, isLoginBusy, isNicknameBusy, signIn,
 import router from "@/router";
 import {useI18n} from "vue-i18n";
 import LanguageChooser from '@/components/LanguageChooser.vue';
+import {useReactionsStore} from "@/stores/reactionsStore.ts";
 
 const { locale, t } = useI18n()
 
@@ -62,6 +63,8 @@ const rules = computed<FormRules<LoginForm>>(() => ({
   password: [{ required: true, message: t('login.form.errors.password_required'), trigger: 'blur'}],
 }))
 
+const reactionsStore = useReactionsStore();
+
 const handleLocaleChange = (value: string) => {
   locale.value = value
 }
@@ -74,6 +77,7 @@ const submitForm = (form: FormInstance | undefined) => {
       if (loginResult.type === 'ok') {
         const sessionInfo = await getCurrentSessionInfo()
         handleLocaleChange(sessionInfo.language)
+        await reactionsStore.loadAvatars()
         await router.push({name: 'diary', params: {login: loginForm.login}})
       } else {
         error.value = loginResult.message
