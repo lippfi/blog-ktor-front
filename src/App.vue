@@ -1,10 +1,12 @@
 <template>
   <HeaderComponent/>
-  <MenuComponent v-if="signedIn && $route.name !== 'register'"/>
   <!-- Apply all styles globally -->
   <link v-for="style in getStyles()" :key="style" rel="stylesheet" :href="style" data-diary-style="true" />
-  <div class="centralized-block">
-    <router-view v-if="isLoaded" @reaction-added="reactionsStore.addReaction"/>
+  <div class="content-wrapper">
+    <div class="centralized-block">
+      <router-view v-if="isLoaded" @reaction-added="reactionsStore.addReaction"/>
+    </div>
+    <MenuComponent v-if="signedIn && $route.name !== 'register'" class="right-menu"/>
   </div>
 </template>
 
@@ -214,6 +216,12 @@ html {
   gap: 4px;
 }
 
+.content-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .centralized-block {
   display: flex;
   flex-direction: column;
@@ -222,5 +230,14 @@ html {
   width: 100%;
   box-sizing: border-box;
   gap: 60px;
+  margin: 0 auto;
+}
+
+.right-menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 100;
 }
 </style>

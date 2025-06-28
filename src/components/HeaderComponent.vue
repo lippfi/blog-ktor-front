@@ -44,8 +44,7 @@ const subtitle = computed(() => diaryHeaderInfo.value?.subtitle || '');
   justify-content: space-between;
   padding: 12px 20px;
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
+  max-width: 1440px;
 }
 
 .header-logo {
