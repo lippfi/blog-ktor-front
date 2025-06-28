@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref, defineProps, defineExpose } from 'vue';
+import { ref, defineProps, defineExpose, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import { diaryClient } from '@/api/diaryClient';
 import { updateStyles } from '@/styles/stylesManager';
 import { getCurrentUserLogin } from '@/api/userService';
 
 // Initialize i18n
 const { t } = useI18n();
+const router = useRouter();
 
 const props = defineProps<{
   styleId: string;
@@ -15,6 +17,31 @@ const props = defineProps<{
   currentState: 'idle' | 'loading' | 'success' | 'error';
   isLoggedIn: boolean;
 }>();
+
+// Track if the style is already in the user's collection
+const isInCollection = ref(false);
+
+// Check if the style is already in the user's collection
+async function checkIfStyleInCollection() {
+  try {
+    const userLogin = getCurrentUserLogin();
+    if (!userLogin || !props.isLoggedIn) {
+      return;
+    }
+
+    const styles = await diaryClient.getDiaryStyleCollection(userLogin);
+    isInCollection.value = styles.some(style => style.id === props.styleId);
+  } catch (error) {
+    console.error('Failed to check if style is in collection:', error);
+  }
+}
+
+// Call the check function when the component is mounted
+onMounted(() => {
+  if (props.isLoggedIn) {
+    checkIfStyleInCollection();
+  }
+});
 
 // Define the addStyleToCollection function
 async function addStyleToCollection(styleId: string, enable: boolean) {
@@ -33,6 +60,9 @@ async function addStyleToCollection(styleId: string, enable: boolean) {
     // Update global styles
     const stylesResult = await diaryClient.getDiaryStyleUris(userLogin);
     updateStyles(stylesResult);
+
+    // Update isInCollection state
+    isInCollection.value = true;
 
     // Emit event to parent to update state
     emit('updateState', styleId, 'success');
@@ -100,15 +130,30 @@ defineExpose({
       <div class="overlay-text">{{ t('styles.error') }}</div>
     </div>
 
-    <!-- Add save button with updated function call -->
+    <!-- Add save button -->
     <button
-      v-if="isLoggedIn"
+      v-if="isLoggedIn && currentState === 'idle' && !isInCollection"
       class="style-save-btn"
       @click="addStyleToCollection(styleId, true)"
-      :style="{ display: currentState === 'idle' ? 'block' : 'none' }"
     >
       {{ t('styles.preview.save') }}
     </button>
+
+    <!-- Add "already added" overlay -->
+    <div
+      v-if="isLoggedIn && isInCollection && currentState === 'idle'"
+      class="style-overlay already-added-overlay"
+    >
+      <p>{{ t('styles.preview.alreadyAdded') }}</p>
+      <router-link 
+        :to="{ name: 'styles', params: { login: getCurrentUserLogin() } }" 
+        class="go-to-collection-link"
+      >
+        <el-button>
+          {{ t('styles.preview.goToCollection') }}
+        </el-button>
+      </router-link>
+    </div>
   </div>
 </template>
 
@@ -274,5 +319,28 @@ input:checked + .slider:before {
 .overlay-text {
   font-size: 0.8em;
   font-weight: bold;
+}
+
+/* Styles for the "already added" overlay */
+.already-added-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  text-align: center;
+}
+
+.style-preview:hover .already-added-overlay {
+  opacity: 1;
+}
+
+.already-added-overlay p {
+  margin: 0 0 15px 0;
+  font-size: 1em;
+  color: white;
+  font-weight: 600;
+}
+
+.go-to-collection-link {
+  display: inline-block;
 }
 </style>

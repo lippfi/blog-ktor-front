@@ -565,6 +565,8 @@ export default {
     styles: {
         preview: {
             save: 'Add to my collection',
+            alreadyAdded: 'Style added',
+            goToCollection: 'Go to style collection',
         },
         form: {
             title: {
