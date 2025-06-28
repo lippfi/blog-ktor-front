@@ -5,8 +5,5 @@ import MenuComponent from "@/components/MenuComponent.vue";
 </script>
 
 <template>
-  <main>
-    <MenuComponent v-if="getCurrentUserLogin()"/>
-    <FeedView/>
-  </main>
+  <FeedView/>
 </template>

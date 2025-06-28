@@ -154,7 +154,7 @@ class PostClientImpl implements IPostClient {
 
     public async getLatestPosts(page = 0): Promise<Result<PostSearchResult>> {
         try {
-            const response = await fetch(`${backendURL}/posts/latest`);
+            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/latest`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };

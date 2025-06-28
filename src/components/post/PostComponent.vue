@@ -13,14 +13,14 @@
         :nickname="post.authorNickname"
       />
       <div class="post-content">
-        <router-link :to="{name: 'post', params: {'login': login, 'postUri': post.uri}}">
+        <router-link :to="{name: 'post', params: {'login': post.diaryLogin, 'postUri': post.uri}}">
           <h1 class="title"> {{ post.title }} </h1>
         </router-link>
         <ProcessedText :text="post.text" :avatars="reactionsStore.avatars" @update-avatars="reactionsStore.loadAvatars"/>
         <div v-if="post.tags.length > 0" class="tags">
           <div class="tag">
             <template v-for="(tag, index) in post.tags" :key="tag">
-              <router-link :to="{name: 'diary search', params: {'diary': login}, query: {tags: [tag]} }">
+              <router-link :to="{name: 'diary search', params: {'diary': post.diaryLogin}, query: {tags: [tag]} }">
                 #{{ tag }}
               </router-link><span v-if="index < post.tags.length - 1">, </span>
             </template>
@@ -53,16 +53,16 @@
             :postID="post.id"
             :tags="post.tags"
             :avatar="post.avatar"
+            :diary-login="post.diaryLogin"
             @post-updated="postUpdated"
             @cancelEdit="cancelEditing"
   />
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import {computed} from 'vue'
 import type { Post } from "@/models/posts/post.ts";
 import Reactions from "@/components/post/reaction/Reactions.vue";
-import {backendURL} from "@/main.ts";
 import {getCurrentUserLogin} from "@/api/userService.ts";
 import { ref } from 'vue';
 import {getDateTimeString} from "@/components/post/util.ts";
@@ -71,7 +71,6 @@ import FooterButtons from "@/components/post/FooterButtons.vue";
 import ProcessedText from "@/components/post/ProcessedText.vue";
 import PostEdit from "@/components/post/PostEdit.vue";
 import NicknameComponent from "@/components/NicknameComponent.vue";
-import router from "@/router";
 import type {Result} from "@/api/postClient/postClient.ts";
 import type {PostViewDto} from "@/api/dto/postServiceDto.ts";
 import {mapDtoToReaction} from "@/api/dto/mapper.ts";
@@ -111,7 +110,6 @@ const postUpdated = (result: Result<PostViewDto>) => {
 }
 
 const props = defineProps<{
-  login: string;
   post: Post,
   showCommentsCount: boolean,
   redirectOnDelete?: string,
