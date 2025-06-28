@@ -1,20 +1,29 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ProcessedText from "@/components/post/ProcessedText.vue";
+import { getUserByLogin } from '@/api/userMapService';
 
 const { t } = useI18n();
 
 const props = defineProps<{
   authorLogin: string,
-  authorNickname: string,
   origin: string,
   contentEncoded: string,
   collapsed?: boolean
 }>();
 
-const content = atob(props.contentEncoded)
+const content = atob(props.contentEncoded);
 const isCollapsed = ref(props.collapsed || false);
+const authorNickname = ref(props.authorLogin); // Default to login until nickname is fetched
+
+// Fetch the author's nickname
+onMounted(async () => {
+  const user = await getUserByLogin(props.authorLogin);
+  if (user) {
+    authorNickname.value = user.nickname;
+  }
+});
 
 function toggleCollapse() {
   isCollapsed.value = !isCollapsed.value;

@@ -145,7 +145,7 @@ interface FriendRequestData {
 }
 
 type Result<T = void> =
-    | { type: 'ok'; data?: T }
+    | { type: 'ok'; data: T }
     | { type: 'error'; message: string };
 
 type LoginResult = Result;

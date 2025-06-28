@@ -8,7 +8,7 @@
 import { ref, onMounted, watch } from 'vue'
 import RuntimeTemplate from 'vue3-runtime-template';
 import { getReactions} from '@/api/reactionService';
-import {getUsers, isSignedIn, addAvatarByUrl, getCurrentUserLogin} from '@/api/userService';
+import { getCurrentUserLogin} from '@/api/userService';
 import { useI18n } from 'vue-i18n';
 import { diaryClient } from '@/api/diaryClient';
 
@@ -16,6 +16,7 @@ import { diaryClient } from '@/api/diaryClient';
 const components = {
   StylePostComponent,
   RepostComponent,
+  UserMentionComponent,
 };
 
 // Initialize i18n
@@ -162,42 +163,18 @@ async function replaceMentions(text: string): Promise<string> {
     return result;
   }
 
-  const logins = [...new Set(matches.map(match => match[1]))];
-
-  const usersResult = await getUsers(logins);
-
-  if (usersResult.type === 'error') {
-    console.error('Failed to fetch users:', usersResult.message);
-    return result;
-  }
-
-  const users = usersResult.data;
-
-  const userMap = new Map<string, { login: string, nickname: string }>();
-  users.forEach(user => {
-    userMap.set(user.login, { login: user.login, nickname: user.nickname });
-  });
-
   for (const match of matches) {
     const fullMatch = match[0]; // @login
     const login = match[1]; // login
 
-    if (userMap.has(login)) {
-      const user = userMap.get(login)!!;
-      result = result.replace(
-        fullMatch, 
-        `<a href="/${user?.login}" class="user-mention">${user.nickname}</a>`
-      );
-    }
+    console.log('replacing mention', login, fullMatch);
+    result = result.replace(
+      fullMatch, 
+      `<UserMentionComponent login="${login}"/>`
+    );
   }
 
   return result;
-}
-
-declare global {
-  interface Window {
-    addStyleToCollection: (styleId: string, enable: boolean) => void;
-  }
 }
 
 async function replaceStyleReferences(text: string): Promise<string> {
@@ -418,25 +395,8 @@ async function replaceRepost(text: string): Promise<string> {
     return result;
   }
 
-  // Collect all author logins
+  // Collect all matches
   const matches = [...result.matchAll(new RegExp(pattern, 'g'))];
-  const authorLogins = [...new Set(matches.map(m => m[1]))];
-
-  // Fetch user data for all authors
-  const usersResult = await getUsers(authorLogins);
-
-  if (usersResult.type === 'error') {
-    console.error('Failed to fetch users:', usersResult.message);
-    return result;
-  }
-
-  const users = usersResult.data;
-
-  // Create a map of login to user data
-  const userMap = new Map<string, { login: string, nickname: string }>();
-  users.forEach(user => {
-    userMap.set(user.login, { login: user.login, nickname: user.nickname });
-  });
 
   // Process each repost
   match = result.match(pattern);
@@ -446,12 +406,9 @@ async function replaceRepost(text: string): Promise<string> {
     const collapsed = match[4] ? match[4].toLowerCase() === 'true' : false;
     const content = match[5];
 
-    // Get author nickname from the map, fallback to login if not found
-    const authorNickname = userMap.has(authorLogin) ? userMap.get(authorLogin)!!.nickname : authorLogin;
-
     const contentBase64 = btoa(content);
     result = result.replace(match[0],
-      `<RepostComponent author-login="${authorLogin}" author-nickname="${authorNickname}" origin="${origin}" content-encoded="${contentBase64}" :collapsed="${collapsed}" />`
+      `<RepostComponent author-login="${authorLogin}" origin="${origin}" content-encoded="${contentBase64}" :collapsed="${collapsed}" />`
     );
     match = result.match(pattern);
   }
@@ -462,12 +419,14 @@ async function replaceRepost(text: string): Promise<string> {
 import StylePostComponent from '@/components/embeddable/StylePostComponent.vue';
 import AvatarCollectionComponent from '@/components/embeddable/AvatarCollectionComponent.vue';
 import RepostComponent from '@/components/embeddable/RepostComponent.vue';
+import UserMentionComponent from '@/components/embeddable/UserMentionComponent.vue';
 
 export default {
   components: {
     StylePostComponent,
     AvatarCollectionComponent,
     RepostComponent,
+    UserMentionComponent,
   }
 };
 </script>
@@ -496,24 +455,4 @@ export default {
   vertical-align: middle;
   margin: 0 0.1em;
 }
-
-/* Repost-related CSS has been moved to RepostComponent.vue */
-
-.user-mention {
-  color: #0366d6;
-  font-weight: 600;
-  text-decoration: none;
-  background-color: rgba(3, 102, 214, 0.08);
-  border-radius: 3px;
-  padding: 0 3px;
-  transition: background-color 0.2s ease;
-}
-
-.user-mention:hover {
-  text-decoration: underline;
-  background-color: rgba(3, 102, 214, 0.15);
-}
-
-
-/* Style-related CSS has been moved to StylePostComponent.vue */
 </style>
