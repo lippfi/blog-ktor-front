@@ -2,23 +2,21 @@
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { isSignedIn, addAvatarByUrl } from '@/api/userService';
+import { useReactionsStore } from "@/stores/reactionsStore";
 
 const { t } = useI18n();
-
-const emit = defineEmits<{
-  (e: 'update-avatars'): void
-}>();
+const reactionsStore = useReactionsStore();
 
 const props = defineProps<{
   collectionAvatarUri: string,
-  avatars: string[],
 }>();
 
 // Track avatar addition state
 const avatarState = ref<'idle' | 'loading' | 'error'>('idle');
 
-// Check if the avatar is already in the collection
-const isAlreadyAdded = computed(() => props.avatars.includes(props.collectionAvatarUri));
+const isAlreadyAdded = computed(() =>
+    reactionsStore.avatars.includes(props.collectionAvatarUri)
+);
 
 // Function to add avatar to collection
 async function addAvatarToCollection() {
@@ -28,7 +26,7 @@ async function addAvatarToCollection() {
     const result = await addAvatarByUrl(props.collectionAvatarUri);
 
     if (result.type === 'ok') {
-      emit('update-avatars');
+      await reactionsStore.loadAvatars();
       avatarState.value = 'idle';
     } else {
       avatarState.value = 'error';

@@ -4,11 +4,11 @@ import SmartTextArea from "@/components/post/SmartTextArea.vue";
 import {defineEmits, watchEffect, ref, watch, onMounted, onUnmounted, nextTick} from "vue";
 import PostClientImpl from "@/api/postClient/postClient";
 import type {CommentCreateRequest, CommentDto, CommentUpdateRequest} from "@/api/dto/postServiceDto";
-import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
-import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import {useI18n} from "vue-i18n";
+import { useReactionsStore } from "@/stores/reactionsStore";
 
 const { t } = useI18n();
+const reactionsStore = useReactionsStore();
 
 const props = defineProps<{
   id?:string;
@@ -16,9 +16,6 @@ const props = defineProps<{
   content?: string;
   postId: string;
   replyingToComment?: CommentDto;
-  avatars: string[];
-  basicReactions: ReactionPackDto[],
-  recentReactions: BasicReactionResponse[],
   isEdit: boolean;
 }>();
 
@@ -145,12 +142,7 @@ const emit = defineEmits<{
   (e: 'cancel-reply'): void
   (e: 'commentAdded', comment: CommentDto): void
   (e: 'commentUpdated', comment: CommentDto): void
-  (e: 'reaction-added', reaction: BasicReactionResponse): void
 }>();
-
-const reactionAdded = (reaction: BasicReactionResponse) => {
-  emit('reaction-added', reaction);
-}
 
 const localContent = ref<string>(props.content || '');
 const localAvatar = ref<string | undefined>(props.avatar);
@@ -240,9 +232,9 @@ async function updateComment() {
       <el-button size="small" @click="quoteSelectedText">{{ $t('comment.form.button.quote') }}</el-button>
     </div>
     <div class="form">
-      <AvatarChooser :avatar-size="80" :outline-size="3" :show-buttons="true" :is-vertical="true" v-model:selected-avatar="localAvatar" :avatars="avatars"/>
+      <AvatarChooser :avatar-size="80" :outline-size="3" :show-buttons="true" :is-vertical="true" v-model:selected-avatar="localAvatar"/>
       <div class="right">
-        <SmartTextArea v-model:content="localContent" :basic-reactions="basicReactions" :recent-reactions="recentReactions" @reaction-added="reactionAdded"/>
+        <SmartTextArea v-model:content="localContent" :basic-reactions="reactionsStore.basicReactions" :recent-reactions="reactionsStore.recentReactions" @reaction-added="reactionsStore.addReaction"/>
         <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
         <div class="footer">
           <el-button

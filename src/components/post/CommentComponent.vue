@@ -12,21 +12,19 @@ import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import ProcessedText from "@/components/post/ProcessedText.vue";
 import type {Reaction} from "@/models/posts/post.ts";
+import { useReactionsStore } from "@/stores/reactionsStore";
+
+const reactionsStore = useReactionsStore();
 
 const props = defineProps<{
   comment: Comment,
   post: Post,
   isReactable: boolean,
-  avatars: string[],
-  basicReactions: ReactionPackDto[],
-  recentReactions: BasicReactionResponse[],
   isSelected?: boolean,
 }>();
 
 const emit = defineEmits<{
-  (e: 'update-avatars'): void
   (e: 'comment-deleted'): void
-  (e: 'reaction-added', reaction: BasicReactionResponse): void
   (e: 'reply', comment: Comment): void
   (e: 'select-comment', commentId: string): void
 }>();
@@ -91,7 +89,7 @@ const scrollToComment = (commentId: string) => {
           <NicknameComponent :nickname="comment.authorNickname" :login="comment.authorLogin"/>
           <span class="date">{{ formattedCreationTime }}</span>
         </div>
-        <ProcessedText :text="comment.text" :avatars="avatars" @update-avatars="emit('update-avatars')"/>
+        <ProcessedText :text="comment.text" :avatars="reactionsStore.avatars" @update-avatars="reactionsStore.loadAvatars"/>
         <div class="footer">
           <!--        todo reaction added-->
           <Reactions
@@ -99,9 +97,9 @@ const scrollToComment = (commentId: string) => {
               :is-reactable="isReactable"
               type="comment"
               :comment-id="comment.id"
-              :basic-reactions="props.basicReactions"
-              :recent-reactions="props.recentReactions"
-              @reaction-added="emit('reaction-added', $event)"
+              :basic-reactions="reactionsStore.basicReactions"
+              :recent-reactions="reactionsStore.recentReactions"
+              @reaction-added="reactionsStore.addReaction"
           />
           <FooterButtons :post="post" :comment="comment" :show-comments-count="false" @startEdit="startEditing" @reply="reply"/>
         </div>
@@ -113,9 +111,6 @@ const scrollToComment = (commentId: string) => {
                  :content="comment.text"
                  :post-id="props.post.id"
                  :replying-to-comment="undefined"
-                 :avatars="avatars"
-                 :basic-reactions="basicReactions"
-                 :recent-reactions="recentReactions"
                  @cancel-edit="cancelEditing"
                  :is-edit="true"
     />

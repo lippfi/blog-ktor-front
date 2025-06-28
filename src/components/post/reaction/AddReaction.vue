@@ -11,8 +11,6 @@
       </div>
     </template>
     <ReactionList 
-      :basic-reactions="props.basicReactions"
-      :recent-reactions="props.recentReactions"
       @select-reaction="handleReactionSelect"
     />
   </el-popover>
@@ -22,13 +20,10 @@
 import ReactionList from "./ReactionList.vue";
 import type { BasicReactionResponse } from "@/api/reactionService.ts";
 import { ref, watch, onMounted } from 'vue';
-import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import { reactionClient } from "@/api/postClient/reactionClient.ts";
+import { useReactionsStore } from "@/stores/reactionsStore";
 
-const props = defineProps<{
-  basicReactions: ReactionPackDto[],
-  recentReactions: BasicReactionResponse[],
-}>()
+const reactionsStore = useReactionsStore()
 
 const searchResults = ref<BasicReactionResponse[]>([]);
 const searchQuery = ref('');

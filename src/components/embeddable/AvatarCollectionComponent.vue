@@ -1,18 +1,12 @@
 <script setup lang="ts">
-import {defineProps, defineEmits} from "vue";
+import {defineProps} from "vue";
 import AvatarCollectionItemComponent from "@/components/embeddable/AvatarCollectionItemComponent.vue";
 
 const props = defineProps<{
   avatarCollectionJson: string,
-  avatarsJson: string,
 }>();
 
 const collectionAvatarUris: string[] = JSON.parse(props.avatarCollectionJson);
-const avatars = JSON.parse(props.avatarsJson);
-
-const emit = defineEmits<{
-  (e: 'update-avatars'): void
-}>();
 </script>
 
 <template>
@@ -21,8 +15,6 @@ const emit = defineEmits<{
       v-for="avatarUri in collectionAvatarUris"
       :key="avatarUri"
       :collection-avatar-uri="avatarUri"
-      :avatars="avatars"
-      @update-avatars="emit('update-avatars')"
   />
 </div>
 </template>

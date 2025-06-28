@@ -31,7 +31,7 @@
           <el-tabs v-model="activeTab" class="reaction-tabs">
             <!-- Recent Reactions Tab -->
             <el-tab-pane 
-              v-if="recentReactions.length > 0"
+              v-if="reactionsStore.recentReactions.length > 0"
               name="recent"
             >
               <template #label>
@@ -40,7 +40,7 @@
                 </el-icon>
               </template>
               <div class="reaction-grid">
-                <button v-for="reaction in recentReactions" 
+                <button v-for="reaction in reactionsStore.recentReactions" 
                         :key="reaction.name"
                         class="reaction-button"
                         @click="handleReactionSelect(reaction)">
@@ -50,7 +50,7 @@
             </el-tab-pane>
 
             <el-tab-pane 
-              v-for="(pack, index) in basicReactions" 
+              v-for="(pack, index) in reactionsStore.basicReactions" 
               :key="index" 
               :name="String(index)"
             >
@@ -99,36 +99,14 @@ import {useI18n} from "vue-i18n";
 import { Search, Clock } from '@element-plus/icons-vue';
 import type {ReactionPackDto, ReactionViewDto} from "@/api/dto/reactionServiceDto.ts";
 import { reactionClient } from '@/api/postClient/reactionClient.ts';
+import { useReactionsStore } from "@/stores/reactionsStore";
 
 const { t } = useI18n()
+const reactionsStore = useReactionsStore()
 
-const props = defineProps<{
-  basicReactions: ReactionPackDto[],
-  recentReactions: BasicReactionResponse[]
-}>()
-
-const activeTab = ref(props.recentReactions.length > 0 ? 'recent' : '0')
+const activeTab = ref(reactionsStore.recentReactions.length > 0 ? 'recent' : '0')
 const searchQuery = ref('')
 const searchResults = ref<BasicReactionResponse[]>([])
-
-// Convert ReactionViewDto to BasicReactionResponse
-const convertToBasicReactionResponse = (reaction: ReactionViewDto): BasicReactionResponse => {
-  return {
-    name: reaction.name,
-    iconUri: String(reaction.iconUri)
-  }
-}
-
-// Flatten all reactions from all packs for search
-const allReactions = computed(() => {
-  const result: BasicReactionResponse[] = []
-  props.basicReactions.forEach((pack, _) => {
-    pack.reactions.forEach((reaction, _) => {
-      result.push(convertToBasicReactionResponse(reaction))
-    })
-  })
-  return result
-})
 
 watch(searchQuery, async (newQuery) => {
   if (!newQuery.trim()) {
@@ -139,7 +117,6 @@ watch(searchQuery, async (newQuery) => {
   try {
     const result = await reactionClient.search(newQuery.trim())
     if (result.type === 'ok') {
-      // Convert ReactionViewDto[] to BasicReactionResponse[]
       searchResults.value = result.data.map(reaction => ({
         name: reaction.name,
         iconUri: String(reaction.iconUri)
@@ -155,7 +132,7 @@ watch(searchQuery, async (newQuery) => {
 })
 
 // Watch for changes in recentReactions to update activeTab
-watch(() => props.recentReactions.length, (newLength) => {
+watch(() => reactionsStore.recentReactions.length, (newLength) => {
   if (newLength > 0 && activeTab.value === '0') {
     activeTab.value = 'recent'
   } else if (newLength === 0 && activeTab.value === 'recent') {

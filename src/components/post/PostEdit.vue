@@ -5,13 +5,13 @@
     <h3 v-if="type === 'repost'">{{ $t('post.form.title.repost') }}</h3>
 
     <div class="form">
-      <AvatarChooser :avatar-size="100" :outline-size="3" :show-buttons="true" :is-vertical="true" v-model:selected-avatar="localAvatar" :avatars="avatars"/>
+      <AvatarChooser :avatar-size="100" :outline-size="3" :show-buttons="true" :is-vertical="true" v-model:selected-avatar="localAvatar" :avatars="reactionsStore.avatars"/>
       <div class="fields">
         <div class="title-row">
           <span>{{ $t('post.form.fields.title.label') }}</span>
           <el-input v-model="localTitle"/>
         </div>
-        <SmartTextArea v-model:content="localContent" :basic-reactions="basicReactions" :recent-reactions="recentReactions" @reaction-added="reactionAdded"/>
+        <SmartTextArea v-model:content="localContent" :basic-reactions="reactionsStore.basicReactions" :recent-reactions="reactionsStore.recentReactions" @reaction-added="reactionsStore.addReaction"/>
         <div class="tags-row">
           <span>{{ $t('post.form.fields.tags.label')}}</span>
           <el-input-tag :trigger="'Space'" v-model="localTags"/>
@@ -69,9 +69,9 @@ import PostClientImpl, {type Result} from "@/api/postClient/postClient.ts";
 import type {PostCreateDto, PostViewDto} from "@/api/dto/postServiceDto.ts";
 import {getAccessGroups, getDefaultAccessGroups} from "@/api/accessGroupService.ts";
 import router from "@/router";
-import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
-import type {BasicReactionResponse} from "@/api/reactionService.ts";
+import { useReactionsStore } from "@/stores/reactionsStore";
 
+const reactionsStore = useReactionsStore();
 const {t } = useI18n()
 
 export type PostFormType = 'post' | 'repost' | 'edit';
@@ -88,9 +88,6 @@ const props = withDefaults(defineProps<{
   reactionGroup?: string;
   commentGroup?: string;
   readGroup?: string;
-  avatars: string[];
-  basicReactions: ReactionPackDto[],
-  recentReactions: BasicReactionResponse[],
 }>(), {
   tags: () => [],
   content: '',
@@ -102,13 +99,8 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
   (e: 'cancelEdit'): void
-  (e: 'reaction-added', reaction: BasicReactionResponse): void
   (e: 'post-updated', reaction: Result<PostViewDto>): void
 }>();
-
-const reactionAdded = (reaction: BasicReactionResponse) => {
-  emit('reaction-added', reaction);
-}
 
 // Use reactive local state
 const localTags = ref<string[]>(props.tags || []);

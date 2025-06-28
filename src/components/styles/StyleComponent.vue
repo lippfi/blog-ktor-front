@@ -9,15 +9,14 @@ import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import AddOrEditStyleForm from "@/components/styles/AddOrEditStyleForm.vue";
 import {updateStyles} from "@/styles/stylesManager";
 import {useI18n} from "vue-i18n";
+import { useReactionsStore } from "@/stores/reactionsStore";
 
 const { t } = useI18n();
+const reactionsStore = useReactionsStore();
 
 const props = defineProps<{
   style: DiaryStyle,
   diaryLogin: string,
-  avatars: string[],
-  basicReactions: ReactionPackDto[],
-  recentReactions: BasicReactionResponse[],
 }>();
 
 // Create a local state for the switch
@@ -29,7 +28,6 @@ watch(() => props.style.enabled, (newValue) => {
 });
 
 const emit = defineEmits<{
-  (e: 'reaction-added', reaction: BasicReactionResponse): void,
   (e: 'style-deleted', styleId: string): void,
   (e: 'editing-changed', isEditing: boolean): void
 }>();
@@ -120,7 +118,7 @@ const handleStyleSaved = async (updatedStyle: DiaryStyle) => {
           <p class="style-name">{{ props.style.name }}</p>
           <router-link :to="{ name: 'profile', params: { login: props.style.authorLogin } }"  class="style-author">{{ props.style.authorNickname }}</router-link>
         </div>
-        <ProcessedText :text="props.style.description || ''" :avatars="avatars"/>
+        <ProcessedText :text="props.style.description || ''" :avatars="reactionsStore.avatars"/>
         <div class="footer">
           <el-input v-if="showShare" v-model="shareCode" size="small" class="share-input"/>
           <el-icon size="20" @click="showShare = !showShare">
@@ -140,9 +138,9 @@ const handleStyleSaved = async (updatedStyle: DiaryStyle) => {
         type="edit"
         :diary-login="diaryLogin"
         :style="style"
-        :basic-reactions="basicReactions"
-        :recent-reactions="recentReactions"
-        @reaction-added="emit('reaction-added', $event)"
+        :basic-reactions="reactionsStore.basicReactions"
+        :recent-reactions="reactionsStore.recentReactions"
+        @reaction-added="reactionsStore.addReaction"
         @saved="handleStyleSaved"
         @cancel="isEditing = false"
     />

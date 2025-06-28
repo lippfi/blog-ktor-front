@@ -29,7 +29,6 @@ const emit = defineEmits<{
 
 const props = defineProps<{
   text: string,
-  avatars: string[],
 }>();
 
 const processedText = ref('');
@@ -47,6 +46,7 @@ async function processTextAsync(text: string): Promise<string> {
   result = escapeBrackets(result);
 
   result = await replaceRepost(result);
+  result = await replaceMentions(result);
 
   result = replacePatternWithTag(result, /\[b\]([\s\S]*?)\[\/b\]/, 'b', null, null);
   result = replacePatternWithTag(result, /\[i\]([\s\S]*?)\[\/i\]/, 'em', null, null);
@@ -75,7 +75,6 @@ async function processTextAsync(text: string): Promise<string> {
 
   // Process reactions
   result = await replaceReactions(result);
-  result = await replaceMentions(result);
 
   // Process style references
   result = await replaceStyleReferences(result);
@@ -91,12 +90,6 @@ onMounted(async () => {
 watch(() => props.text, async (newText) => {
   processedText.value = await processTextAsync(newText);
 });
-
-// Watch for changes in avatars and reprocess the text
-watch(() => props.avatars, async () => {
-  processedText.value = await processTextAsync(props.text);
-}, { deep: true });
-
 
 function processWhiteSpaces(text: string): string {
   let result = text;
@@ -317,9 +310,8 @@ function replaceAvatars(text: string): string {
       .map(line => line.trim())
       .filter(line => line.length > 0);
 
-    const avatarsJson = JSON.stringify(props.avatars);
     const avatarCollectionJson = JSON.stringify(uris);
-    const avatarCollectionComponent = `<AvatarCollectionComponent avatar-collection-json='${avatarCollectionJson}' avatars-json='${avatarsJson}' @update-avatars="$emit('update-avatars')" />`;
+    const avatarCollectionComponent = `<AvatarCollectionComponent avatar-collection-json='${avatarCollectionJson}' />`;
 
     result = result.replace(match[0], avatarCollectionComponent);
     match = result.match(pattern);

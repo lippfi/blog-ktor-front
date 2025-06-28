@@ -41,8 +41,6 @@ import PostClientImpl from '@/api/postClient/postClient';
 import type { Post } from '@/models/posts/post';
 import { mapPostDtoToPost } from '@/models/posts/mapper';
 import PostSearchComponent from '@/components/PostSearchComponent.vue';
-import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
-import type {BasicReactionResponse} from "@/api/reactionService.ts";
 
 const route = useRoute();
 const postClient = new PostClientImpl();
@@ -52,17 +50,6 @@ const error = ref<string | null>(null);
 const currentPage = ref(0);
 const totalPages = ref(0);
 const login = ref('');
-
-const props = defineProps<{
-  avatars: string[];
-  basicReactions: ReactionPackDto[],
-  recentReactions: BasicReactionResponse[],
-}>();
-
-const emit = defineEmits<{
-  (e: 'update-avatars'): void
-  (e: 'reaction-added', reaction: BasicReactionResponse): void
-}>();
 
 const fetchPosts = async () => {
   loading.value = true;
@@ -133,11 +120,6 @@ watch(() => route.params, fetchPosts, { deep: true });
                      :key="post.id" :login="login"
                      :post="post"
                      :show-comments-count="true"
-                     :avatars="avatars"
-                     @update-avatars="emit('update-avatars')"
-                     :basic-reactions="basicReactions"
-                     :recent-reactions="recentReactions"
-                     @reaction-added="emit('reaction-added', $event)"
       />
     </div>
 

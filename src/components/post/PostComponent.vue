@@ -16,7 +16,7 @@
         <router-link :to="{name: 'post', params: {'login': login, 'postUri': post.uri}}">
           <h1 class="title"> {{ post.title }} </h1>
         </router-link>
-        <ProcessedText :text="post.text" :avatars="avatars" @update-avatars="emit('update-avatars')"/>
+        <ProcessedText :text="post.text" :avatars="reactionsStore.avatars" @update-avatars="reactionsStore.loadAvatars"/>
         <div v-if="post.tags.length > 0" class="tags">
           <div class="tag">
             <template v-for="(tag, index) in post.tags" :key="tag">
@@ -35,9 +35,9 @@
               :isReactable="post.isReactable"
               :post-login="post.authorLogin"
               :post-uri="post.uri"
-              :basic-reactions="basicReactions"
-              :recent-reactions="recentReactions"
-              @reaction-added="emit('reaction-added', $event)"
+              :basic-reactions="reactionsStore.basicReactions"
+              :recent-reactions="reactionsStore.recentReactions"
+              @reaction-added="reactionsStore.addReaction"
             />
           </div>
           <FooterButtons :post="post" :show-comments-count="showCommentsCount" @startEdit="startEditing"/>
@@ -53,9 +53,6 @@
             :postID="post.id"
             :tags="post.tags"
             :avatar="post.avatar"
-            :avatars="avatars"
-            :basic-reactions="basicReactions"
-            :recent-reactions="recentReactions"
             @post-updated="postUpdated"
             @cancelEdit="cancelEditing"
   />
@@ -75,12 +72,12 @@ import ProcessedText from "@/components/post/ProcessedText.vue";
 import PostEdit from "@/components/post/PostEdit.vue";
 import NicknameComponent from "@/components/NicknameComponent.vue";
 import router from "@/router";
-import type { ReactionPackDto } from "@/api/dto/reactionServiceDto.ts";
-import type { BasicReactionResponse } from "@/api/reactionService.ts";
 import type {Result} from "@/api/postClient/postClient.ts";
 import type {PostViewDto} from "@/api/dto/postServiceDto.ts";
 import {mapDtoToReaction} from "@/api/dto/mapper.ts";
+import { useReactionsStore } from "@/stores/reactionsStore";
 
+const reactionsStore = useReactionsStore();
 let isEditing = ref(false);
 
 const startEditing = () => {
@@ -113,28 +110,16 @@ const postUpdated = (result: Result<PostViewDto>) => {
   }
 }
 
-const emit = defineEmits<{
-  (e: 'update-avatars'): void
-  (e: 'reaction-added', reaction: BasicReactionResponse): void
-}>();
-
 const props = defineProps<{
   login: string;
   post: Post,
   showCommentsCount: boolean,
   redirectOnDelete?: string,
-  avatars: string[],
-  basicReactions: ReactionPackDto[],
-  recentReactions: BasicReactionResponse[],
 }>();
 
 const formattedCreationTime = computed(() => {
   return getDateTimeString(props.post.creationTime.toString());
 });
-
-const reactionAdded = (reaction: BasicReactionResponse) => {
-  emit('reaction-added', reaction);
-}
 </script>
 
 <style scoped>

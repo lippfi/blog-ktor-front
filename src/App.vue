@@ -2,31 +2,21 @@
   <MenuComponent v-if="signedIn && $route.name !== 'register'"/>
   <!-- Apply all styles globally -->
   <link v-for="style in getStyles()" :key="style" rel="stylesheet" :href="style" data-diary-style="true" />
-  <router-view v-if="isLoaded"
-               :avatars="avatars"
-               @update-avatars="updateAvatars"
-               :basic-reactions="basicReactions"
-               :recent-reactions="recentReactions"
-               @reaction-added="reactionAdded"/>
+  <router-view v-if="isLoaded" @reaction-added="reactionsStore.addReaction"/>
 </template>
 
 <script setup lang="ts">
 import {RouterView, useRouter} from 'vue-router'
 import MenuComponent from "@/components/MenuComponent.vue";
-import {isSignedIn, authEvents, getAvatars} from "@/api/userService.ts";
+import {isSignedIn, authEvents} from "@/api/userService.ts";
 import { ref, onMounted, watch, onUnmounted } from 'vue'
-import {reactionClient} from "@/api/postClient/reactionClient.ts";
-import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
-import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import { getStyles } from "@/styles/stylesManager";
+import { useReactionsStore } from "@/stores/reactionsStore";
 
 const router = useRouter()
 const signedIn = ref(isSignedIn())
 const isLoaded = ref(false)
-
-const avatars = ref<string[]>([]);
-const basicReactions = ref<ReactionPackDto[]>([]);
-const recentReactions = ref<BasicReactionResponse[]>([]);
+const reactionsStore = useReactionsStore()
 
 // Update signedIn state when route changes
 watch(() => router.currentRoute.value, () => {
@@ -41,44 +31,15 @@ onMounted(async () => {
     return
   }
 
-  const avatarsResponse = await getAvatars();
-  avatars.value = Object.values(avatarsResponse)
-  console.log('Avatars:', avatars.value);
-
-  const basicReactionsResponse = await reactionClient.getBasicReactions();
-  if (basicReactionsResponse.type === 'ok') {
-    basicReactions.value = Array.isArray(basicReactionsResponse.data)
-        ? basicReactionsResponse.data
-        : [basicReactionsResponse.data];
-  } else {
-    console.error('Failed to load basic reactions:', basicReactionsResponse.message);
-  }
-
-  const recentReactionsResponse = await reactionClient.getRecentReactions(60);
-  if (recentReactionsResponse.type === 'ok') {
-    recentReactions.value = Array.isArray(recentReactionsResponse.data)
-        ? recentReactionsResponse.data
-        : [recentReactionsResponse.data];
-  } else {
-    console.error('Failed to load recent reactions:', recentReactionsResponse.message);
-  }
+  // Load all data from the store
+  await Promise.all([
+    reactionsStore.loadAvatars(),
+    reactionsStore.loadBasicReactions(),
+    reactionsStore.loadRecentReactions(60)
+  ]);
 
   isLoaded.value = true;
 });
-
-const reactionAdded = (reaction: BasicReactionResponse) => {
-  const existingIndex = recentReactions.value.findIndex(r => r.name === reaction.name);
-  if (existingIndex !== -1) {
-    recentReactions.value.splice(existingIndex, 1);
-  }
-  recentReactions.value.unshift(reaction);
-};
-
-const updateAvatars = async () => {
-  console.log('Updating avatars');
-  const avatarsResponse = await getAvatars();
-  avatars.value = Object.values(avatarsResponse);
-}
 </script>
 
 <style>

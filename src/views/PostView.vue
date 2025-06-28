@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import {RouterView, useRoute} from "vue-router";
-import {computed, type ComputedRef, ref, nextTick, onMounted, onUnmounted} from "vue";
+import { useRoute} from "vue-router";
+import { computed, type ComputedRef, ref, nextTick, onMounted, onUnmounted} from "vue";
 
 import CommentEdit from "@/components/post/CommentEdit.vue";
 import CommentComponent from "@/components/post/CommentComponent.vue";
 import PostComponent from "@/components/post/PostComponent.vue";
 import type {Post, Comment} from "@/models/posts/post.ts";
-import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import PostClientImpl from "@/api/postClient/postClient.ts";
 import {mapCommentDtoToComment} from "@/models/posts/mapper.ts";
@@ -16,9 +15,6 @@ const props = defineProps<{
   login: string;
   postUri: string;
   commentId?: string;
-  avatars: string[];
-  basicReactions: ReactionPackDto[],
-  recentReactions: BasicReactionResponse[],
 }>();
 
 const emit = defineEmits<{
@@ -209,30 +205,17 @@ const cancelReply = () => {
         :post="post"
         :show-editing-buttons="false"
         :show-comments-count="false"
-        :avatars="avatars"
-        @update-avatars="emit('update-avatars')"
-        :basic-reactions="basicReactions"
-        :recent-reactions="recentReactions"
-        @reaction-added="emit('reaction-added', $event)"
     />
     <CommentEdit v-if="post.isCommentable && !parentCommentId"
                  :post-id="post.id"
-                 :avatars="avatars"
-                 :basic-reactions="basicReactions"
-                 :recent-reactions="recentReactions"
                  :is-edit="false"
-                 @reaction-added="emit('reaction-added', $event)"/>
+    />
     <div class="comments_block">
       <CommentComponent v-for="comment in comments" :key="comment.id"
                :comment="comment"
                :post="post"
                :is-reactable="true"
-               :avatars="avatars"
                :is-selected="selectedCommentId === comment.id"
-               @update-avatars="emit('update-avatars')"
-               :basic-reactions="basicReactions"
-               :recent-reactions="recentReactions"
-               @reaction-added="emit('reaction-added', $event)"
                @reply="startReply(comment)"
                @select-comment="(commentId) => { selectedCommentId = commentId; scrollToComment(commentId); }"
       />
@@ -241,12 +224,8 @@ const cancelReply = () => {
                  :post-id="post.id"
                  :parent-comment-id="parentCommentId"
                  :replying-to-comment="replyingToComment"
-                 :avatars="avatars"
-                 :basic-reactions="basicReactions"
-                 :recent-reactions="recentReactions"
                  :is-edit="false"
                  :is-reply="true"
-                 @reaction-added="emit('reaction-added', $event)"
                  @cancel-reply="cancelReply"/>
   </div>
 </template>

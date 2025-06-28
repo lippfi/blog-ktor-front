@@ -10,20 +10,16 @@ import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import {useRoute} from "vue-router";
 import {updateStyles} from "@/styles/stylesManager";
 import {useI18n} from "vue-i18n";
+import { useReactionsStore } from "@/stores/reactionsStore";
 
 const { t } = useI18n();
+const reactionsStore = useReactionsStore();
 
 const route = useRoute();
 const props = defineProps<{
   login: string,
-  avatars: string[],
-  basicReactions: ReactionPackDto[],
-  recentReactions: BasicReactionResponse[],
 }>();
 
-const emit = defineEmits<{
-  (e: 'reaction-added', reaction: BasicReactionResponse): void
-}>();
 
 const isEditing = ref(false);
 const isAdding = ref(false);
@@ -227,10 +223,6 @@ const handleEditingChanged = (styleId: string, isEditing: boolean) => {
       <StyleComponent
           :style="style"
           :diary-login="login"
-          :avatars="avatars"
-          :basic-reactions="basicReactions"
-          :recent-reactions="recentReactions"
-          @reaction-added="emit('reaction-added', $event)"
           @style-deleted="handleStyleDeleted"
           @editing-changed="(isEditing) => handleEditingChanged(style.id, isEditing)"
       />
@@ -258,9 +250,9 @@ const handleEditingChanged = (styleId: string, isEditing: boolean) => {
       <AddOrEditStyleForm
           v-if="isAdding"
           :diary-login="login"
-          :basic-reactions="basicReactions"
-          :recent-reactions="recentReactions"
-          @reaction-added="emit('reaction-added', $event)"
+          :basic-reactions="reactionsStore.basicReactions"
+          :recent-reactions="reactionsStore.recentReactions"
+          @reaction-added="reactionsStore.addReaction"
           @saved="handleStyleAdded"
           @cancel="isAdding = false"
           type="add"

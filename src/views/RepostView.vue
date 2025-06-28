@@ -1,24 +1,14 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 import PostEdit from '@/components/post/PostEdit.vue';
 import { getCurrentUserLogin } from '@/api/userService.ts';
-import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
-import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import { useI18n } from 'vue-i18n';
 import type {CommentDto, PostViewDto} from "@/api/dto/postServiceDto.ts";
 
 const props = defineProps<{
   type: 'comment' | 'post';
   postUri: string;
-  avatars: string[];
-  basicReactions: ReactionPackDto[],
-  recentReactions: BasicReactionResponse[],
-}>();
-
-const emit = defineEmits<{
-  (e: 'update-avatars'): void
-  (e: 'reaction-added', reaction: BasicReactionResponse): void
 }>();
 
 const route = useRoute();
@@ -49,10 +39,6 @@ const wrappedContent = `[repost author="${authorLogin}" origin="${origin}" colla
       :diaryLogin="currentUserLogin"
       :content="wrappedContent"
       :title="repostTitle"
-      :avatars="avatars"
-      :basic-reactions="basicReactions"
-      :recent-reactions="recentReactions"
-      @reaction-added="emit('reaction-added', $event)"
     />
   </div>
 </template>

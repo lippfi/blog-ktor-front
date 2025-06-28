@@ -16,14 +16,6 @@ const route = useRoute();
 const props = defineProps<{
   login: string;
   page: string;
-  avatars: string[];
-  basicReactions: ReactionPackDto[],
-  recentReactions: BasicReactionResponse[],
-}>();
-
-const emit = defineEmits<{
-  (e: 'update-avatars'): void
-  (e: 'reaction-added', reaction: BasicReactionResponse): void
 }>();
 
 const loggedIn: boolean = isSignedIn();
@@ -40,20 +32,11 @@ const posts = computed<PostModel[]>(() => route.meta.posts as PostModel[] || [])
           :login="login"
           :post="post"
           :show-comments-count="true"
-          :avatars="avatars"
-          @update-avatars="emit('update-avatars')"
-          :basic-reactions="basicReactions"
-          :recent-reactions="recentReactions"
-          @reaction-added="emit('reaction-added', $event)"
       />
       <PostEdit
           v-if="loggedIn"
           :type="'post'"
           :diary-login="props.login"
-          :avatars="avatars"
-          :basic-reactions="basicReactions"
-          :recent-reactions="recentReactions"
-          @reaction-added="emit('reaction-added', $event)"
       />
     </div>
   </div>

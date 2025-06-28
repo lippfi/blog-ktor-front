@@ -7,12 +7,12 @@
       </el-icon>
     </div>
     <div class="avatars">
-      <template v-for="(avatar, index) in avatars" :key="avatar">
+      <template v-for="(avatar, index) in reactionsStore.avatars" :key="avatar">
         <input type="radio" name="avatar" :id="String(index)" :value="avatar" v-model="selectedAvatarModel">
         <label :for="String(index)"><img class="avatar" :src="avatar" alt="avatar"></label>
       </template>
-      <input type="radio" name="avatar" :id="String(avatars.length)" :value="customAvatar" v-model="selectedAvatarModel">
-      <label :for="String(avatars.length)" class="one-time-avatar">
+      <input type="radio" name="avatar" :id="String(reactionsStore.avatars.length)" :value="customAvatar" v-model="selectedAvatarModel">
+      <label :for="String(reactionsStore.avatars.length)" class="one-time-avatar">
         <div class="avatar">
           <p style="margin: 5px; text-align: center;">{{ t('avatarChooser.oneTimeAvatar') }}</p>
           <el-input v-model="customAvatar" style="padding: 0 10px;"/>
@@ -33,15 +33,16 @@ import { ref, computed, watch, onMounted } from 'vue'
 import {ArrowDownBold, ArrowLeft, ArrowLeftBold, ArrowRightBold, ArrowUpBold} from "@element-plus/icons-vue";
 import { getAvatars } from "@/api/userService";
 import {useI18n} from "vue-i18n";
+import { useReactionsStore } from "@/stores/reactionsStore";
 
 const { t } = useI18n()
+const reactionsStore = useReactionsStore()
 
 interface Props {
   avatarSize: number
   outlineSize: number
   showButtons: boolean
   isVertical: boolean
-  avatars: string[]
 }
 
 const props = defineProps<Props>()
@@ -103,13 +104,13 @@ watch(customAvatar, () => {
 
 onMounted(() => {
   if (selectedAvatarModel.value) {
-    const avatarExists = props.avatars.includes(selectedAvatarModel.value)
+    const avatarExists = reactionsStore.avatars.includes(selectedAvatarModel.value)
     if (!avatarExists) {
       customAvatar.value = selectedAvatarModel.value
     }
   }
-  else if (props.avatars.length > 0) {
-    selectedAvatarModel.value = props.avatars[0]
+  else if (reactionsStore.avatars.length > 0) {
+    selectedAvatarModel.value = reactionsStore.avatars[0]
   }
 })
 </script>

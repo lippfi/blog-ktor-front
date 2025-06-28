@@ -3,8 +3,10 @@ import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import ProcessedText from "@/components/post/ProcessedText.vue";
 import { getUserByLogin } from '@/api/userMapService';
+import { useReactionsStore } from "@/stores/reactionsStore";
 
 const { t } = useI18n();
+const reactionsStore = useReactionsStore();
 
 const props = defineProps<{
   authorLogin: string,
@@ -41,7 +43,7 @@ function toggleCollapse() {
       <span class="collapse-indicator" :class="{ 'collapsed': isCollapsed }">▼</span>
     </div>
     <div class="repost-content" :class="{ 'collapsed': isCollapsed }">
-      <ProcessedText :text="content" :avatars="[]"/>
+      <ProcessedText :text="content" :avatars="reactionsStore.avatars"/>
     </div>
   </div>
 </template>
