@@ -8,7 +8,8 @@
 import { ref, onMounted, watch } from 'vue'
 import RuntimeTemplate from 'vue3-runtime-template';
 import { getReactions} from '@/api/reactionService';
-import { getCurrentUserLogin} from '@/api/userService';
+import { getCurrentUserLogin } from '@/api/userService';
+import { fetchUsersToCache } from '@/api/userMapService';
 import { useI18n } from 'vue-i18n';
 import { diaryClient } from '@/api/diaryClient';
 
@@ -163,11 +164,21 @@ async function replaceMentions(text: string): Promise<string> {
     return result;
   }
 
+  // Extract all unique logins from mentions
+  const logins = [...new Set(matches.map(match => match[1]))];
+
+  // Prefetch all users in a single request and cache them
+  try {
+    const users = await fetchUsersToCache(logins);
+  } catch (error) {
+    console.error('Failed to prefetch users to cache:', error);
+  }
+
+  // Now replace the mentions with components
   for (const match of matches) {
     const fullMatch = match[0]; // @login
     const login = match[1]; // login
 
-    console.log('replacing mention', login, fullMatch);
     result = result.replace(
       fullMatch, 
       `<UserMentionComponent login="${login}"/>`
@@ -297,7 +308,6 @@ function replaceAvatars(text: string): string {
   let result = text;
   const pattern = /\n?\[avatars\]([\s\S]*?)\[\/avatars\]\n?/;
   let match = result.match(pattern);
-  console.log(match);
 
   while (match !== null) {
     const content = match[1];

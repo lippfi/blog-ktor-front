@@ -49,17 +49,14 @@ function loadCachedUserMap(): Map<string, CachedUser> {
         if (cachedUser.timestamp && now - cachedUser.timestamp < POSITIVE_CACHE_DURATION) {
           loadedMap.set(login, cachedUser);
         } else {
-          console.log(`Cached user ${login} expired, will be fetched from API when requested`);
         }
       }
 
-      console.log(`Loaded ${loadedMap.size} non-expired users from cache (out of ${tempMap.size} total cached)`);
       return loadedMap;
     }
   } catch (error) {
     console.error('Failed to load user map from cache:', error);
   }
-  console.log('No cached user map found, creating empty map');
   return new Map();
 }
 
@@ -84,13 +81,11 @@ function loadNegativeCache(): Map<string, number> {
         }
       });
 
-      console.log(`Loaded ${loadedMap.size} negative cache entries:`, [...loadedMap.entries()]);
       return loadedMap;
     }
   } catch (error) {
     console.error('Failed to load negative cache:', error);
   }
-  console.log('No negative cache found, creating empty map');
   return new Map();
 }
 
@@ -106,7 +101,6 @@ watchEffect(() => {
     // Convert Map to array of entries for JSON serialization
     const mapEntries = Array.from(userMap.value.entries());
     localStorage.setItem(USER_MAP_CACHE_KEY, JSON.stringify(mapEntries));
-    console.log(`Saved ${userMap.value.size} users to cache`);
   } catch (error) {
     console.error('Failed to save user map to cache:', error);
   }
@@ -120,7 +114,6 @@ watchEffect(() => {
       .map(([login, timestamp]) => ({ login, timestamp }));
 
     localStorage.setItem(NEGATIVE_CACHE_KEY, JSON.stringify(entries));
-    console.log(`Saved ${negativeCache.value.size} negative cache entries`);
   } catch (error) {
     console.error('Failed to save negative cache:', error);
   }
@@ -134,10 +127,8 @@ export async function getUserByLogin(login: string): Promise<User | null> {
 
     // Check if the cached user is still valid (less than 5 minutes old)
     if (now - cachedUser.timestamp < POSITIVE_CACHE_DURATION) {
-      console.log(`User ${login} found in cache (cached at ${new Date(cachedUser.timestamp).toISOString()}), returning cached data`);
       return cachedUser;
     } else {
-      console.log(`User ${login} found in cache but expired (cached at ${new Date(cachedUser.timestamp).toISOString()}), fetching fresh data`);
       // We'll fetch fresh data below, but keep the user in the map for now
       // in case the API call fails, we can fall back to the stale data
     }
@@ -150,11 +141,9 @@ export async function getUserByLogin(login: string): Promise<User | null> {
 
     // Check if the negative cache entry is still valid (less than 1 hour old)
     if (now - timestamp < NEGATIVE_CACHE_DURATION) {
-      console.log(`User ${login} found in negative cache (cached at ${new Date(timestamp).toISOString()}), skipping API call`);
       return null;
     } else {
       // Entry expired, remove it from negative cache
-      console.log(`Negative cache entry for ${login} expired, removing from cache`);
       const newNegativeCache = new Map(negativeCache.value);
       newNegativeCache.delete(login);
       negativeCache.value = newNegativeCache;
@@ -162,7 +151,6 @@ export async function getUserByLogin(login: string): Promise<User | null> {
   }
 
   // Fetch from API if not in cache or cache expired
-  console.log(`Fetching user ${login} from API`);
   try {
     const result = await getUsers([login]);
     if (result.type === 'error') {
@@ -171,7 +159,6 @@ export async function getUserByLogin(login: string): Promise<User | null> {
       // If we have stale data, return it as a fallback
       if (userMap.value.has(login)) {
         const staleUser = userMap.value.get(login)!;
-        console.log(`Returning stale data for ${login} as fallback after API error`);
         return staleUser;
       }
 
@@ -180,7 +167,6 @@ export async function getUserByLogin(login: string): Promise<User | null> {
 
     const users = result.data;
     if (users.length === 0) {
-      console.log(`No user found with login ${login}, adding to negative cache`);
 
       // Add to negative cache with current timestamp
       const now = Date.now();
@@ -188,12 +174,10 @@ export async function getUserByLogin(login: string): Promise<User | null> {
       newNegativeCache.set(login, now);
       negativeCache.value = newNegativeCache;
 
-      console.log(`Added ${login} to negative cache, new negative cache size: ${negativeCache.value.size}`);
       return null;
     }
 
     const user = users[0];
-    console.log(`User ${login} fetched from API:`, user);
 
     // Add to positive cache with current timestamp
     const now = Date.now();
@@ -205,7 +189,6 @@ export async function getUserByLogin(login: string): Promise<User | null> {
     const newMap = new Map(userMap.value);
     newMap.set(login, cachedUser);
     userMap.value = newMap;
-    console.log(`User ${login} added to cache with timestamp ${new Date(now).toISOString()}, new cache size: ${userMap.value.size}`);
 
     return user;
   } catch (error) {
@@ -214,7 +197,6 @@ export async function getUserByLogin(login: string): Promise<User | null> {
     // If we have stale data, return it as a fallback
     if (userMap.value.has(login)) {
       const staleUser = userMap.value.get(login)!;
-      console.log(`Returning stale data for ${login} as fallback after API error`);
       return staleUser;
     }
 
@@ -222,17 +204,107 @@ export async function getUserByLogin(login: string): Promise<User | null> {
   }
 }
 
-export function clearUserMap(): void {
-  console.log(`Clearing user map - current size: ${userMap.value.size}`);
-  console.log(`Clearing negative cache - current size: ${negativeCache.value.size}`);
+export async function fetchUsersToCache(logins: string[]): Promise<User[]> {
+  if (logins.length === 0) {
+    return [];
+  }
 
-  // Clear both maps in memory
+  // Filter out duplicates
+  const uniqueLogins = [...new Set(logins)];
+
+  // Check which logins need to be fetched (not in valid cache)
+  const loginsToFetch: string[] = [];
+  const now = Date.now();
+
+  for (const login of uniqueLogins) {
+    // Skip if in valid positive cache
+    if (userMap.value.has(login)) {
+      const cachedUser = userMap.value.get(login)!;
+      if (now - cachedUser.timestamp < POSITIVE_CACHE_DURATION) {
+        continue;
+      }
+    }
+
+    // Skip if in valid negative cache
+    if (negativeCache.value.has(login)) {
+      const timestamp = negativeCache.value.get(login)!;
+      if (now - timestamp < NEGATIVE_CACHE_DURATION) {
+        continue;
+      } else {
+        // Remove expired negative cache entry
+        const newNegativeCache = new Map(negativeCache.value);
+        newNegativeCache.delete(login);
+        negativeCache.value = newNegativeCache;
+      }
+    }
+
+    // Need to fetch this login
+    loginsToFetch.push(login);
+  }
+
+  // If all logins are in valid cache, return early
+  if (loginsToFetch.length === 0) {
+    return uniqueLogins
+      .map(login => userMap.value.get(login))
+      .filter((user): user is CachedUser => user !== undefined);
+  }
+
+  // Fetch users from API
+  try {
+    const result = await getUsers(loginsToFetch);
+    if (result.type === 'error') {
+      console.error('Failed to fetch users:', result.message);
+      return uniqueLogins
+        .map(login => userMap.value.get(login))
+        .filter((user): user is CachedUser => user !== undefined);
+    }
+
+    const fetchedUsers = result.data;
+
+    // Update cache with fetched users
+    const newMap = new Map(userMap.value);
+    const timestamp = Date.now();
+
+    // Add fetched users to positive cache
+    for (const user of fetchedUsers) {
+      const cachedUser: CachedUser = {
+        ...user,
+        timestamp
+      };
+      newMap.set(user.login, cachedUser);
+    }
+
+    // Add not found users to negative cache
+    const fetchedLogins = new Set(fetchedUsers.map(user => user.login));
+    const newNegativeCache = new Map(negativeCache.value);
+
+    for (const login of loginsToFetch) {
+      if (!fetchedLogins.has(login)) {
+        newNegativeCache.set(login, timestamp);
+      }
+    }
+
+    // Update caches
+    userMap.value = newMap;
+    negativeCache.value = newNegativeCache;
+
+    // Return all users that were found (both from cache and newly fetched)
+    return uniqueLogins
+      .map(login => userMap.value.get(login))
+      .filter((user): user is CachedUser => user !== undefined);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return uniqueLogins
+      .map(login => userMap.value.get(login))
+      .filter((user): user is CachedUser => user !== undefined);
+  }
+}
+
+export function clearUserMap(): void {
   userMap.value = new Map();
   negativeCache.value = new Map();
 
   // Clear both caches in localStorage
   localStorage.removeItem(USER_MAP_CACHE_KEY);
   localStorage.removeItem(NEGATIVE_CACHE_KEY);
-
-  console.log('User map and negative cache cleared');
 }

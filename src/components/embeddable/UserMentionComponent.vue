@@ -11,7 +11,6 @@ const displayNickname = ref(props.login);
 const isUserFound = ref(false);
 
 onMounted(async () => {
-  console.log('props', props.login);
   const user = await getUserByLogin(props.login);
   if (user) {
     displayNickname.value = user.nickname;
