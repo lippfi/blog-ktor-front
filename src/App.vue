@@ -236,6 +236,7 @@ html {
   box-sizing: border-box;
   gap: 60px;
   margin: 0 auto;
+  height: 100%;
 }
 
 .right-menu {
