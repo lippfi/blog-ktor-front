@@ -38,7 +38,7 @@ function toggleCollapse() {
     <div class="repost-header clickable" @click="toggleCollapse">
       <span class="repost-icon">↻</span>
       <span class="repost-info">
-        {{ t('post.repost.from') }} 
+        {{ t('post.repost.from') }}
         <a :href="origin" class="repost-link" @click.stop>{{ authorNickname }}</a>
       </span>
       <span class="collapse-indicator" :class="{ 'collapsed': isCollapsed }">▼</span>
@@ -51,19 +51,16 @@ function toggleCollapse() {
 
 <style scoped>
 .repost-block {
-  border: #e6e8eb solid 2px;
-  border-radius: 8px;
-  margin: 15px 0;
-  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.08);
+  border: #f0f0f0 solid 1px;
+  border-radius: 0px;
+  box-shadow: 2px 2px 0 #f0f0f0;
 }
 
 .repost-header {
-  background-color: #eaecef;
-  padding: 8px 12px;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
+  background-color: #f0f0f0;
+  padding: 1%;
   font-size: 0.9em;
-  color: #586069;
+  color: #707070;
   display: flex;
   align-items: center;
 }
