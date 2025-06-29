@@ -6,6 +6,7 @@ import {computed, onMounted} from 'vue';
 import {isSignedIn} from "@/api/userService.ts";
 import {useRoute} from "vue-router";
 import type {DiaryHeaderInfo} from "@/api/dto/postServiceDto.ts";
+import DiaryMenuComponent from "@/components/DiaryMenuComponent.vue";
 
 const route = useRoute();
 const props = defineProps<{
@@ -23,6 +24,7 @@ onMounted(() => {
 </script>
 
 <template>
+<!--  <DiaryMenuComponent/>-->
   <PostComponent
       v-for="post in posts"
       :key="post.id"
