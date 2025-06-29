@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import ProcessedText from "@/components/post/ProcessedText.vue";
 import { getUserByLogin } from '@/api/userMapService';
 import { useReactionsStore } from "@/stores/reactionsStore";
+import {safeBase64Decode} from "@/components/post/util.ts";
 
 const { t } = useI18n();
 const reactionsStore = useReactionsStore();
@@ -15,7 +16,7 @@ const props = defineProps<{
   collapsed?: boolean
 }>();
 
-const content = atob(props.contentEncoded);
+const content = safeBase64Decode(props.contentEncoded);
 const isCollapsed = ref(props.collapsed || false);
 const authorNickname = ref(props.authorLogin); // Default to login until nickname is fetched
 

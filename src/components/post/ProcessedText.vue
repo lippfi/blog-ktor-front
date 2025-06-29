@@ -12,6 +12,7 @@ import { getCurrentUserLogin } from '@/api/userService';
 import { fetchUsersToCache } from '@/api/userMapService';
 import { useI18n } from 'vue-i18n';
 import { diaryClient } from '@/api/diaryClient';
+import {safeBase64Decode, safeBase64Encode} from "@/components/post/util.ts";
 
 // Register components for use in the template
 const components = {
@@ -408,7 +409,7 @@ async function replaceRepost(text: string): Promise<string> {
     const collapsed = match[4] ? match[4].toLowerCase() === 'true' : false;
     const content = match[5];
 
-    const contentBase64 = btoa(content);
+    const contentBase64 = safeBase64Encode(content);
     result = result.replace(match[0],
       `<RepostComponent author-login="${authorLogin}" origin="${origin}" content-encoded="${contentBase64}" :collapsed="${collapsed}" />`
     );
