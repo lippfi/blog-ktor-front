@@ -1,6 +1,5 @@
 <template>
   <HeaderComponent @toggleMenu="toggleMenuCollapse"/>
-  <!-- Apply all styles globally -->
   <link v-for="style in getStyles()" :key="style" rel="stylesheet" :href="style" data-diary-style="true" />
   <div class="content-wrapper">
     <div class="centralized-block">
