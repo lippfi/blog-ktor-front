@@ -13,7 +13,6 @@ const router = useRouter();
 const props = defineProps<{
   styleId: string;
   styleName: string;
-  enabled: boolean;
   currentState: 'idle' | 'loading' | 'success' | 'error';
   isLoggedIn: boolean;
 }>();
@@ -52,43 +51,18 @@ async function addStyleToCollection(styleId: string, enable: boolean) {
       return;
     }
 
-    // Emit event to parent to update state
-    emit('updateState', styleId, 'loading');
-
+    console.log('Adding style to collection:', userLogin, styleId, enable);
     const result = await diaryClient.addDiaryStyleById(userLogin, styleId, enable);
 
-    // Update global styles
     const stylesResult = await diaryClient.getDiaryStyleUris(userLogin);
     updateStyles(stylesResult);
 
-    // Update isInCollection state
     isInCollection.value = true;
-
-    // Emit event to parent to update state
-    emit('updateState', styleId, 'success');
-
-    // Reset to idle after 3 seconds
-    setTimeout(() => {
-      emit('updateState', styleId, 'idle');
-    }, 3000);
   } catch (error) {
-    // Emit event to parent to update state
-    emit('updateState', styleId, 'error');
     console.error('Failed to add style:', error);
-
-    // Reset to idle after 3 seconds
-    setTimeout(() => {
-      emit('updateState', styleId, 'idle');
-    }, 3000);
   }
 }
 
-// Define emits
-const emit = defineEmits<{
-  (e: 'updateState', styleId: string, state: 'idle' | 'loading' | 'success' | 'error'): void;
-}>();
-
-// Expose the function to the parent component
 defineExpose({
   addStyleToCollection
 });

@@ -214,7 +214,6 @@ async function replaceStyleReferences(text: string): Promise<string> {
          :enabled="${stylePreview.enabled}"
          :current-state="'${currentState}'"
          :is-logged-in="${!!userLogin}"
-         @update-state="(id, state) => { styleStates.set(id, state); styleStates = new Map(styleStates); }"
        />`;
 
       // Replace all occurrences of this style reference
