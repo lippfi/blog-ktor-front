@@ -170,8 +170,6 @@ textarea {
 body {
   margin: 0;
   padding: 0;
-  min-height: 100vh;
-  width: 100%;
 }
 
 .snakes > .post-content {
@@ -210,9 +208,9 @@ body {
   font-size: 14px;
 }
 
-html {
+/*html {
   scrollbar-gutter: stable;
-}
+}*/
 
 .row {
   display: flex;
@@ -222,9 +220,10 @@ html {
 }
 
 .content-wrapper {
-  position: relative;
   width: 100%;
-  height: 100%;
+  height: auto;
+  background: #eeeeee;
+  position: relative;
 }
 
 .centralized-block {
@@ -240,10 +239,9 @@ html {
 }
 
 .right-menu {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100vh;
+  position: fixed;
+  top: 10vh;
+  right: 0;
   z-index: 100;
 }
 </style>

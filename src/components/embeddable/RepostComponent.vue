@@ -57,7 +57,7 @@ function toggleCollapse() {
 }
 
 .repost-header {
-  background-color: #f1f1f1;
+  background-color: #f0f0f0;
   padding: 1%;
   font-size: 0.9em;
   color: #707070;

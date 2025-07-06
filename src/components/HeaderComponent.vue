@@ -39,7 +39,8 @@ const toggleMenu = () => {
   align-items: center;
   top: 0;
   z-index: 100;
-  border-bottom: #dadada 1px solid;
+  position: sticky;
+  background: #ffffff;
 }
 
 .header-content {
