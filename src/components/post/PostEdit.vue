@@ -123,9 +123,15 @@ onMounted(async () => {
   const defaultGroupsResponse = await getDefaultAccessGroups(props.diaryLogin, language);
   if (defaultGroupsResponse.type === 'ok') {
     const defaultGroups: Record<string, string> = defaultGroupsResponse.data;
-    localReadGroup.value = defaultGroups["read"] ?? ''
-    localCommentGroup.value = defaultGroups["comment"] ?? ''
-    localReactionGroup.value = defaultGroups["react"] ?? ''
+    if (localReadGroup.value === '') {
+      localReadGroup.value = defaultGroups["read"] ?? ''
+    }
+    if (localCommentGroup.value === '') {
+      localCommentGroup.value = defaultGroups["comment"] ?? ''
+    }
+    if (localReactionGroup.value === '') {
+      localReactionGroup.value = defaultGroups["react"] ?? ''
+    }
   }
 })
 
@@ -138,10 +144,9 @@ async function fetchAccessGroups() {
 
     // Set default values if not already set
     if (!props.readGroup && accessGroups.value.size > 0) {
-      const firstGroupId = Array.from(accessGroups.value.values())[0]
-      localReadGroup.value = localReadGroup.value || firstGroupId
-      localReactionGroup.value = localReactionGroup.value || firstGroupId
-      localCommentGroup.value = localCommentGroup.value || firstGroupId
+      localReadGroup.value = localReadGroup.value
+      localReactionGroup.value = localReactionGroup.value
+      localCommentGroup.value = localCommentGroup.value
     }
   } else {
     console.error('Failed to fetch access groups:', result.message)
