@@ -1,5 +1,5 @@
 <template>
-  <HeaderComponent @toggleMenu="toggleMenuCollapse"/>
+  <HeaderComponent v-if="signedIn" @toggleMenu="toggleMenuCollapse"/>
   <!-- Apply all styles globally -->
   <link v-for="style in getStyles()" :key="style" rel="stylesheet" :href="style" data-diary-style="true" />
   <div class="content-wrapper">
@@ -170,8 +170,6 @@ textarea {
 body {
   margin: 0;
   padding: 0;
-  min-height: 100vh;
-  width: 100%;
 }
 
 .snakes > .post-content {
