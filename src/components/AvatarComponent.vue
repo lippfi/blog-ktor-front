@@ -11,7 +11,6 @@ const avatars = ref<Record<string, string>>({});
 const originalAvatars = ref<Record<string, string>>({});
 const loading = ref(false);
 const saveLoading = ref(false);
-const uploadLoading = ref(false);
 const draggedAvatarId = ref<string | null>(null);
 const draggedOverAvatarId = ref<string | null>(null);
 const hasChanges = ref(false);
@@ -139,7 +138,6 @@ const handleFileUpload = async (event: Event) => {
   if (!target.files || target.files.length === 0) return;
 
   try {
-    uploadLoading.value = true;
     const files = Array.from(target.files);
     const result = await addAvatars(files);
 
@@ -171,7 +169,6 @@ const handleFileUpload = async (event: Event) => {
     console.error('Failed to upload avatars:', error);
     ElMessage.error(t('errors.failedToUploadAvatars'));
   } finally {
-    uploadLoading.value = false;
     // Reset file input
     if (fileInput.value) {
       fileInput.value.value = '';
@@ -210,16 +207,12 @@ const handleFileUpload = async (event: Event) => {
           <div
             key="add-avatar"
             class="avatar-item add-avatar-item"
-            @click="!uploadLoading && triggerFileUpload"
-            :class="{ 'disabled': uploadLoading }"
+            @click="triggerFileUpload"
           >
-            <el-icon class="add-avatar-icon" v-if="!uploadLoading">
+            <el-icon class="add-avatar-icon">
               <Plus />
             </el-icon>
-            <el-icon class="add-avatar-icon loading-icon" v-else>
-              <i class="el-icon-loading"></i>
-            </el-icon>
-            <div class="add-avatar-text">{{ uploadLoading ? t('avatars.uploading', 'Uploading...') : t('avatars.addAvatar') }}</div>
+            <div class="add-avatar-text">{{ t('avatars.addAvatar') }}</div>
           </div>
         </transition-group>
 
