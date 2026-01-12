@@ -1,7 +1,7 @@
 <template>
   <div :class="'post ' + post.classes" v-if="!isEditing">
     <div class="top">
-      <NicknameComponent :nickname="post.authorNickname" :login="post.authorLogin"/>
+<!--      <NicknameComponent :nickname="post.authorNickname" :login="post.authorLogin"/>-->
       <span class="date"> {{ formattedCreationTime }}</span>
     </div>
     <div class="columns">
@@ -54,6 +54,9 @@
             :tags="post.tags"
             :avatar="post.avatar"
             :diary-login="post.diaryLogin"
+            :read-group="post.readGroupId"
+            :reaction-group="post.reactionGroupId"
+            :comment-group="post.commentGroupId"
             @post-updated="postUpdated"
             @cancelEdit="cancelEditing"
   />
@@ -134,7 +137,7 @@ const formattedCreationTime = computed(() => {
 
 .post > .top {
   display: flex;
-  justify-content: space-between;
+  justify-content: end;
   margin-bottom: 5px;
 
 }
