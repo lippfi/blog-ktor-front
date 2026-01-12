@@ -6,6 +6,7 @@
     </div>
     <div class="columns">
       <UserAvatarComponent
+        class="post-avatar"
         avatar-size="100px"
         :avatar-url="post.avatar"
         :login="post.authorLogin"
@@ -201,6 +202,12 @@ h1.title {
   margin-left: 0 !important;
 }
 
+@media (max-width: 799px) {
+  .post-avatar {
+    display: none;
+  }
+}
+
 @media (min-width: 800px) {
 }
 </style>
@@ -208,6 +215,8 @@ h1.title {
 <style>
 .post-content-img {
   max-width: 100%;
+  border-radius: 5px;
+  margin-top: 2px;
 }
 
 .dark .editing-button {

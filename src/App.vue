@@ -228,7 +228,7 @@ html {
 .centralized-block {
   display: flex;
   flex-direction: column;
-  padding: 1rem 1rem;
+  padding: 1rem 0.5rem;
   max-width: 850px;
   width: 100%;
   box-sizing: border-box;
