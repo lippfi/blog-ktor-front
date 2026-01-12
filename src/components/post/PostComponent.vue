@@ -8,7 +8,7 @@
       <UserAvatarComponent
         avatar-size="100px"
         :avatar-url="post.avatar"
-        :login="post.authorLogin" 
+        :login="post.authorLogin"
         :label="post.authorNickname"
         :nickname="post.authorNickname"
       />
