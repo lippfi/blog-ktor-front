@@ -213,7 +213,7 @@ const cancelReply = () => {
       <CommentComponent v-for="comment in comments" :key="comment.id"
                :comment="comment"
                :post="post"
-               :is-reactable="true"
+               :is-reactable="comment.isReactable"
                :is-selected="selectedCommentId === comment.id"
                @reply="startReply(comment)"
                @select-comment="(commentId) => { selectedCommentId = commentId; scrollToComment(commentId); }"
