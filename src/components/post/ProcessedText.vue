@@ -331,7 +331,7 @@ function replaceSlider(text: string): string {
   const slidePattern = /\n?\[slide\]([\s\S]*?)\[\/slide\]\n?/;
   match = result.match(slidePattern);
   while (match !== null) {
-    result = result.replace(match[0], '<el-carousel-item>' + match[1] + '</el-carousel-item>');
+    result = result.replace(match[0], '<el-carousel-item><div class="slide">' + match[1] + '</div></el-carousel-item>');
     match = result.match(slidePattern);
   }
   return result;
