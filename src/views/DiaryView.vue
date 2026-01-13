@@ -2,11 +2,14 @@
 import PostComponent from "@/components/post/PostComponent.vue";
 import PostEdit from "@/components/post/PostEdit.vue";
 import type {Post as PostModel} from "@/models/posts/post.ts";
-import {computed, onMounted} from 'vue';
+import {computed, onMounted, ref, watch} from 'vue';
 import {isSignedIn} from "@/api/userService.ts";
 import {useRoute} from "vue-router";
 import type {DiaryHeaderInfo} from "@/api/dto/postServiceDto.ts";
 import DiaryMenuComponent from "@/components/DiaryMenuComponent.vue";
+import PostClientImpl from "@/api/postClient/postClient.ts";
+import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
+import {updateStyles} from "@/styles/stylesManager";
 
 const route = useRoute();
 const props = defineProps<{
@@ -15,11 +18,36 @@ const props = defineProps<{
 }>();
 
 const loggedIn: boolean = isSignedIn();
-const posts = computed<PostModel[]>(() => route.meta.posts as PostModel[] || []);
+const posts = ref<PostModel[]>(route.meta.posts as PostModel[] || []);
+const currentPage = ref<number>(route.meta.currentPage as number || 0);
+const totalPages = ref<number>(route.meta.totalPages as number || 0);
+
+const fetchPosts = async () => {
+  const postClient = new PostClientImpl();
+  const pageNumber = parseInt(props.page || '1');
+  const result = await postClient.getDiaryPosts(props.login, pageNumber);
+  if (result.type === 'ok') {
+    const diaryPage = result.data;
+    posts.value = diaryPage.posts.content.map(mapPostDtoToPost);
+    currentPage.value = diaryPage.posts.currentPage;
+    totalPages.value = diaryPage.posts.totalPages;
+    updateStyles(diaryPage.diary.styles);
+    if (diaryPage.diary) {
+      document.title = diaryPage.diary.name;
+    }
+  }
+};
 
 onMounted(() => {
-  document.title = (route.meta.diaryHeaderInfo as DiaryHeaderInfo).name
+  if (route.meta.diaryHeaderInfo) {
+    document.title = (route.meta.diaryHeaderInfo as DiaryHeaderInfo).name
+  }
+  if (posts.value.length === 0) {
+    fetchPosts();
+  }
 })
+
+watch(() => [props.login, props.page], fetchPosts);
 
 </script>
 
@@ -31,6 +59,12 @@ onMounted(() => {
       :post="post"
       :show-comments-count="true"
   />
+
+  <div class="pagination">
+    <router-link v-if="currentPage > 1" :to="`/${props.login}/diary/${currentPage - 1}`">&lt; previous</router-link>
+    <router-link v-if="currentPage < totalPages" :to="`/${props.login}/diary/${currentPage + 1}`">next &gt;</router-link>
+  </div>
+
   <PostEdit
       v-if="loggedIn"
       :type="'post'"
@@ -39,4 +73,17 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 20px 0;
+}
+.pagination a {
+  text-decoration: none;
+  color: inherit;
+}
+.pagination a:hover {
+  text-decoration: underline;
+}
 </style>

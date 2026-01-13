@@ -241,7 +241,7 @@ const router = createRouter({
           return;
         }
 
-        const searchResult = await postClient.getDiaryPosts(to.params.login as string, page - 1);
+        const searchResult = await postClient.getDiaryPosts(to.params.login as string, page);
 
         if (searchResult.type === 'ok') {
           const diaryPage = searchResult.data;
@@ -250,6 +250,8 @@ const router = createRouter({
             subtitle: diaryPage.diary.subtitle,
           }
           to.meta.posts = diaryPage.posts.content.map(mapPostDtoToPost);
+          to.meta.currentPage = diaryPage.posts.currentPage;
+          to.meta.totalPages = diaryPage.posts.totalPages;
           to.meta.styles = diaryPage.diary.styles;
 
           // Update global styles
