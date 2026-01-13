@@ -22,7 +22,7 @@ import HeaderComponent from "@/components/HeaderComponent.vue";
 const router = useRouter()
 const signedIn = ref(isSignedIn())
 const isLoaded = ref(false)
-const menuCollapsed = ref(false)
+const menuCollapsed = ref(true)
 const reactionsStore = useReactionsStore()
 
 const toggleMenuCollapse = () => {

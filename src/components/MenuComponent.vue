@@ -17,7 +17,7 @@ import { defineProps } from 'vue';
 const props = defineProps({
   collapsed: {
     type: Boolean,
-    default: false
+    default: true
   }
 });
 
@@ -37,8 +37,9 @@ function signOut() {
 
 <template>
   <el-menu
-    class="el-menu-vertical"
-    :collapse="props.collapsed"
+      v-if="!collapsed"
+      class="el-menu-vertical"
+      :collapse="false"
   >
     <el-menu-item index="1" @click="navigateTo('/')">
       <el-icon><HomeFilled /></el-icon>
