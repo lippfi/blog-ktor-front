@@ -23,9 +23,6 @@ import 'vue3-audio-player/dist/style.css'
 .audio__player-play-icon {
   position: unset !important;
 }
-.centralized-block {
-  margin-right: 100px;
-}
 </style>
 <style scoped>
 .menu-block {
