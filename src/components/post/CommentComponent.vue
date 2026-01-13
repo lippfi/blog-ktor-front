@@ -30,7 +30,7 @@ const emit = defineEmits<{
 }>();
 
 const formattedCreationTime = computed(() => {
-  return getDateTimeString(props.comment.creationTime);
+  return getDateTimeString(props.comment.creationTime.toISOString());
 });
 
 let isEditing = ref(false);

@@ -9,8 +9,8 @@ import type {
 } from "@/api/dto/postServiceDto.ts";
 import {authenticatedRequest} from "@/api/userService.ts";
 
-export type Result<T> =
-    | { type: 'ok'; data: T }
+export type Result<T = void> =
+    | (T extends void ? { type: 'ok'; data?: T } : { type: 'ok'; data: T })
     | { type: 'error'; message: string };
 
 export interface IPostClient {
@@ -23,7 +23,7 @@ export interface IPostClient {
     getPostForEditing(id: string): Promise<Result<PostEditDto>>;
     updatePost(post: PostEditDto): Promise<Result<PostViewDto>>;
     deletePost(postId: string): Promise<Result<string>>;
-    addPost(post: PostViewDto): Promise<Result<PostViewDto>>
+    addPost(post: PostCreateDto): Promise<Result<PostViewDto>>
     getComment(commentId: string): Promise<Result<CommentDto>>;
     addComment(comment: CommentCreateRequest): Promise<Result<CommentDto>>;
     updateComment(comment: CommentUpdateRequest): Promise<Result<CommentDto>>;

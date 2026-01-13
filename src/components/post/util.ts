@@ -1,4 +1,4 @@
-export function getDateTimeString(localDateTime: String) {
+export function getDateTimeString(localDateTime: string) {
     const creationDate = new Date(localDateTime);
     const now = new Date();
     const diffHours = (now.getTime() - creationDate.getTime()) / (1000 * 60 * 60);
@@ -20,6 +20,6 @@ export function safeBase64Encode(str: string): string {
 
 export function safeBase64Decode(base64: string): string {
     const binString = atob(base64);
-    const bytes = Uint8Array.from(binString, (char) => char.codePointAt(0));
+    const bytes = Uint8Array.from(binString, (char) => char.codePointAt(0)!);
     return new TextDecoder().decode(bytes);
 }

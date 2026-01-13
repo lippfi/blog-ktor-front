@@ -5,7 +5,7 @@ import type {
     CommentUpdateRequest,
     PostViewDto,
     PostEditDto, PostSearchResult,
-    SearchPostsParamsDto
+    SearchPostsParamsDto, DiaryPageDto, PostPageDto, PostCreateDto
 } from "@/api/dto/postServiceDto.ts";
 import type {IPostClient} from "@/api/postClient/postClient.ts";
 import type {Comment, Post, Reaction} from "@/models/posts/post.ts";
@@ -13,8 +13,8 @@ import {mapPostToViewDto} from "@/api/dto/mapper.ts";
 import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
 
 
-type Result<T> =
-    | { type: 'ok'; data: T }
+type Result<T = void> =
+    | (T extends void ? { type: 'ok'; data?: T } : { type: 'ok'; data: T })
     | { type: 'error'; message: string };
 
 class PostClientMock implements IPostClient {
@@ -33,20 +33,24 @@ class PostClientMock implements IPostClient {
         avatar: 'https://i.pinimg.com/550x/56/90/72/569072435a51a4c2690e08a3026de5a0.jpg',
         authorLogin: 'john_doe',
         authorNickname: 'John Doe',
+        diaryLogin: 'shimpansky',
+        postUri: 'test-post',
         text: 'This is a test comment',
-        creationTime: new Date('17:35 12.20.24'),
+        creationTime: new Date('2024-12-20T17:35:00'),
         isReactable: true,
         reactions: [this.stubReaction],
         reactionGroupId: 'comment-reactions-1'
     }
 
     stubComment2: Comment = {
-        id: '1',
+        id: '2',
         avatar: 'https://i.pinimg.com/550x/56/90/72/569072435a51a4c2690e08a3026de5a0.jpg',
         authorLogin: 'shimpansky',
         authorNickname: 'Ванючка боб',
+        diaryLogin: 'shimpansky',
+        postUri: 'test-post',
         text: 'Я ебал бабра',
-        creationTime: new Date('17:35 12.20.24'),
+        creationTime: new Date('2024-12-20T17:35:00'),
         isReactable: true,
         reactions: [this.stubReaction],
         reactionGroupId: 'comment-reactions-1'
@@ -58,6 +62,7 @@ class PostClientMock implements IPostClient {
         avatar: 'https://i.pinimg.com/550x/56/90/72/569072435a51a4c2690e08a3026de5a0.jpg',
         authorLogin: 'shimpansky',
         authorNickname: 'детектив шимпански',
+        diaryLogin: 'shimpansky',
         title: '7942',
         text: "I'm a little late, but here are the month's totals:heart::heart::smol-serious::\nI finally :heart: made an appointment :heart: with my ENT and had nose surgery in the middle of the month. I haven't fully recovered yet, but I have this feeling that breathing is... cool?\nI've tried hiking, but it was too hard for me. I became exhausted after gaining only 300m of elevation. I'll definitely go again, but I'll practice with easier hikes first.\nThe scenery was very beautiful. Here are some photos:\n[slider]\n[slide][image link=\"https://lipp.fi/static/images/62944b84-4126-4b48-9014-fac7471dc875.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/2306c07a-d67c-4144-8562-a7ca85a0976e.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/42be085e-5389-4b2c-99a4-242ef211b700.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/7732076f-74ab-4327-9991-3ebcc78f817f.jpg\" description=\"\"][/slide]\n[/slider]\n\n[expandable name=\"Read more..\"]\nThis month's recipe is baked artichokes. Although I failed to capture a sexy photo, the artichokes were delicious and definitely deserve a spot here.[slider]\n [slide][image link=\"https://lipp.fi/static/images/a88f8f43-971b-4297-8111-f4537bcba27b.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/b90484ee-5f29-40cc-a6e9-71f63ac98615.jpg\" description=\"\"][/slide]\n[/slider][/expandable]",
         // text: 'testtastn oariet narisoetnrsoietnrois entorie ntrosien tarosietn aroiten roisetn ras',
@@ -83,6 +88,7 @@ class PostClientMock implements IPostClient {
         avatar: 'https://i.pinimg.com/736x/95/e3/c6/95e3c6d76a09ddda2d524771394110ba.jpg',
         authorLogin: 'monkey1',
         authorNickname: 'впечатляющая обезьяна',
+        diaryLogin: 'monkey1',
         title: '2283',
         text: "Ахуеть какой пиздец, я сегодня видел обезьяну, которая сосала хуй",
         creationTime: subtractDays(new Date(), 5),
@@ -106,6 +112,7 @@ class PostClientMock implements IPostClient {
         avatar: 'https://sun1-30.userapi.com/impg/qAXkOlaHp_QsdlMRSnyPIjuxWGr6YwzJ1A6aDA/VG5LE2i0fuY.jpg?size=604x409&quality=96&sign=bf57c38d7f93884e1f832efd9da7d6eb&type=album',
         authorLogin: 'makaka2',
         authorNickname: 'Абалдуй',
+        diaryLogin: 'makaka2',
         title: 'пизда',
         text: "да",
         creationTime: subtractDays(new Date(), 3),
@@ -126,47 +133,48 @@ class PostClientMock implements IPostClient {
     stubPosts: Post[] = [ this.stubPost ]
 
 
-    public async getDiaryPosts(diary: string, page: number): Promise<Result<PostSearchResult>> {
+    public async getDiaryPosts(diary: string, page: number): Promise<Result<DiaryPageDto>> {
         try {
             const postRes: PostViewDto[] = this.stubPosts.map((c) => mapPostToViewDto(c))
             const searchResult: PostSearchResult = {
-                result: postRes,
-                totalPageCount: 10
-            } as PostSearchResult;
+                content: postRes,
+                currentPage: page,
+                totalPages: 10
+            };
 
-            return { type: 'ok', data: searchResult};
+            const diaryPage: DiaryPageDto = {
+                diary: {
+                    name: diary,
+                    subtitle: 'Mock Diary',
+                    styles: [],
+                    defaultGroups: {}
+                },
+                posts: searchResult
+            };
+
+            return { type: 'ok', data: diaryPage};
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
         }
     }
 
-    public async getDiaryPreface(diary: string): Promise<Result<PostViewDto>> {
-        try {
-            const response = await fetch(`${backendURL}/posts/preface?diary=${encodeURIComponent(diary)}`);
-            if (response.ok) {
-                const data = await response.json();
-                return { type: 'ok', data };
-            } else {
-                const message = await response.text();
-                return { type: 'error', message };
-            }
-        } catch (error) {
-            return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
-        }
+    public async searchDiaryPosts(params: SearchPostsParamsDto): Promise<Result<DiaryPageDto>> {
+        return this.getDiaryPosts(params.diary || 'mock', params.page || 0);
     }
 
-    public async getPost(login: string, uri: string): Promise<Result<PostViewDto>> {
+    public async getPost(login: string, uri: string): Promise<Result<PostPageDto>> {
         try {
-            const response = await fetch(
-                `${backendURL}/posts?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}`
-            );
-            if (response.ok) {
-                const data = await response.json();
-                return { type: 'ok', data };
-            } else {
-                const message = await response.text();
-                return { type: 'error', message };
-            }
+            const postView = mapPostToViewDto(this.stubPost);
+            const postPage: PostPageDto = {
+                diary: {
+                    name: login,
+                    subtitle: 'Mock Diary',
+                    styles: [],
+                    defaultGroups: {}
+                },
+                post: postView
+            };
+            return { type: 'ok', data: postPage };
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
         }
@@ -197,19 +205,24 @@ class PostClientMock implements IPostClient {
         }
     }
 
-    public async getLatestPosts(offset = 0): Promise<Result<PostSearchResult>> {
+    public async getLatestPosts(page = 0): Promise<Result<PostSearchResult>> {
         try {
             const latestPosts = [this.stubPost, this.stubPost2, this.stubPost3];
             const postRes: PostViewDto[] = latestPosts.map((c) => mapPostToViewDto(c))
             const searchResult: PostSearchResult = {
-                result: postRes,
-                totalPageCount: 10
-            } as PostSearchResult;
+                content: postRes,
+                currentPage: page,
+                totalPages: 10
+            };
 
             return { type: 'ok', data: searchResult};
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
         }
+    }
+
+    public connectToCommentsWebSocket(postId: string): WebSocket {
+        return new WebSocket(`ws://localhost/ws/comments/${postId}`);
     }
 
     public async getDiscussedPosts(page = 0, size = 10): Promise<Result<PostSearchResult>> {
@@ -275,11 +288,14 @@ class PostClientMock implements IPostClient {
                     const newComment : Comment = {
                         id: id,
                         text: comment.text,
-                        avatar: comment.avatar,
+                        avatar: comment.avatar || "",
+                        diaryLogin: "shimpansky",
+                        postUri: "test-post",
                         isReactable: true,
                         authorLogin: "pidarok",
                         authorNickname: "gomogey",
-                        creationTime: new Date()
+                        creationTime: new Date(),
+                        reactions: []
                     }
                     x.comments.push( newComment )
                 }
@@ -314,10 +330,37 @@ class PostClientMock implements IPostClient {
         }
     }
 
-    public async addPost(post: PostViewDto): Promise<Result<PostViewDto>> {
+    public async getComment(commentId: string): Promise<Result<CommentDto>> {
+        return { type: 'ok', data: ({} as any) as CommentDto };
+    }
+
+    public async addPost(post: PostCreateDto): Promise<Result<PostViewDto>> {
         try {
-            this.stubPosts.push(mapPostDtoToPost(post))
-            return { type: 'ok', data: post };
+            const postView: PostViewDto = {
+                id: 'new-id',
+                uri: post.uri || 'new-post',
+                avatar: post.avatar || '',
+                authorLogin: 'current-user',
+                authorNickname: 'Current User',
+                diaryLogin: 'current-user',
+                title: post.title || '',
+                text: post.text || '',
+                creationTime: new Date().toISOString(),
+                isPreface: post.isPreface || false,
+                isEncrypted: post.isEncrypted || false,
+                classes: post.classes || '',
+                tags: post.tags || [],
+                isReactable: true,
+                reactions: [],
+                isCommentable: true,
+                comments: [],
+                readGroupId: post.readGroupId,
+                commentGroupId: post.commentGroupId,
+                reactionGroupId: post.reactionGroupId,
+                commentReactionGroupId: post.commentReactionGroupId
+            };
+            this.stubPosts.push(mapPostDtoToPost(postView))
+            return { type: 'ok', data: postView };
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
         }

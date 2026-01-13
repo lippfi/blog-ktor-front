@@ -142,7 +142,7 @@ const rules = computed<FormRules>(() => ({
 const timezones = ref<string[]>([]);
 
 onMounted(() => {
-  timezones.value = Intl.supportedValuesOf('timeZone');
+  timezones.value = (Intl as any).supportedValuesOf('timeZone');
   additionalInfoForm.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 });
 

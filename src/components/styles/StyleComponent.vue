@@ -120,7 +120,7 @@ const handleStyleSaved = async (updatedStyle: DiaryStyle) => {
         </div>
         <ProcessedText :text="props.style.description || ''" :avatars="reactionsStore.avatars"/>
         <div class="footer">
-          <el-input v-if="showShare" v-model="shareCode" size="small" class="share-input"/>
+          <el-input v-if="showShare" :model-value="shareCode" readonly size="small" class="share-input"/>
           <el-icon size="20" @click="showShare = !showShare">
             <Link/>
           </el-icon>

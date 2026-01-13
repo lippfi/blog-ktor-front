@@ -1,4 +1,4 @@
-export function getDateTimeString(localDateTime: String) {
+export function getDateTimeString(localDateTime: string) {
     const creationDate = new Date(localDateTime);
     const now = new Date();
     const diffHours = (now.getTime() - creationDate.getTime()) / (1000 * 60 * 60);

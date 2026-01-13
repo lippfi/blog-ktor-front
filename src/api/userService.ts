@@ -145,7 +145,7 @@ interface FriendRequestData {
 }
 
 type Result<T = void> =
-    | { type: 'ok'; data: T }
+    | (T extends void ? { type: 'ok'; data?: T } : { type: 'ok'; data: T })
     | { type: 'error'; message: string };
 
 type LoginResult = Result;
@@ -259,7 +259,13 @@ export async function confirmEmail(
     return result;
 }
 
-export async function getProfile(login: string): Promise<UserBase> {}
+export async function getProfile(login: string): Promise<UserBase> {
+    const response = await authenticatedRequest(`/user/profile?login=${encodeURIComponent(login)}`);
+    if (!response.ok) {
+        throw new Error(await response.text());
+    }
+    return await response.json();
+}
 
 export async function isLoginBusy(login: string): Promise<boolean> {
     const response = await fetch(`${backendURL}/user/is-login-busy?login=${encodeURIComponent(login)}`);

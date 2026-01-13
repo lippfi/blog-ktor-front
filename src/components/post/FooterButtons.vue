@@ -16,7 +16,7 @@ const { t } = useI18n()
 
 const router = useRouter();
 
-const emit = defineEmits(['startEdit', 'reply']);
+const emit = defineEmits(['startEdit', 'reply', 'show-comments']);
 
 const postClient = new PostClientImpl()
 
@@ -70,15 +70,11 @@ async function deletePost() {
         router.go(0)
       }
     } else {
-      ElMessageBox.alert(result.message, 'Error', {
-        width: '200px'
-      });
+      ElMessageBox.alert(result.message, 'Error');
     }
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessageBox.alert('Failed to delete post', 'Error', {
-        width: '200px'
-      });
+      ElMessageBox.alert('Failed to delete post', 'Error');
     }
   }
 }

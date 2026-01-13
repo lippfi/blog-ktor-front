@@ -11,10 +11,12 @@ export interface Reaction {
 }
 
 export interface Comment {
-    id?: string;
+    id: string;
     avatar: string;
     authorLogin: string;
     authorNickname: string;
+    diaryLogin: string;
+    postUri: string;
     text: string;
     creationTime: Date;
     isReactable: boolean;

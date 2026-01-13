@@ -7,6 +7,8 @@ export const mapCommentDtoToComment = (dto: CommentDto): Comment => ({
     avatar: dto.avatar,
     authorLogin: dto.authorLogin,
     authorNickname: dto.authorNickname,
+    diaryLogin: dto.diaryLogin,
+    postUri: dto.postUri,
     text: dto.text,
     creationTime: new Date(dto.creationTime), // Преобразуем строку в Date
     isReactable: dto.isReactable,

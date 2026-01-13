@@ -124,7 +124,7 @@ const handleMenuClick = async (command: string) => {
       :width="200"
       trigger="click"
       popper-class="avatar-popover"
-      offset="10"
+      :offset="10"
     >
       <template #reference>
         <img :src="avatarUrl" alt="avatar" class="avatar-image">

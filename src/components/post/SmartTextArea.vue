@@ -55,7 +55,7 @@ watchEffect(async () => {
   if (query.length > 0) {
     try {
       const result = await searchUsers(query);
-      if (result.type === 'ok' && result.data) {
+      if (result.type === 'ok') {
         searchedUsers.value = result.data;
       } else {
         console.error('Failed to search users:', result.message);
@@ -210,7 +210,7 @@ const getUserAvatar = async (text: string): Promise<string> => {
     if (!user) {
       try {
         const result = await searchUsers(text);
-        if (result.type === 'ok' && result.data) {
+        if (result.type === 'ok') {
           searchedUsers.value = result.data;
           user = result.data.find(item => item.login === text);
         }
@@ -739,7 +739,7 @@ const handleMentionSearch = async (query: string, prefix: MentionPrefix) => {
   if (prefix === '@') {
     try {
       const result = await searchUsers(query);
-      if (result.type === 'ok' && result.data) {
+      if (result.type === 'ok') {
         searchedUsers.value = result.data;
         options.value = result.data.map((user): MentionOption => ({
           value: user.login,

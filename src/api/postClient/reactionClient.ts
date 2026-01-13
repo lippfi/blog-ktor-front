@@ -2,14 +2,9 @@ import type {ReactionPackDto, ReactionViewDto} from "@/api/dto/reactionServiceDt
 import {backendURL} from "@/main.ts";
 import type {RecentReactionResponse} from "@/api/reactionService.ts";
 import type {Result} from "@/api/postClient/postClient.ts";
-import * as url from "node:url";
-
-type Result<T> =
-    | { type: 'ok'; data: T }
-    | { type: 'error'; message: string };
 
 export interface IReactionClient {
-    search(text: String): Promise<Result<ReactionViewDto[]>>
+    search(text: string): Promise<Result<ReactionViewDto[]>>
 
     addPostReaction(login: string, uri: string, reactionName: string): Promise<void>
     removePostReaction(login: string, uri: string, reactionName: string): Promise<void>
