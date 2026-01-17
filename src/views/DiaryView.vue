@@ -60,7 +60,7 @@ watch(() => [props.login, props.page], fetchPosts);
       :show-comments-count="true"
   />
 
-  <div class="pagination">
+  <div v-if="totalPages > 1" class="pagination">
     <router-link v-if="currentPage > 1" :to="`/${props.login}/diary/${currentPage - 1}`">&lt; previous</router-link>
     <router-link v-if="currentPage < totalPages" :to="`/${props.login}/diary/${currentPage + 1}`">next &gt;</router-link>
   </div>
