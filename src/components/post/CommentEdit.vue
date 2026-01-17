@@ -308,6 +308,10 @@ async function updateComment() {
   .form {
     flex-direction: column;
   }
+
+  .chooser-container {
+    height: unset;
+  }
 }
 .right {
   display: flex;
