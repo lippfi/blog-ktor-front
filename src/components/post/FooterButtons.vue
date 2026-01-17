@@ -181,6 +181,7 @@ const props = defineProps<{
 .hidden-buttons {
   display: flex;
   gap: 12px;
+  height: 25px;
 }
 
 .comments-count {
@@ -211,9 +212,6 @@ const props = defineProps<{
   color: #606060;
 }
 
-.comments-count {
-  margin-top: -4px;
-}
 .more, .more-filled {
   margin-top: -2px;
 }
