@@ -27,7 +27,7 @@
             </template>
           </div>
         </div>
-        <el-divider/>
+        <el-divider v-if="getCurrentUserLogin() || post.comments.length > 0"/>
         <div class="icon-buttons">
           <div class="left-buttons">
             <Reactions
@@ -76,6 +76,7 @@ import type {Result} from "@/api/postClient/postClient.ts";
 import type {PostViewDto} from "@/api/dto/postServiceDto.ts";
 import {mapDtoToReaction} from "@/api/dto/mapper.ts";
 import { useReactionsStore } from "@/stores/reactionsStore";
+import {getCurrentUserLogin} from "@/api/userService.ts";
 
 const reactionsStore = useReactionsStore();
 let isEditing = ref(false);
