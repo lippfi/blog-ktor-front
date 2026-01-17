@@ -205,10 +205,6 @@ const cancelReply = () => {
         :show-editing-buttons="false"
         :show-comments-count="false"
     />
-    <CommentEdit v-if="post.isCommentable && !parentCommentId"
-                 :post-id="post.id"
-                 :is-edit="false"
-    />
     <div class="comments_block">
       <CommentComponent v-for="comment in comments" :key="comment.id"
                :comment="comment"
@@ -219,7 +215,11 @@ const cancelReply = () => {
                @select-comment="(commentId) => { selectedCommentId = commentId; scrollToComment(commentId); }"
       />
     </div>
-    <CommentEdit v-if="post.isCommentable && parentCommentId" 
+    <CommentEdit v-if="post.isCommentable && !parentCommentId"
+                 :post-id="post.id"
+                 :is-edit="false"
+    />
+    <CommentEdit v-if="post.isCommentable && parentCommentId"
                  :post-id="post.id"
                  :parent-comment-id="parentCommentId"
                  :replying-to-comment="replyingToComment"
@@ -232,6 +232,9 @@ const cancelReply = () => {
 </style>
 
 <style scoped>
+.centralized-block {
+  gap: 20px;
+}
 
 .comments_block {
   width: 100%;
