@@ -54,9 +54,6 @@ const messages = [
 </template>
 
 <style>
-.centralized-block {
-  gap: 16px;
-}
 </style>
 
 <style scoped>

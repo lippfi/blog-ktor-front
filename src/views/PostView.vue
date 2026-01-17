@@ -229,9 +229,6 @@ const cancelReply = () => {
 </template>
 
 <style>
-.centralized-block {
-  gap: 25px;
-}
 </style>
 
 <style scoped>

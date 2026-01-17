@@ -260,9 +260,6 @@ const handleEditingChanged = (styleId: string, isEditing: boolean) => {
 </template>
 
 <style>
-.centralized-block {
-  gap: 20px;
-}
 </style>
 
 <style scoped>

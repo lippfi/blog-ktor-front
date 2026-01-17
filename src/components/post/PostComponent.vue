@@ -27,7 +27,7 @@
             </template>
           </div>
         </div>
-        <el-divider v-if="post.isReactable || post.reactions.length > 0 || getCurrentUserLogin()"/>
+        <el-divider/>
         <div class="icon-buttons">
           <div class="left-buttons">
             <Reactions
