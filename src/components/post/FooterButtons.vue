@@ -133,7 +133,7 @@ const props = defineProps<{
       <el-icon v-if="showHiddenButtons && (post.authorLogin !== getCurrentUserLogin() || (comment && comment.authorLogin !== getCurrentUserLogin()))" size="20" class="warning">
         <Warning/>
       </el-icon>
-        <router-link :to="{name: 'post', params: {'login': post.diaryLogin, 'postUri': post.uri}}">
+        <router-link :to="{name: 'post', params: {'login': post.diaryLogin, 'postUri': post.uri}}" style="text-decoration: none;">
           <div v-if="showCommentsCount && !comment" class="comments-count" @click="$emit('show-comments')">
             <el-icon size="20"><ChatLineRound/></el-icon>
             <span class="count">{{post.comments.length}}</span>
