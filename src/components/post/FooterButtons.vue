@@ -99,9 +99,9 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div v-if="getCurrentUserLogin()" class="right-buttons">
+  <div class="right-buttons">
     <div class="hidden-buttons">
-      <el-icon v-if="showHiddenButtons" size="20" class="repost" @click="handleRepost">
+      <el-icon v-if="showHiddenButtons && getCurrentUserLogin()" size="20" class="repost" @click="handleRepost">
         <svg width="20" height="20" viewBox="2 8.5 20 7" xmlns="http://www.w3.org/2000/svg" class="icon line">
           <g transform="rotate(90 12 12)">
             <polyline points="8 12 6 14 4 12" style="fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.2;"/>
@@ -130,24 +130,24 @@ const props = defineProps<{
           </template>
         </el-popconfirm>
       </div>
-      <el-icon v-if="showHiddenButtons && (post.authorLogin !== getCurrentUserLogin() || (comment && comment.authorLogin !== getCurrentUserLogin()))" size="20" class="warning">
+      <el-icon v-if="showHiddenButtons && (post.authorLogin !== getCurrentUserLogin() || (comment && comment.authorLogin !== getCurrentUserLogin())) && getCurrentUserLogin()" size="20" class="warning">
         <Warning/>
       </el-icon>
-        <router-link :to="{name: 'post', params: {'login': post.diaryLogin, 'postUri': post.uri}}" style="text-decoration: none;">
-          <div v-if="showCommentsCount && !comment" class="comments-count" @click="$emit('show-comments')">
+        <router-link v-if="showCommentsCount && !comment" :to="{name: 'post', params: {'login': post.diaryLogin, 'postUri': post.uri}}" style="text-decoration: none;">
+          <div class="comments-count" @click="$emit('show-comments')">
             <el-icon size="20"><ChatLineRound/></el-icon>
             <span class="count">{{post.comments.length}}</span>
           </div>
         </router-link>
     </div>
-    <div v-if="comment" class="reply-button" @click="reply">
+    <div v-if="comment && getCurrentUserLogin()" class="reply-button" @click="reply">
       <span class="reply-text">{{ t('comment.view.footer.buttons.reply.text') }}</span>
       <el-icon size="20">
         <BottomLeft />
       </el-icon>
     </div>
-    <el-icon v-if="!showHiddenButtons" size="20" @click="toggleHiddenButtons(true)" class="more"><More/></el-icon>
-    <el-icon v-if="showHiddenButtons" size="20" @click="toggleHiddenButtons(false)" class="more-filled"><MoreFilled/></el-icon>
+    <el-icon v-if="!showHiddenButtons && getCurrentUserLogin()" size="20" @click="toggleHiddenButtons(true)" class="more"><More/></el-icon>
+    <el-icon v-if="showHiddenButtons && getCurrentUserLogin()" size="20" @click="toggleHiddenButtons(false)" class="more-filled"><MoreFilled/></el-icon>
   </div>
 </template>
 
