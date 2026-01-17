@@ -243,6 +243,7 @@ function preprocessPostTitle(title: string): string {
 @media (max-width: 1023px) {
   .form {
     flex-direction: column;
+    gap: 5px;
   }
 }
 .fields {
