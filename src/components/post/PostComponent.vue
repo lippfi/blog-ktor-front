@@ -2,17 +2,18 @@
   <div :class="'post ' + post.classes" v-if="!isEditing">
     <div class="top">
 <!--      <NicknameComponent :nickname="post.authorNickname" :login="post.authorLogin"/>-->
-      <span class="date"> {{ formattedCreationTime }}</span>
+      <span v-if="!post.isPreface" class="date"> {{ formattedCreationTime }}</span>
     </div>
     <div class="columns">
-      <UserAvatarComponent
-        class="post-avatar"
-        avatar-size="100px"
-        :avatar-url="post.avatar"
-        :login="post.authorLogin"
-        :label="post.authorNickname"
-        :nickname="post.authorNickname"
-      />
+  <!--      <UserAvatarComponent-->
+  <!--        class="post-avatar"-->
+  <!--        avatar-size="100px"-->
+  <!--        :avatar-url="post.avatar"-->
+  <!--        :login="post.authorLogin"-->
+  <!--        :label="post.authorNickname"-->
+  <!--        :nickname="post.authorNickname"-->
+  <!--      />-->
+      <div style="width: 100px; height: 100px;"></div>
       <div class="post-content">
         <router-link :to="{name: 'post', params: {'login': post.diaryLogin, 'postUri': post.uri}}">
           <h1 class="title"> {{ post.title }} </h1>
@@ -67,14 +68,11 @@
 import {computed} from 'vue'
 import type { Post } from "@/models/posts/post.ts";
 import Reactions from "@/components/post/reaction/Reactions.vue";
-import {getCurrentUserLogin} from "@/api/userService.ts";
 import { ref } from 'vue';
 import {getDateTimeString} from "@/components/post/util.ts";
-import UserAvatarComponent from "@/components/post/UserAvatarComponent.vue";
 import FooterButtons from "@/components/post/FooterButtons.vue";
 import ProcessedText from "@/components/post/ProcessedText.vue";
 import PostEdit from "@/components/post/PostEdit.vue";
-import NicknameComponent from "@/components/NicknameComponent.vue";
 import type {Result} from "@/api/postClient/postClient.ts";
 import type {PostViewDto} from "@/api/dto/postServiceDto.ts";
 import {mapDtoToReaction} from "@/api/dto/mapper.ts";
