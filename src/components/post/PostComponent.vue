@@ -13,7 +13,6 @@
   <!--        :label="post.authorNickname"-->
   <!--        :nickname="post.authorNickname"-->
   <!--      />-->
-      <div style="width: 100px; height: 100px;"></div>
       <div class="post-content">
         <router-link :to="{name: 'post', params: {'login': post.diaryLogin, 'postUri': post.uri}}">
           <h1 class="title"> {{ post.title }} </h1>
