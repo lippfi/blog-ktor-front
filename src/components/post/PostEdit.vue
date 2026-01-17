@@ -5,7 +5,7 @@
     <h3 v-if="type === 'repost'">{{ $t('post.form.title.repost') }}</h3>
 
     <div class="form">
-      <AvatarChooser :avatar-size="100" :outline-size="3" :show-buttons="true" :is-vertical="true" v-model:selected-avatar="localAvatar" :avatars="reactionsStore.avatars"/>
+      <AvatarChooser :avatar-size="100" :outline-size="3" :show-buttons="true" :is-vertical="isAvatarVertical" v-model:selected-avatar="localAvatar" :avatars="reactionsStore.avatars"/>
       <div class="fields">
         <div class="title-row">
           <span>{{ $t('post.form.fields.title.label') }}</span>
@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, onUnmounted} from 'vue'
 import {useI18n} from "vue-i18n";
 import SmartTextArea from "@/components/post/SmartTextArea.vue";
 import AvatarChooser from "@/components/post/AvatarChooser.vue";
@@ -117,7 +117,15 @@ const localReadGroup = ref<string>(props.readGroup || '');
 const client = new PostClientImpl()
 const accessGroups = ref<Map<string, string>>(new Map())
 
+const isAvatarVertical = ref(window.matchMedia('(min-width: 1024px)').matches);
+const mediaQuery = window.matchMedia('(min-width: 1024px)');
+
+const updateScreenSize = (e: MediaQueryListEvent) => {
+  isAvatarVertical.value = e.matches;
+};
+
 onMounted(async () => {
+  mediaQuery.addEventListener('change', updateScreenSize);
   await fetchAccessGroups()
   const language = (await getCurrentSessionInfo()).language
   const defaultGroupsResponse = await getDefaultAccessGroups(props.diaryLogin, language);
@@ -133,6 +141,10 @@ onMounted(async () => {
       localReactionGroup.value = defaultGroups["react"] ?? ''
     }
   }
+})
+
+onUnmounted(() => {
+  mediaQuery.removeEventListener('change', updateScreenSize);
 })
 
 async function fetchAccessGroups() {
@@ -227,6 +239,11 @@ function preprocessPostTitle(title: string): string {
   gap: 10px;
   width: 100%;
   min-width: 0;  /* Prevent flex items from overflowing */
+}
+@media (max-width: 1023px) {
+  .form {
+    flex-direction: column;
+  }
 }
 .fields {
   display: flex;

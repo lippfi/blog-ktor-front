@@ -111,14 +111,23 @@ const delayedTextSelectionHandler = () => {
   setTimeout(handleTextSelection, 10);
 };
 
+const isAvatarVertical = ref(window.matchMedia('(min-width: 1024px)').matches);
+const mediaQuery = window.matchMedia('(min-width: 1024px)');
+
+const updateScreenSize = (e: MediaQueryListEvent) => {
+  isAvatarVertical.value = e.matches;
+};
+
 // Add click handler to document to hide popup when clicking outside
 onMounted(() => {
   document.addEventListener('mousedown', documentClickHandler);
+  mediaQuery.addEventListener('change', updateScreenSize);
 });
 
 onUnmounted(() => {
   // Remove document mousedown event listener
   document.removeEventListener('mousedown', documentClickHandler);
+  mediaQuery.removeEventListener('change', updateScreenSize);
 
   // The mouseup event listener will be removed by the watch effect
 });
@@ -232,7 +241,7 @@ async function updateComment() {
       <el-button size="small" @click="quoteSelectedText">{{ $t('comment.form.button.quote') }}</el-button>
     </div>
     <div class="form">
-      <AvatarChooser :avatar-size="80" :outline-size="3" :show-buttons="true" :is-vertical="true" v-model:selected-avatar="localAvatar"/>
+      <AvatarChooser :avatar-size="80" :outline-size="3" :show-buttons="true" :is-vertical="isAvatarVertical" v-model:selected-avatar="localAvatar"/>
       <div class="right">
         <SmartTextArea v-model:content="localContent" :basic-reactions="reactionsStore.basicReactions" :recent-reactions="reactionsStore.recentReactions" @reaction-added="reactionsStore.addReaction"/>
         <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
@@ -294,6 +303,11 @@ async function updateComment() {
   gap: 10px;
   width: 100%;
   min-width: 0;  /* Prevent flex items from overflowing */
+}
+@media (max-width: 1023px) {
+  .form {
+    flex-direction: column;
+  }
 }
 .right {
   display: flex;
