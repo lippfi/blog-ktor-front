@@ -222,7 +222,17 @@ class PostClientMock implements IPostClient {
     }
 
     public connectToCommentsWebSocket(postId: string): WebSocket {
-        return new WebSocket(`ws://localhost/ws/comments/${postId}`);
+        const socket = new WebSocket(`ws://localhost/ws/comments/${postId}`);
+        socket.onopen = () => {
+            const token = localStorage.getItem('jwt');
+            const subscribeMessage = JSON.stringify({
+                postId: postId,
+                type: "Subscribe",
+                authToken: token ? `Bearer ${token}` : undefined
+            });
+            socket.send(subscribeMessage);
+        };
+        return socket;
     }
 
     public async getDiscussedPosts(page = 0, size = 10): Promise<Result<PostSearchResult>> {

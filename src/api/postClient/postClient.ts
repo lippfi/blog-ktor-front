@@ -7,7 +7,6 @@ import type {
     PostEditDto, PostSearchResult,
     SearchPostsParamsDto, DiaryPageDto, PostPageDto
 } from "@/api/dto/postServiceDto.ts";
-import {authenticatedRequest} from "@/api/userService.ts";
 
 export type Result<T = void> =
     | (T extends void ? { type: 'ok'; data?: T } : { type: 'ok'; data: T })
@@ -323,9 +322,11 @@ class PostClientImpl implements IPostClient {
 
         socket.onopen = () => {
             // Send subscribe message when connection is established
+            const token = localStorage.getItem('jwt');
             const subscribeMessage = JSON.stringify({
                 postId: postId,
                 type: "Subscribe",
+                authToken: token ? `Bearer ${token}` : undefined
             });
             socket.send(subscribeMessage);
         };
