@@ -290,6 +290,22 @@ class PostClientMock implements IPostClient {
         }
     }
 
+    public async hidePost(postId: string): Promise<Result> {
+        try {
+            return { type: 'ok' };
+        } catch (error) {
+            return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        }
+    }
+
+    public async showPost(postId: string): Promise<Result> {
+        try {
+            return { type: 'ok' };
+        } catch (error) {
+            return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        }
+    }
+
     public async addComment(comment: CommentCreateRequest): Promise<Result<CommentDto>> {
         try {
             this.stubPosts.forEach(x => {

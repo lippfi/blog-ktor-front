@@ -6,7 +6,7 @@ import {
   type Post
 } from "@/models/posts/post.ts";
 import {ElMessage, ElMessageBox} from "element-plus";
-import {BottomLeft, ChatLineRound, Delete, Edit, More, MoreFilled, Warning} from "@element-plus/icons-vue";
+import {BottomLeft, ChatLineRound, Delete, Edit, Hide, More, MoreFilled, View, Warning} from "@element-plus/icons-vue";
 import {getCurrentUserLogin} from "@/api/userService.ts";
 import {useI18n} from "vue-i18n";
 import PostClientMock from "@/api/postClient/postClientMock.ts";
@@ -51,6 +51,24 @@ const showHiddenButtons = ref(false);
 const toggleHiddenButtons = (value: boolean) => {
   showHiddenButtons.value = value;
 };
+
+async function handleHide() {
+  const result = await postClient.hidePost(props.post.id);
+  if (result.type === 'ok') {
+    props.post.isHidden = true;
+  } else {
+    ElMessageBox.alert(result.message, 'Error');
+  }
+}
+
+async function handleShow() {
+  const result = await postClient.showPost(props.post.id);
+  if (result.type === 'ok') {
+    props.post.isHidden = false;
+  } else {
+    ElMessageBox.alert(result.message, 'Error');
+  }
+}
 
 async function handleDelete() {
   if (props.comment) {
@@ -130,6 +148,12 @@ const props = defineProps<{
           </template>
         </el-popconfirm>
       </div>
+      <el-icon v-if="showHiddenButtons && !comment && post.authorLogin === getCurrentUserLogin() && !post.isHidden" size="20" class="hide" @click="handleHide">
+        <Hide />
+      </el-icon>
+      <el-icon v-if="showHiddenButtons && !comment && post.authorLogin === getCurrentUserLogin() && post.isHidden" size="20" class="view" @click="handleShow">
+        <View />
+      </el-icon>
       <el-icon v-if="showHiddenButtons && (post.authorLogin !== getCurrentUserLogin() || (comment && comment.authorLogin !== getCurrentUserLogin())) && getCurrentUserLogin()" size="20" class="warning">
         <Warning/>
       </el-icon>

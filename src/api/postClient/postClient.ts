@@ -22,6 +22,8 @@ export interface IPostClient {
     getPostForEditing(id: string): Promise<Result<PostEditDto>>;
     updatePost(post: PostEditDto): Promise<Result<PostViewDto>>;
     deletePost(postId: string): Promise<Result<string>>;
+    hidePost(postId: string): Promise<Result>;
+    showPost(postId: string): Promise<Result>;
     addPost(post: PostCreateDto): Promise<Result<PostViewDto>>
     getComment(commentId: string): Promise<Result<CommentDto>>;
     addComment(comment: CommentCreateRequest): Promise<Result<CommentDto>>;
@@ -242,6 +244,40 @@ class PostClientImpl implements IPostClient {
             if (response.ok) {
                 const message = await response.text();
                 return { type: 'ok', data: message };
+            } else {
+                const message = await response.text();
+                return { type: 'error', message };
+            }
+        } catch (error) {
+            return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        }
+    }
+
+    public async hidePost(postId: string): Promise<Result> {
+        try {
+            const response = await PostClientImpl.authenticatedRequest(`/posts/hide?postId=${encodeURIComponent(postId)}`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                return { type: 'ok' };
+            } else {
+                const message = await response.text();
+                return { type: 'error', message };
+            }
+        } catch (error) {
+            return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        }
+    }
+
+    public async showPost(postId: string): Promise<Result> {
+        try {
+            const response = await PostClientImpl.authenticatedRequest(`/posts/show?postId=${encodeURIComponent(postId)}`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                return { type: 'ok' };
             } else {
                 const message = await response.text();
                 return { type: 'error', message };
