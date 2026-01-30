@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute} from "vue-router";
-import { computed, type ComputedRef, ref, nextTick, onMounted, onUnmounted, watch} from "vue";
+import { ref, nextTick, onMounted, onUnmounted, watch} from "vue";
 
 import CommentEdit from "@/components/post/CommentEdit.vue";
 import CommentComponent from "@/components/post/CommentComponent.vue";
@@ -28,8 +28,14 @@ const replyingToComment = ref<any | null>(null);
 const selectedCommentId = ref<string | undefined>(props.commentId);
 
 const route = useRoute();
-const post: ComputedRef<Post> = computed(() => route.meta.post as Post);
+const post = ref<Post>(route.meta.post as Post);
 const comments = ref<Comment[]>([]);
+
+watch(() => route.meta.post, (newPost) => {
+  if (newPost) {
+    post.value = newPost as Post;
+  }
+}, { immediate: true });
 
 watch(() => route.meta.comments, (newComments) => {
   comments.value = [...(newComments as Comment[] || [])];
