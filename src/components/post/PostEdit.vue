@@ -185,6 +185,7 @@ async function createPost() {
     commentGroupId: localCommentGroup.value,
     reactionGroupId: localReactionGroup.value,
     commentReactionGroupId: localReactionGroup.value,
+    isHidden: false,
   }
 
   const res = await client.addPost(newPost)
@@ -212,7 +213,8 @@ async function updatePost() {
     classes: localClasses.value || "",
     text: localContent.value || "",
     title: preprocessPostTitle(localTitle.value || ""),
-    uri: ""
+    uri: "",
+    isHidden: false,
   }
 
   const res = await client.updatePost(mapPostEditToPostEditDto(postEdit))

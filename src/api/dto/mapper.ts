@@ -15,7 +15,8 @@ export function mapPostToCreateDto(post: Post): PostCreateDto {
         readGroupId: post.readGroupId,
         commentGroupId: post.commentGroupId,
         reactionGroupId: post.reactionGroupId,
-        commentReactionGroupId: post.commentReactionGroupId
+        commentReactionGroupId: post.commentReactionGroupId,
+        isHidden: post.isHidden,
     };
 }
 
@@ -37,11 +38,12 @@ export function mapPostToViewDto(post: Post): PostViewDto {
         isReactable: post.isReactable,
         reactions: post.reactions.map(reaction => mapReactionToDto(reaction)),
         isCommentable: post.isCommentable,
-        comments: post.comments.map(comment => mapCommentToDto(comment)),
+        commentsCount: post.commentsCount,
         readGroupId: post.readGroupId,
         commentGroupId: post.commentGroupId,
         reactionGroupId: post.reactionGroupId,
-        commentReactionGroupId: post.commentReactionGroupId
+        commentReactionGroupId: post.commentReactionGroupId,
+        isHidden: post.isHidden,
     };
 }
 
@@ -97,5 +99,6 @@ export function mapPostEditToPostEditDto(postEdit: PostEdit): PostEditDto {
         tags: postEdit.tags,
         classes: postEdit.classes,
         isEncrypted: postEdit.isEncrypted,
+        isHidden: postEdit.isHidden,
     };
 }

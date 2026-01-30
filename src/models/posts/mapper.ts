@@ -34,11 +34,12 @@ export const mapPostDtoToPost = (dto: PostViewDto): Post => ({
     isReactable: dto.isReactable,
     reactions: dto.reactions.map(mapDtoToReaction),
     isCommentable: dto.isCommentable,
-    comments: dto.comments.map(mapCommentDtoToComment),
+    commentsCount: dto.commentsCount,
     readGroupId: dto.readGroupId,
     commentGroupId: dto.commentGroupId,
     reactionGroupId: dto.reactionGroupId,
     commentReactionGroupId: dto.commentReactionGroupId,
+    isHidden: dto.isHidden,
 });
 
 // Маппер для PostEditDto

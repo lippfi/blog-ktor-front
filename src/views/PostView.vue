@@ -10,6 +10,7 @@ import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import PostClientImpl from "@/api/postClient/postClient.ts";
 import {mapCommentDtoToComment} from "@/models/posts/mapper.ts";
 import {mapDtoToReaction} from "@/api/dto/mapper.ts";
+import type {CommentDto} from "@/api/dto/postServiceDto.ts";
 
 const props = defineProps<{
   login: string;
@@ -28,10 +29,10 @@ const selectedCommentId = ref<string | undefined>(props.commentId);
 
 const route = useRoute();
 const post: ComputedRef<Post> = computed(() => route.meta.post as Post);
+const comments: ComputedRef<Comment[]> = computed(() => route.meta.comments as Comment[]);
 const postClient = new PostClientImpl();
 let commentsSocket: WebSocket | null = null;
 
-const comments = ref<Comment[]>([]);
 
 const scrollToComment = (commentId?: string) => {
   const id = commentId || selectedCommentId.value;
@@ -151,7 +152,6 @@ const handleReactionRemoved = (commentId: string, reactionDto: any) => {
 
 onMounted(() => {
   document.title = post.value.title;
-  comments.value = post.value.comments;
 
   if (props.commentId) {
     setTimeout(() => scrollToComment(), 500);

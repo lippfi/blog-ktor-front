@@ -48,11 +48,12 @@ export interface Post {
     isReactable: boolean;
     reactions: Reaction[];
     isCommentable: boolean;
-    comments: Comment[];
+    commentsCount: number;
     readGroupId: string;
     commentGroupId: string;
     reactionGroupId: string;
     commentReactionGroupId: string;
+    isHidden: boolean;
 }
 
 export interface PostEdit {
@@ -68,6 +69,7 @@ export interface PostEdit {
     tags: string[];
     classes?: string;
     isEncrypted: boolean;
+    isHidden: boolean;
 }
 
 export interface CommentCreateRequest {

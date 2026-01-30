@@ -50,6 +50,7 @@ export interface PostCreateDto {
     commentGroupId: string;
     reactionGroupId: string;
     commentReactionGroupId: string;
+    isHidden: boolean;
 }
 
 export interface PostViewDto {
@@ -69,11 +70,12 @@ export interface PostViewDto {
     isReactable: boolean;
     reactions: ReactionDto[];
     isCommentable: boolean;
-    comments: CommentDto[];
+    commentsCount: number;
     readGroupId: string;
     commentGroupId: string;
     reactionGroupId: string;
     commentReactionGroupId: string;
+    isHidden: boolean;
 }
 
 export interface DiaryHeaderInfo {
@@ -97,6 +99,7 @@ export interface DiaryViewDto {
 export interface PostPageDto {
     diary: DiaryViewDto;
     post: PostViewDto;
+    comments: CommentDto[];
 }
 
 export interface PostEditDto {
@@ -112,6 +115,7 @@ export interface PostEditDto {
     tags: string[];
     classes?: string;
     isEncrypted: boolean;
+    isHidden: boolean;
 }
 
 export interface CommentCreateRequest {

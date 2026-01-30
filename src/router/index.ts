@@ -9,7 +9,7 @@ import ProfileView from "@/views/ProfileView.vue";
 import ResetPassword from "@/views/ResetPassword.vue";
 import AvatarComponent from "@/components/AvatarComponent.vue";
 import PostClientImpl from "@/api/postClient/postClient.ts";
-import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
+import {mapCommentDtoToComment, mapPostDtoToPost} from "@/models/posts/mapper.ts";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import DiarySearchView, { extractSearchParams } from "@/views/DiarySearchView.vue";
@@ -175,6 +175,7 @@ const router = createRouter({
             subtitle: postPage.diary.subtitle,
           }
           to.meta.post = mapPostDtoToPost(postPage.post);
+          to.meta.comments = postPage.comments.map(mapCommentDtoToComment);
           updateStyles(postPage.diary.styles);
           next();
         } else {
