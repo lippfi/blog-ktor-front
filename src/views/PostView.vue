@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute} from "vue-router";
-import { computed, type ComputedRef, ref, nextTick, onMounted, onUnmounted} from "vue";
+import { computed, type ComputedRef, ref, nextTick, onMounted, onUnmounted, watch} from "vue";
 
 import CommentEdit from "@/components/post/CommentEdit.vue";
 import CommentComponent from "@/components/post/CommentComponent.vue";
@@ -29,7 +29,11 @@ const selectedCommentId = ref<string | undefined>(props.commentId);
 
 const route = useRoute();
 const post: ComputedRef<Post> = computed(() => route.meta.post as Post);
-const comments: ComputedRef<Comment[]> = computed(() => route.meta.comments as Comment[]);
+const comments = ref<Comment[]>([]);
+
+watch(() => route.meta.comments, (newComments) => {
+  comments.value = [...(newComments as Comment[] || [])];
+}, { immediate: true });
 const postClient = new PostClientImpl();
 let commentsSocket: WebSocket | null = null;
 
@@ -151,25 +155,34 @@ const handleReactionRemoved = (commentId: string, reactionDto: any) => {
 };
 
 onMounted(() => {
-  document.title = post.value.title;
-
   if (props.commentId) {
     setTimeout(() => scrollToComment(), 500);
   }
-
-  if (post.value && post.value.id) {
-    commentsSocket = postClient.connectToCommentsWebSocket(post.value.id);
-    commentsSocket.onmessage = handleWebSocketMessage;
-
-    commentsSocket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    commentsSocket.onclose = () => {
-      console.log('WebSocket connection closed');
-    };
-  }
 });
+
+watch(() => post.value, (newPost) => {
+  if (commentsSocket) {
+    commentsSocket.close();
+    commentsSocket = null;
+  }
+
+  if (newPost) {
+    document.title = newPost.title;
+
+    if (newPost.id) {
+      commentsSocket = postClient.connectToCommentsWebSocket(newPost.id);
+      commentsSocket.onmessage = handleWebSocketMessage;
+
+      commentsSocket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+
+      commentsSocket.onclose = () => {
+        console.log('WebSocket connection closed');
+      };
+    }
+  }
+}, { immediate: true });
 
 onUnmounted(() => {
   // Clean up WebSocket connection when component is unmounted
