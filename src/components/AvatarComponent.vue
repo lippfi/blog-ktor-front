@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { getAvatars, reorderAvatars, addAvatars } from '@/api/userService';
+import { useReactionsStore } from '@/stores/reactionsStore';
 import { ElMessage } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 import { Close, Plus } from '@element-plus/icons-vue';
 
 
 const { t } = useI18n();
+const reactionsStore = useReactionsStore();
 const avatars = ref<Record<string, string>>({});
 const originalAvatars = ref<Record<string, string>>({});
 const loading = ref(false);
@@ -90,6 +92,7 @@ const saveChanges = async () => {
       // Update the original order after successful save
       originalAvatars.value = { ...avatars.value };
       hasChanges.value = false;
+      await reactionsStore.loadAvatars();
     }
   } catch (error) {
     console.error('Failed to reorder avatars:', error);
@@ -163,6 +166,7 @@ const handleFileUpload = async (event: Event) => {
       // Update original avatars to include the new ones
       originalAvatars.value = { ...newAvatars };
 
+      await reactionsStore.loadAvatars();
       ElMessage.success(t('avatars.uploadSuccess'));
     }
   } catch (error) {
