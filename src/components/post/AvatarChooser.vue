@@ -142,7 +142,7 @@ onMounted(() => {
 .avatars {
   display: flex;
   flex-direction: v-bind(flex_direction);
-  gap: 1px;
+  gap: 4px;
   height: v-bind(height);
   width: v-bind(width);
   overflow-y: v-bind(overflow_y);
