@@ -27,7 +27,7 @@
             </template>
           </div>
         </div>
-        <el-divider v-if="getCurrentUserLogin() || post.comments.length > 0"/>
+        <el-divider v-if="getCurrentUserLogin() || post.commentsCount > 0"/>
         <div class="icon-buttons">
           <div class="left-buttons">
             <Reactions
