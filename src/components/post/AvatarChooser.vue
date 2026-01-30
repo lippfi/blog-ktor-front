@@ -9,7 +9,7 @@
     <div class="avatars">
       <template v-for="(avatar, index) in reactionsStore.avatars" :key="avatar">
         <input type="radio" name="avatar" :id="String(index)" :value="avatar" v-model="selectedAvatarModel">
-        <label :for="String(index)"><img class="avatar" :src="avatar" alt="avatar"></label>
+        <label class="avatar-box" :for="String(index)"><img class="avatar" :src="avatar" alt="avatar"></label>
       </template>
       <input type="radio" name="avatar" :id="String(reactionsStore.avatars.length)" :value="customAvatar" v-model="selectedAvatarModel">
       <label :for="String(reactionsStore.avatars.length)" class="one-time-avatar">
@@ -30,8 +30,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import {ArrowDownBold, ArrowLeft, ArrowLeftBold, ArrowRightBold, ArrowUpBold} from "@element-plus/icons-vue";
-import { getAvatars } from "@/api/userService";
+import {ArrowDownBold, ArrowLeftBold, ArrowRightBold, ArrowUpBold} from "@element-plus/icons-vue";
 import {useI18n} from "vue-i18n";
 import { useReactionsStore } from "@/stores/reactionsStore";
 
@@ -50,7 +49,6 @@ const selectedAvatarModel = defineModel<string>('selectedAvatar', { default: "" 
 
 const customAvatar = ref("")
 
-const grid_flow = computed(() => props.isVertical ? "row" : "column")
 const height = computed(() => props.isVertical ? (props.showButtons ? "calc(100% - 40px)" : "100%") : props.avatarSize + 5 + "px")
 const width = computed(() => props.isVertical ? props.avatarSize + "px" : (props.showButtons ? "calc(100% - 40px)" : "100%"))
 
@@ -142,8 +140,8 @@ onMounted(() => {
 }
 
 .avatars {
-  display: grid;
-  grid-auto-flow: v-bind(grid_flow);
+  display: flex;
+  flex-direction: v-bind(flex_direction);
   gap: 1px;
   height: v-bind(height);
   width: v-bind(width);
@@ -174,8 +172,13 @@ input[type="radio"]:checked+label .avatar {
   outline-offset: v-bind(negativeOutlineSizePx);
 }
 
+.avatar {
+  cursor: pointer;
+}
+
 .one-time-avatar {
   background: white;
+  cursor: pointer;
 }
 
 label {
