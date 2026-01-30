@@ -142,7 +142,8 @@ onMounted(() => {
 .avatars {
   display: flex;
   flex-direction: v-bind(flex_direction);
-  gap: 4px;
+  flex-wrap: nowrap;
+  gap: 3px;
   height: v-bind(height);
   width: v-bind(width);
   overflow-y: v-bind(overflow_y);
@@ -164,6 +165,12 @@ onMounted(() => {
   height: v-bind(avatarSizePx);
   object-fit: cover;
   display: block;
+}
+
+.avatars > label,
+.avatars > .one-time-avatar,
+.avatars > input + label {
+  flex-shrink: 0;
 }
 
 input[type="radio"]:checked+label .avatar {
