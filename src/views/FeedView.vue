@@ -7,13 +7,15 @@
       <el-button type="text" @click="loadPosts('following')">{{ t('feed.following') }}</el-button>
       <el-button type="text" @click="loadPosts('friends')">{{ t('feed.friends') }}</el-button>
     </div>
-    <PostComponent
-        v-for="post in posts"
-        :key="post.id"
-        :post="post"
-        :show-comments-count="true"
-        class="post-item"
-    />
+    <div class="posts">
+      <PostComponent
+          v-for="post in posts"
+          :key="post.id"
+          :post="post"
+          :show-comments-count="true"
+          class="post-item"
+      />
+    </div>
     <el-pagination
         v-if="totalPosts > postsPerPage"
         @current-change="handlePageChange"
@@ -87,6 +89,13 @@ onMounted(() => {
   padding: 0 20px 20px;
   display: flex;
   flex-direction: column;
+}
+
+.posts {
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+  padding-bottom: 40px;
 }
 
 .feed-buttons {
