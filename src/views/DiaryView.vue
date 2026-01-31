@@ -7,6 +7,7 @@ import {isSignedIn} from "@/api/userService.ts";
 import {useRoute} from "vue-router";
 import type {DiaryHeaderInfo} from "@/api/dto/postServiceDto.ts";
 import DiaryMenuComponent from "@/components/DiaryMenuComponent.vue";
+import PaginationComponent from "@/components/PaginationComponent.vue";
 import PostClientImpl from "@/api/postClient/postClient.ts";
 import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
 import {updateStyles} from "@/styles/stylesManager";
@@ -60,10 +61,12 @@ watch(() => [props.login, props.page], fetchPosts);
       :show-comments-count="true"
   />
 
-  <div v-if="totalPages > 1" class="pagination">
-    <router-link v-if="currentPage > 1" :to="`/${props.login}/diary/${currentPage - 1}`">&lt; previous</router-link>
-    <router-link v-if="currentPage < totalPages" :to="`/${props.login}/diary/${currentPage + 1}`">next &gt;</router-link>
-  </div>
+  <PaginationComponent
+      :current-page="currentPage"
+      :total-pages="totalPages"
+      :prev-page-link="`/${props.login}/diary/${currentPage - 1}`"
+      :next-page-link="`/${props.login}/diary/${currentPage + 1}`"
+  />
 
   <PostEdit
       v-if="loggedIn"
@@ -73,17 +76,4 @@ watch(() => [props.login, props.page], fetchPosts);
 </template>
 
 <style scoped>
-.pagination {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin: 20px 0;
-}
-.pagination a {
-  text-decoration: none;
-  color: inherit;
-}
-.pagination a:hover {
-  text-decoration: underline;
-}
 </style>

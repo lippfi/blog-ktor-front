@@ -162,7 +162,7 @@ class PostClientMock implements IPostClient {
     }
 
     public async searchDiaryPosts(params: SearchPostsParamsDto): Promise<Result<DiaryPageDto>> {
-        return this.getDiaryPosts(params.diary || 'mock', params.page || 0);
+        return this.getDiaryPosts(params.diary || 'mock', params.page || 1);
     }
 
     public async getPost(login: string, uri: string): Promise<Result<PostPageDto>> {
@@ -209,17 +209,17 @@ class PostClientMock implements IPostClient {
         }
     }
 
-    public async getLatestPosts(page = 0, size = 10): Promise<Result<PostSearchResult>> {
+    public async getLatestPosts(page = 1, size = 10): Promise<Result<PostSearchResult>> {
         try {
             // Return different posts based on page to test pagination
             const allPosts = [this.stubPost, this.stubPost2, this.stubPost3];
             // Cycle through stub posts based on page
-            const startIndex = (page * size) % allPosts.length;
+            const startIndex = ((page - 1) * size) % allPosts.length;
             const latestPosts = [];
             for (let i = 0; i < size; i++) {
                 const post = { ...allPosts[(startIndex + i) % allPosts.length] };
                 post.id = `${post.id}-${page}-${i}`; // Make IDs unique per page
-                post.title = `${post.title} (Page ${page + 1}, Item ${i + 1})`;
+                post.title = `${post.title} (Page ${page}, Item ${i + 1})`;
                 latestPosts.push(post);
             }
 
@@ -250,7 +250,7 @@ class PostClientMock implements IPostClient {
         return socket;
     }
 
-    public async getDiscussedPosts(page = 0, size = 10): Promise<Result<PostSearchResult>> {
+    public async getDiscussedPosts(page = 1, size = 10): Promise<Result<PostSearchResult>> {
         try {
             const response = await fetch(`${backendURL}/posts/discussed?page=${page}&size=${size}`);
             if (response.ok) {
@@ -265,7 +265,7 @@ class PostClientMock implements IPostClient {
         }
     }
 
-    public async getFollowedPosts(page = 0, size = 10): Promise<Result<PostSearchResult>> {
+    public async getFollowedPosts(page = 1, size = 10): Promise<Result<PostSearchResult>> {
         try {
             return { type: 'ok', data: ({} as any) as PostSearchResult };
         } catch (error) {
@@ -273,7 +273,7 @@ class PostClientMock implements IPostClient {
         }
     }
 
-    public async getFriendsPosts(page = 0, size = 10): Promise<Result<PostSearchResult>> {
+    public async getFriendsPosts(page = 1, size = 10): Promise<Result<PostSearchResult>> {
         try {
             return { type: 'ok', data: ({} as any) as PostSearchResult };
         } catch (error) {

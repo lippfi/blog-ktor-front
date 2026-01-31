@@ -1,11 +1,11 @@
 <template>
   <div class="feed">
     <div v-if="loggedIn" class="feed-buttons">
-      <el-button type="text" @click="loadPosts('latest')">{{ t('feed.latest') }}
+      <el-button type="text" @click="changeFeed('latest')">{{ t('feed.latest') }}
       </el-button>
-      <el-button type="text" @click="loadPosts('popular')">{{ t('feed.popular') }}</el-button>
-      <el-button type="text" @click="loadPosts('following')">{{ t('feed.following') }}</el-button>
-      <el-button type="text" @click="loadPosts('friends')">{{ t('feed.friends') }}</el-button>
+      <el-button type="text" @click="changeFeed('popular')">{{ t('feed.popular') }}</el-button>
+      <el-button type="text" @click="changeFeed('following')">{{ t('feed.following') }}</el-button>
+      <el-button type="text" @click="changeFeed('friends')">{{ t('feed.friends') }}</el-button>
     </div>
     <div class="posts" v-loading="loading">
       <PostComponent
@@ -16,64 +16,65 @@
           class="post-item"
       />
     </div>
-    <el-pagination
-        v-if="totalPages > 1"
-        @current-change="handlePageChange"
-        v-model:current-page="currentPage"
-        :page-size="postsPerPage"
-        :page-count="totalPages"
-        layout="prev, pager, next"
+    <PaginationComponent
+        :current-page="currentPage"
+        :total-pages="totalPages"
+        :prev-page-link="prevPageLink"
+        :next-page-link="nextPageLink"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import PostComponent from '@/components/post/PostComponent.vue';
+import PaginationComponent from "@/components/PaginationComponent.vue";
 import type { Post as PostType } from '@/models/posts/post';
 import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
 import {useI18n} from "vue-i18n";
 import PostClientImpl from "@/api/postClient/postClient.ts";
 import {isSignedIn} from "@/api/userService.ts";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 
 const t = useI18n().t;
 const route = useRoute();
+const router = useRouter();
 
 const loggedIn = isSignedIn()
 const client = new PostClientImpl()
-const currentFeed = ref('latest');
 const posts = ref<PostType[]>(route.meta.posts as PostType[] || []);
-const currentPage = ref(route.meta.currentPage as number || 1);
-const postsPerPage = 10;
 const totalPages = ref(route.meta.totalPages as number || 0);
 const loading = ref(false);
 
-const loadPosts = async (feedType: string, page: number = 1) => {
+const currentFeed = computed(() => route.query.feed as string || 'latest');
+const currentPage = computed(() => parseInt(route.query.page as string) || 1);
+const prevPageLink = computed(() => ({ query: { ...route.query, page: (currentPage.value - 1).toString() } }));
+const nextPageLink = computed(() => ({ query: { ...route.query, page: (currentPage.value + 1).toString() } }));
+
+const loadPosts = async () => {
   if (loading.value) return;
   
   loading.value = true;
   let getPostsResult;
   
-  try {
-    const backendPage = page - 1;
+  const feedType = currentFeed.value;
+  const page = currentPage.value;
 
+  try {
     if (feedType === 'latest') {
-      getPostsResult = await client.getLatestPosts(backendPage);
+      getPostsResult = await client.getLatestPosts(page);
     } else if (feedType === 'popular') {
-      getPostsResult = await client.getDiscussedPosts(backendPage);
+      getPostsResult = await client.getDiscussedPosts(page);
     } else if (feedType === 'following') {
-      getPostsResult = await client.getFollowedPosts(backendPage);
+      getPostsResult = await client.getFollowedPosts(page);
     } else if (feedType === 'friends') {
-      getPostsResult = await client.getFriendsPosts(backendPage);
+      getPostsResult = await client.getFriendsPosts(page);
     }
 
     if (getPostsResult && getPostsResult.type === 'ok') {
       const postSearchResult = getPostsResult.data;
       posts.value = postSearchResult.content.map(c => mapPostDtoToPost(c));
       totalPages.value = postSearchResult.totalPages;
-      currentPage.value = postSearchResult.currentPage;
-      currentFeed.value = feedType;
       
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (getPostsResult && getPostsResult.type === 'error') {
@@ -86,13 +87,18 @@ const loadPosts = async (feedType: string, page: number = 1) => {
   }
 };
 
-const handlePageChange = (page: number) => {
-  loadPosts(currentFeed.value, page + 1);
+
+const changeFeed = (feedType: string) => {
+  router.push({ query: { feed: feedType, page: '1' } });
 };
+
+watch(() => [route.query.feed, route.query.page], () => {
+  loadPosts();
+});
 
 onMounted(() => {
   if (posts.value.length === 0) {
-    loadPosts(currentFeed.value, currentPage.value);
+    loadPosts();
   }
 });
 </script>

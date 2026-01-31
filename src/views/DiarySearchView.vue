@@ -34,9 +34,10 @@ export const extractSearchParams = (route: RouteLocationNormalized): SearchPosts
 </script>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import PostComponent from '@/components/post/PostComponent.vue';
+import PaginationComponent from "@/components/PaginationComponent.vue";
 import PostClientImpl from '@/api/postClient/postClient';
 import type { Post } from '@/models/posts/post';
 import { mapPostDtoToPost } from '@/models/posts/mapper';
@@ -51,15 +52,15 @@ const currentPage = ref(0);
 const totalPages = ref(0);
 const login = ref('');
 
+const prevPageLink = computed(() => ({ query: { ...route.query, page: (currentPage.value - 1).toString() } }));
+const nextPageLink = computed(() => ({ query: { ...route.query, page: (currentPage.value + 1).toString() } }));
+
 const fetchPosts = async () => {
   loading.value = true;
   error.value = null;
 
   // Extract search parameters from the route
   const params = { ...extractSearchParams(route) };
-  if (params.page !== undefined) {
-    params.page = params.page - 1;
-  }
 
   // Set login from diary parameter
   if (params.diary) {
@@ -70,7 +71,7 @@ const fetchPosts = async () => {
     const result = await postClient.searchDiaryPosts(params);
     if (result.type === 'ok') {
       posts.value = result.data.posts.content.map(mapPostDtoToPost);
-      currentPage.value = result.data.posts.currentPage + 1;
+      currentPage.value = result.data.posts.currentPage;
       totalPages.value = result.data.posts.totalPages;
     } else {
       error.value = result.message;
@@ -126,7 +127,12 @@ watch(() => route.params, fetchPosts, { deep: true });
       />
     </div>
 
-    <!-- Pagination could be added here if needed -->
+    <PaginationComponent
+        :current-page="currentPage"
+        :total-pages="totalPages"
+        :prev-page-link="prevPageLink"
+        :next-page-link="nextPageLink"
+    />
   </div>
 </template>
 

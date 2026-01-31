@@ -29,16 +29,29 @@ const router = createRouter({
       component: FeedView,
       beforeEnter: async (to, _, next) => {
         const postClient = new PostClientImpl();
-        const result = await postClient.getLatestPosts(1);
+        const page = parseInt(to.query.page as string) || 1;
+        const feedType = to.query.feed as string || 'latest';
 
-        if (result.type === 'ok') {
+        let result;
+        if (feedType === 'latest') {
+          result = await postClient.getLatestPosts(page);
+        } else if (feedType === 'popular') {
+          result = await postClient.getDiscussedPosts(page);
+        } else if (feedType === 'following') {
+          result = await postClient.getFollowedPosts(page);
+        } else if (feedType === 'friends') {
+          result = await postClient.getFriendsPosts(page);
+        }
+
+        if (result && result.type === 'ok') {
           const postSearchResult = result.data;
           to.meta.posts = postSearchResult.content.map(mapPostDtoToPost);
           to.meta.currentPage = postSearchResult.currentPage;
           to.meta.totalPages = postSearchResult.totalPages;
+          to.meta.currentFeed = feedType;
           next();
         } else {
-          to.meta.error = result.message;
+          to.meta.error = result?.message || 'Failed to load posts';
           next();
         }
       }
