@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {backendURL} from "@/main.ts";
+import {backendURL} from "@/constants";
 
 const props = defineProps<{
   nickname: string,

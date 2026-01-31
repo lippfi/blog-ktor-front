@@ -2,7 +2,7 @@
 import UserAvatarComponent from "@/components/post/UserAvatarComponent.vue";
 import {type Comment, type Post} from "@/models/posts/post.ts";
 import {computed, ref, watch} from "vue";
-import {backendURL} from "@/main.ts";
+import {backendURL} from "@/constants";
 import Reactions from "@/components/post/reaction/Reactions.vue";
 import FooterButtons from "@/components/post/FooterButtons.vue";
 import CommentEdit from "@/components/post/CommentEdit.vue";

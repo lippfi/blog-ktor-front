@@ -4,7 +4,7 @@ import type {FormInstance, FormRules} from "element-plus";
 import {isEmailBusy, isLoginBusy, isNicknameBusy, signUp} from "@/api/userService.ts";
 import router from "@/router";
 import {useI18n} from "vue-i18n";
-import {backendURL} from "@/main";
+import {backendURL} from "@/constants";
 
 const importURL = "http://0.0.0.0:8080";
 const { t } = useI18n()

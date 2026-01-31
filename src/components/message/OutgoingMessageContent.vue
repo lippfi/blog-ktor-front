@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {OutgoingMessage} from "@/components/message/MessagePreview.vue";
-import {backendURL} from "@/main.ts";
+import {backendURL} from "@/constants";
 import UserAvatarComponent from "@/components/post/UserAvatarComponent.vue";
 import {computed} from "vue";
 import {getDateTimeString} from "@/components/message/utils.ts";

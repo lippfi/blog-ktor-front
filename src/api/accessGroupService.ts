@@ -1,4 +1,5 @@
-import { backendURL, i18n } from "@/main";
+import { backendURL } from "@/constants";
+import { i18n } from "@/i18n";
 import type {Language} from "@/api/userService.ts";
 
 // Types

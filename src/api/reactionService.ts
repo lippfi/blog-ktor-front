@@ -1,4 +1,4 @@
-import { backendURL } from "@/main";
+import { backendURL } from "@/constants";
 
 // Types
 export interface ReactionResponse {

@@ -1,4 +1,4 @@
-import { backendURL } from "@/main";
+import { backendURL } from "@/constants";
 import {authenticatedRequest} from "@/api/userService.ts";
 
 // Types

@@ -1,4 +1,4 @@
-import {backendURL} from "@/main.ts";
+import {backendURL} from "@/constants";
 
 export interface DiaryStylePreview {
     id: string,

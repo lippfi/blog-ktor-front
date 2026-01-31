@@ -1,4 +1,4 @@
-import { backendURL } from "@/main";
+import { backendURL } from "@/constants";
 
 type Result<T> = 
     | { type: 'ok'; data: T }

@@ -8,25 +8,8 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
-import en from "@/locales/en.ts";
-import {createI18n} from "vue-i18n";
-import ru from "@/locales/ru.ts";
-import kk from "@/locales/kk.ts";
-import kk_latin from "@/locales/kk_latin.ts";
+import { i18n } from "@/i18n";
 
-export const backendURL = "https://lipp.fi/blog-api"
-
-export const i18n = createI18n({
-    legacy: false,
-    locale: 'EN',
-    fallbackLocale: 'EN',
-    messages: {
-        EN: en,
-        KK: kk_latin,
-        KK_CYRILLIC: kk,
-        RU: ru,
-    }
-})
 const app = createApp(App)
 app.use(i18n)
 app.use(createPinia())

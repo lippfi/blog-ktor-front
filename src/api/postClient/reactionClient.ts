@@ -1,5 +1,5 @@
 import type {ReactionPackDto, ReactionViewDto} from "@/api/dto/reactionServiceDto.ts";
-import {backendURL} from "@/main.ts";
+import {backendURL} from "@/constants";
 import type {RecentReactionResponse} from "@/api/reactionService.ts";
 import type {Result} from "@/api/postClient/postClient.ts";
 

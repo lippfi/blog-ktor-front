@@ -1,4 +1,4 @@
-import { backendURL } from "@/main";
+import { backendURL } from "@/constants";
 import {useI18n} from "vue-i18n";
 import mitt from 'mitt';
 
