@@ -7,7 +7,7 @@
       <el-button type="text" @click="loadPosts('following')">{{ t('feed.following') }}</el-button>
       <el-button type="text" @click="loadPosts('friends')">{{ t('feed.friends') }}</el-button>
     </div>
-    <div class="posts">
+    <div class="posts" v-loading="loading">
       <PostComponent
           v-for="post in posts"
           :key="post.id"
@@ -17,11 +17,11 @@
       />
     </div>
     <el-pagination
-        v-if="totalPosts > postsPerPage"
+        v-if="totalPages > 1"
         @current-change="handlePageChange"
-        :current-page="currentPage"
+        v-model:current-page="currentPage"
         :page-size="postsPerPage"
-        :total="totalPosts"
+        :page-count="totalPages"
         layout="prev, pager, next"
     />
   </div>
@@ -31,56 +31,69 @@
 import { ref, onMounted } from 'vue';
 import PostComponent from '@/components/post/PostComponent.vue';
 import type { Post as PostType } from '@/models/posts/post';
-import PostClientMock from "@/api/postClient/postClientMock.ts";
 import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
 import {useI18n} from "vue-i18n";
 import PostClientImpl from "@/api/postClient/postClient.ts";
 import {isSignedIn} from "@/api/userService.ts";
+import {useRoute} from "vue-router";
 
-const { t } = useI18n()
+const t = useI18n().t;
+const route = useRoute();
 
 const loggedIn = isSignedIn()
-const posts = ref<PostType[]>([]);
-const currentPage = ref(1);
-const postsPerPage = 10;
-const totalPosts = ref(0);
 const client = new PostClientImpl()
+const currentFeed = ref('latest');
+const posts = ref<PostType[]>(route.meta.posts as PostType[] || []);
+const currentPage = ref(route.meta.currentPage as number || 1);
+const postsPerPage = 10;
+const totalPages = ref(route.meta.totalPages as number || 0);
+const loading = ref(false);
 
 const loadPosts = async (feedType: string, page: number = 1) => {
+  if (loading.value) return;
+  
+  loading.value = true;
   let getPostsResult;
-  currentPage.value = page;
-  currentFeed.value = feedType;
+  
+  try {
+    const backendPage = page - 1;
 
-  const backendPage = page - 1;
-
-  if (feedType === 'latest') {
-    getPostsResult = await client.getLatestPosts(backendPage);
-  } else if (feedType === 'popular') {
-    getPostsResult = await client.getDiscussedPosts(backendPage);
-  } else if (feedType === 'following') {
-    getPostsResult = await client.getFollowedPosts(backendPage);
-  } else if (feedType === 'friends') {
-    getPostsResult = await client.getFriendsPosts(backendPage);
-  }
-
-  if (getPostsResult) {
-    if (getPostsResult.type == "ok") {
-      const postSearchResult = getPostsResult.data
-      posts.value = postSearchResult.content.map(c => mapPostDtoToPost(c));
-      totalPosts.value = postSearchResult.totalPages * postsPerPage;
+    if (feedType === 'latest') {
+      getPostsResult = await client.getLatestPosts(backendPage);
+    } else if (feedType === 'popular') {
+      getPostsResult = await client.getDiscussedPosts(backendPage);
+    } else if (feedType === 'following') {
+      getPostsResult = await client.getFollowedPosts(backendPage);
+    } else if (feedType === 'friends') {
+      getPostsResult = await client.getFriendsPosts(backendPage);
     }
+
+    if (getPostsResult && getPostsResult.type === 'ok') {
+      const postSearchResult = getPostsResult.data;
+      posts.value = postSearchResult.content.map(c => mapPostDtoToPost(c));
+      totalPages.value = postSearchResult.totalPages;
+      currentPage.value = postSearchResult.currentPage;
+      currentFeed.value = feedType;
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (getPostsResult && getPostsResult.type === 'error') {
+      console.error('Failed to load posts:', getPostsResult.message);
+    }
+  } catch (error) {
+    console.error('Error in loadPosts:', error);
+  } finally {
+    loading.value = false;
   }
 };
 
 const handlePageChange = (page: number) => {
-  currentPage.value = page;
-  loadPosts(currentFeed.value, page);
+  loadPosts(currentFeed.value, page + 1);
 };
 
-const currentFeed = ref('latest');
-
 onMounted(() => {
-  loadPosts(currentFeed.value, currentPage.value);
+  if (posts.value.length === 0) {
+    loadPosts(currentFeed.value, currentPage.value);
+  }
 });
 </script>
 

@@ -18,14 +18,30 @@ import StylesComponent from "@/components/styles/StylesComponent.vue";
 import {diaryClient} from "@/api/diaryClient.ts";
 import {updateStyles} from "@/styles/stylesManager";
 import NotFoundView from "@/views/NotFoundView.vue";
+import FeedView from "@/views/FeedView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: HomeView,
+      name: 'feed',
+      component: FeedView,
+      beforeEnter: async (to, _, next) => {
+        const postClient = new PostClientImpl();
+        const result = await postClient.getLatestPosts(1);
+
+        if (result.type === 'ok') {
+          const postSearchResult = result.data;
+          to.meta.posts = postSearchResult.content.map(mapPostDtoToPost);
+          to.meta.currentPage = postSearchResult.currentPage;
+          to.meta.totalPages = postSearchResult.totalPages;
+          next();
+        } else {
+          to.meta.error = result.message;
+          next();
+        }
+      }
     },
     {
       path: '/about',

@@ -75,11 +75,12 @@ class PostClientMock implements IPostClient {
         isReactable: true,
         reactions: [this.stubReaction],
         isCommentable: true,
-        comments: [this.stubComment, this.stubComment2],
+        commentsCount: 2,
         readGroupId: 'read-group-1',
         commentGroupId: 'comment-group-1',
         reactionGroupId: 'reaction-group-1',
-        commentReactionGroupId: 'comment-reactions-group-1'
+        commentReactionGroupId: 'comment-reactions-group-1',
+        isHidden: false
     };
 
     stubPost2: Post = {
@@ -99,11 +100,12 @@ class PostClientMock implements IPostClient {
         isReactable: true,
         reactions: [this.stubReaction],
         isCommentable: true,
-        comments: [this.stubComment],
+        commentsCount: 1,
         readGroupId: 'read-group-1',
         commentGroupId: 'comment-group-1',
         reactionGroupId: 'reaction-group-1',
-        commentReactionGroupId: 'comment-reactions-group-1'
+        commentReactionGroupId: 'comment-reactions-group-1',
+        isHidden: false
     };
 
     stubPost3: Post = {
@@ -123,11 +125,12 @@ class PostClientMock implements IPostClient {
         isReactable: true,
         reactions: [this.stubReaction],
         isCommentable: true,
-        comments: [this.stubComment, this.stubComment2],
+        commentsCount: 2,
         readGroupId: 'read-group-1',
         commentGroupId: 'comment-group-1',
         reactionGroupId: 'reaction-group-1',
-        commentReactionGroupId: 'comment-reactions-group-1'
+        commentReactionGroupId: 'comment-reactions-group-1',
+        isHidden: false
     };
 
     stubPosts: Post[] = [ this.stubPost ]
@@ -172,7 +175,8 @@ class PostClientMock implements IPostClient {
                     styles: [],
                     defaultGroups: {}
                 },
-                post: postView
+                post: postView,
+                comments: []
             };
             return { type: 'ok', data: postPage };
         } catch (error) {
@@ -207,7 +211,18 @@ class PostClientMock implements IPostClient {
 
     public async getLatestPosts(page = 0, size = 10): Promise<Result<PostSearchResult>> {
         try {
-            const latestPosts = [this.stubPost, this.stubPost2, this.stubPost3];
+            // Return different posts based on page to test pagination
+            const allPosts = [this.stubPost, this.stubPost2, this.stubPost3];
+            // Cycle through stub posts based on page
+            const startIndex = (page * size) % allPosts.length;
+            const latestPosts = [];
+            for (let i = 0; i < size; i++) {
+                const post = { ...allPosts[(startIndex + i) % allPosts.length] };
+                post.id = `${post.id}-${page}-${i}`; // Make IDs unique per page
+                post.title = `${post.title} (Page ${page + 1}, Item ${i + 1})`;
+                latestPosts.push(post);
+            }
+
             const postRes: PostViewDto[] = latestPosts.map((c) => mapPostToViewDto(c))
             const searchResult: PostSearchResult = {
                 content: postRes,
@@ -316,24 +331,6 @@ class PostClientMock implements IPostClient {
 
     public async addComment(comment: CommentCreateRequest): Promise<Result<CommentDto>> {
         try {
-            this.stubPosts.forEach(x => {
-                if (x.id == comment.postId) {
-                    const id: string = this.makeid(3);
-                    const newComment : Comment = {
-                        id: id,
-                        text: comment.text,
-                        avatar: comment.avatar || "",
-                        diaryLogin: "shimpansky",
-                        postUri: "test-post",
-                        isReactable: true,
-                        authorLogin: "pidarok",
-                        authorNickname: "gomogey",
-                        creationTime: new Date(),
-                        reactions: []
-                    }
-                    x.comments.push( newComment )
-                }
-            })
             return { type: 'ok', data: ({} as any) as CommentDto };
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
@@ -342,11 +339,6 @@ class PostClientMock implements IPostClient {
 
     public async updateComment(comment: CommentUpdateRequest): Promise<Result<CommentDto>> {
         try {
-            this.stubPosts.forEach(x => {
-                if (x.id == comment.id) {
-                    x.text = comment.text
-                }
-            })
             return { type: 'ok', data: ({} as any) as CommentDto };
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
@@ -355,9 +347,6 @@ class PostClientMock implements IPostClient {
 
     public async deleteComment(commentId: string): Promise<Result<string>> {
         try {
-            this.stubPosts.forEach(x => {
-                x.comments = x.comments.filter(c => c.id != commentId)
-            })
             return { type: 'ok', data: "" };
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
@@ -387,11 +376,12 @@ class PostClientMock implements IPostClient {
                 isReactable: true,
                 reactions: [],
                 isCommentable: true,
-                comments: [],
+                commentsCount: 0,
                 readGroupId: post.readGroupId,
                 commentGroupId: post.commentGroupId,
                 reactionGroupId: post.reactionGroupId,
-                commentReactionGroupId: post.commentReactionGroupId
+                commentReactionGroupId: post.commentReactionGroupId,
+                isHidden: false
             };
             this.stubPosts.push(mapPostDtoToPost(postView))
             return { type: 'ok', data: postView };

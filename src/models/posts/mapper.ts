@@ -56,6 +56,7 @@ const mapPostEditDtoToPostEdit = (dto: PostEditDto): PostEdit => ({
     tags: dto.tags,
     classes: dto.classes,
     isEncrypted: dto.isEncrypted,
+    isHidden: dto.isHidden,
 });
 
 // Маппер для SearchPostsParamsDto

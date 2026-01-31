@@ -56,7 +56,10 @@ const fetchPosts = async () => {
   error.value = null;
 
   // Extract search parameters from the route
-  const params = extractSearchParams(route);
+  const params = { ...extractSearchParams(route) };
+  if (params.page !== undefined) {
+    params.page = params.page - 1;
+  }
 
   // Set login from diary parameter
   if (params.diary) {
@@ -67,7 +70,7 @@ const fetchPosts = async () => {
     const result = await postClient.searchDiaryPosts(params);
     if (result.type === 'ok') {
       posts.value = result.data.posts.content.map(mapPostDtoToPost);
-      currentPage.value = result.data.posts.currentPage;
+      currentPage.value = result.data.posts.currentPage + 1;
       totalPages.value = result.data.posts.totalPages;
     } else {
       error.value = result.message;

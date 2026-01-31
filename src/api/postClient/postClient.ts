@@ -63,7 +63,11 @@ class PostClientImpl implements IPostClient {
 
     public async getDiaryPosts(diary: string, page: number): Promise<Result<DiaryPageDto>> {
         try {
-            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/diary?diary=${encodeURIComponent(diary)}&page=${encodeURIComponent(page.toString())}`);
+            const queryParams = new URLSearchParams();
+            queryParams.set('diary', diary);
+            queryParams.set('page', page.toString());
+            
+            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/diary?${queryParams.toString()}`);
 
             if (response.ok) {
                 const data = await response.json();
@@ -101,7 +105,10 @@ class PostClientImpl implements IPostClient {
 
     public async getPost(login: string, uri: string): Promise<Result<PostPageDto>> {
         try {
-            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}`);
+            const queryParams = new URLSearchParams();
+            queryParams.set('login', login);
+            queryParams.set('uri', uri);
+            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
@@ -116,7 +123,9 @@ class PostClientImpl implements IPostClient {
 
     public async getComment(commentId: string): Promise<Result<CommentDto>> {
         try {
-            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/comment?commentId=${encodeURIComponent(commentId)}`);
+            const queryParams = new URLSearchParams();
+            queryParams.set('commentId', commentId);
+            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/comment?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
@@ -154,9 +163,14 @@ class PostClientImpl implements IPostClient {
         }
     }
 
-    public async getLatestPosts(page = 0, size = 10): Promise<Result<PostSearchResult>> {
+    public async getLatestPosts(page = 1, size = 10): Promise<Result<PostSearchResult>> {
         try {
-            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/search?page=${page}&size=${size}&isHidden=false`);
+            const queryParams = new URLSearchParams();
+            queryParams.set('page', page.toString());
+            queryParams.set('size', size.toString());
+            queryParams.set('isHidden', 'false');
+            
+            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/search?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
@@ -169,45 +183,57 @@ class PostClientImpl implements IPostClient {
         }
     }
 
-    public async getDiscussedPosts(page = 0, size = 10): Promise<Result<PostSearchResult>> {
+    public async getDiscussedPosts(page = 1, size = 10): Promise<Result<PostSearchResult>> {
         try {
-            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/discussed?page=${page}&size=${size}`);
+            const queryParams = new URLSearchParams();
+            queryParams.set('page', page.toString());
+            queryParams.set('size', size.toString());
+
+            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/discussed?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
             } else {
                 const message = await response.text();
-                return { type: 'error', message };
+                return { type: 'error', message, status: response.status };
             }
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
         }
     }
 
-    public async getFollowedPosts(page = 0, size = 10): Promise<Result<PostSearchResult>> {
+    public async getFollowedPosts(page = 1, size = 10): Promise<Result<PostSearchResult>> {
         try {
-            const response = await PostClientImpl.authenticatedRequest(`/posts/followed?page=${page}&size=${size}`);
+            const queryParams = new URLSearchParams();
+            queryParams.set('page', page.toString());
+            queryParams.set('size', size.toString());
+
+            const response = await PostClientImpl.authenticatedRequest(`/posts/followed?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
             } else {
                 const message = await response.text();
-                return { type: 'error', message };
+                return { type: 'error', message, status: response.status };
             }
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
         }
     }
 
-    public async getFriendsPosts(page = 0, size = 10): Promise<Result<PostSearchResult>> {
+    public async getFriendsPosts(page = 1, size = 10): Promise<Result<PostSearchResult>> {
         try {
-            const response = await PostClientImpl.authenticatedRequest(`/posts/friends?page=${page}&size=${size}`);
+            const queryParams = new URLSearchParams();
+            queryParams.set('page', page.toString());
+            queryParams.set('size', size.toString());
+
+            const response = await PostClientImpl.authenticatedRequest(`/posts/friends?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
             } else {
                 const message = await response.text();
-                return { type: 'error', message };
+                return { type: 'error', message, status: response.status };
             }
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
