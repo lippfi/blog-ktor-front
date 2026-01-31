@@ -4,7 +4,7 @@
     <h3 v-if="type === 'post'">{{ $t('post.form.title.add') }}</h3>
     <h3 v-if="type === 'repost'">{{ $t('post.form.title.repost') }}</h3>
 
-    <div class="form">
+    <div class="form" @keydown.ctrl.enter.prevent="handleSubmit" @keydown.meta.enter.prevent="handleSubmit">
       <AvatarChooser :avatar-size="100" :outline-size="3" :show-buttons="true" :is-vertical="isAvatarVertical" v-model:selected-avatar="localAvatar" :avatars="reactionsStore.avatars"/>
       <div class="fields">
         <div class="title-row">
@@ -219,6 +219,14 @@ async function updatePost() {
 
   const res = await client.updatePost(mapPostEditToPostEditDto(postEdit))
   emit('post-updated', res)
+}
+
+function handleSubmit() {
+  if (props.type === 'edit') {
+    updatePost();
+  } else {
+    createPost();
+  }
 }
 
 function preprocessPostTitle(title: string): string {

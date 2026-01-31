@@ -194,6 +194,14 @@ async function addComment() {
   }
 }
 
+function handleSubmit() {
+  if (props.isEdit) {
+    updateComment();
+  } else {
+    addComment();
+  }
+}
+
 async function updateComment() {
   if (!props.id || !localContent.value || !localAvatar.value) return;
 
@@ -240,7 +248,7 @@ async function updateComment() {
     <div v-if="showQuotePopup" class="quote-popup" :style="{ top: popupPosition.top + 'px', left: popupPosition.left + 'px' }">
       <el-button size="small" @click="quoteSelectedText">{{ $t('comment.form.button.quote') }}</el-button>
     </div>
-    <div class="form">
+    <div class="form" @keydown.ctrl.enter.prevent="handleSubmit" @keydown.meta.enter.prevent="handleSubmit">
       <AvatarChooser :avatar-size="80" :outline-size="3" :show-buttons="true" :is-vertical="isAvatarVertical" v-model:selected-avatar="localAvatar"/>
       <div class="right">
         <SmartTextArea v-model:content="localContent" :basic-reactions="reactionsStore.basicReactions" :recent-reactions="reactionsStore.recentReactions" @reaction-added="reactionsStore.addReaction"/>

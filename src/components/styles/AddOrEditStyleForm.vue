@@ -74,7 +74,7 @@ const handleCancel = () => {
 </script>
 
 <template>
-  <div class="style-form">
+  <div class="style-form" @keydown.ctrl.enter.prevent="handleSubmit" @keydown.meta.enter.prevent="handleSubmit">
     <h3>{{ type === 'add' ? t("styles.form.title.add") : t("styles.form.title.edit") }}</h3>
       <el-input
         id="name"
