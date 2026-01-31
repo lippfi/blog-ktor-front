@@ -205,7 +205,7 @@ class PostClientMock implements IPostClient {
         }
     }
 
-    public async getLatestPosts(page = 0): Promise<Result<PostSearchResult>> {
+    public async getLatestPosts(page = 0, size = 10): Promise<Result<PostSearchResult>> {
         try {
             const latestPosts = [this.stubPost, this.stubPost2, this.stubPost3];
             const postRes: PostViewDto[] = latestPosts.map((c) => mapPostToViewDto(c))
@@ -251,6 +251,14 @@ class PostClientMock implements IPostClient {
     }
 
     public async getFollowedPosts(page = 0, size = 10): Promise<Result<PostSearchResult>> {
+        try {
+            return { type: 'ok', data: ({} as any) as PostSearchResult };
+        } catch (error) {
+            return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        }
+    }
+
+    public async getFriendsPosts(page = 0, size = 10): Promise<Result<PostSearchResult>> {
         try {
             return { type: 'ok', data: ({} as any) as PostSearchResult };
         } catch (error) {

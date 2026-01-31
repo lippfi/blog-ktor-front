@@ -1,10 +1,11 @@
 <template>
   <div class="feed">
-    <div class="feed-buttons">
+    <div v-if="loggedIn" class="feed-buttons">
       <el-button type="text" @click="loadPosts('latest')">{{ t('feed.latest') }}
       </el-button>
       <el-button type="text" @click="loadPosts('popular')">{{ t('feed.popular') }}</el-button>
       <el-button type="text" @click="loadPosts('following')">{{ t('feed.following') }}</el-button>
+      <el-button type="text" @click="loadPosts('friends')">{{ t('feed.friends') }}</el-button>
     </div>
     <PostComponent
         v-for="post in posts"
@@ -32,9 +33,11 @@ import PostClientMock from "@/api/postClient/postClientMock.ts";
 import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
 import {useI18n} from "vue-i18n";
 import PostClientImpl from "@/api/postClient/postClient.ts";
+import {isSignedIn} from "@/api/userService.ts";
 
 const { t } = useI18n()
 
+const loggedIn = isSignedIn()
 const posts = ref<PostType[]>([]);
 const currentPage = ref(1);
 const postsPerPage = 10;
@@ -43,16 +46,19 @@ const client = new PostClientImpl()
 
 const loadPosts = async (feedType: string, page: number = 1) => {
   let getPostsResult;
-  let currentPageValue = currentPage.value ?? 1
-
+  currentPage.value = page;
   currentFeed.value = feedType;
 
+  const backendPage = page - 1;
+
   if (feedType === 'latest') {
-    getPostsResult = await client.getLatestPosts(currentPageValue);
+    getPostsResult = await client.getLatestPosts(backendPage);
   } else if (feedType === 'popular') {
-    getPostsResult = await client.getDiscussedPosts(currentPageValue);
+    getPostsResult = await client.getDiscussedPosts(backendPage);
   } else if (feedType === 'following') {
-    getPostsResult = await client.getFollowedPosts(currentPageValue);
+    getPostsResult = await client.getFollowedPosts(backendPage);
+  } else if (feedType === 'friends') {
+    getPostsResult = await client.getFriendsPosts(backendPage);
   }
 
   if (getPostsResult) {
@@ -78,7 +84,7 @@ onMounted(() => {
 
 <style scoped>
 .feed {
-  padding: 20px;
+  padding: 0 20px 20px;
   display: flex;
   flex-direction: column;
 }

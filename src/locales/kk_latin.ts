@@ -295,6 +295,12 @@ export default {
         requiredFields: 'Atauy jane CSS stil mazmuny mindetti',
         previewUrlApplied: 'Aldyn ala qarau suretinin URL mekenjayy satti qoldanyldy'
     },
+    feed: {
+        latest: 'Sońǵy',
+        popular: 'Tanymal',
+        following: 'Jazylymdar',
+        friends: 'Dostar'
+    },
     errors: {
         not_found: 'Bet nemese jazba tabylmady'
     },

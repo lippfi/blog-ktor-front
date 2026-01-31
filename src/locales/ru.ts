@@ -310,6 +310,12 @@ export default {
         requiredFields: 'Название и содержимое CSS стиля обязательны',
         previewUrlApplied: 'URL изображения предпросмотра успешно применен'
     },
+    feed: {
+        latest: 'Свежее',
+        popular: 'Популярное',
+        following: 'Подписки',
+        friends: 'Друзья'
+    },
     errors: {
         not_found: 'Страница или пост не найдены'
     },

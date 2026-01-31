@@ -542,7 +542,8 @@ export default {
     feed: {
         latest: 'Latest',
         popular: 'Popular',
-        following: 'Following'
+        following: 'Following',
+        friends: 'Friends'
     },
     avatars: {
         noAvatarsAvailable: 'No avatars available',

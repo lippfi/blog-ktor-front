@@ -295,6 +295,12 @@ export default {
         requiredFields: 'Атауы және CSS стиль мазмұны міндетті',
         previewUrlApplied: 'Алдын ала қарау суретінің URL мекенжайы сәтті қолданылды'
     },
+    feed: {
+        latest: 'Соңғы',
+        popular: 'Танымал',
+        following: 'Жазылымдар',
+        friends: 'Достар'
+    },
     errors: {
         not_found: 'Бет немесе жазба табылмады'
     },
