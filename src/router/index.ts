@@ -17,6 +17,7 @@ import RepostView from "@/views/RepostView.vue";
 import StylesComponent from "@/components/styles/StylesComponent.vue";
 import {diaryClient} from "@/api/diaryClient.ts";
 import {updateStyles} from "@/styles/stylesManager";
+import NotFoundView from "@/views/NotFoundView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -124,8 +125,12 @@ const router = createRouter({
 
           next();
         } else {
-          to.meta.error = searchResult.message;
-          next();
+          if (searchResult.status === 401 || searchResult.status === 404) {
+            next({name: 'not-found'});
+          } else {
+            to.meta.error = searchResult.message;
+            next();
+          }
         }
       }
     },
@@ -179,8 +184,12 @@ const router = createRouter({
           updateStyles(postPage.diary.styles);
           next();
         } else {
-          to.meta.post = null;
-          next(); // todo redirect if post not found
+          if (result.status === 401 || result.status === 404) {
+            next({name: 'not-found'});
+          } else {
+            to.meta.post = null;
+            next();
+          }
         }
       }
     },
@@ -194,6 +203,15 @@ const router = createRouter({
       path: "/messages",
       name: "messages",
       component: DialogsView,
+    },
+    {
+      path: "/404",
+      name: "not-found",
+      component: NotFoundView,
+    },
+    {
+      path: "/:pathMatch(.*)*",
+      redirect: "/404",
     },
     {
       path: "/repost",

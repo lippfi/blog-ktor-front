@@ -294,5 +294,12 @@ export default {
         changesCancelled: 'Өзгерістер болдырылмады',
         requiredFields: 'Атауы және CSS стиль мазмұны міндетті',
         previewUrlApplied: 'Алдын ала қарау суретінің URL мекенжайы сәтті қолданылды'
+    },
+    errors: {
+        not_found: 'Бет немесе жазба табылмады'
+    },
+    buttons: {
+        go_home: 'Басты бетке өту',
+        go_back: 'Артқа'
     }
 }

@@ -309,5 +309,12 @@ export default {
         changesCancelled: 'Изменения отменены',
         requiredFields: 'Название и содержимое CSS стиля обязательны',
         previewUrlApplied: 'URL изображения предпросмотра успешно применен'
+    },
+    errors: {
+        not_found: 'Страница или пост не найдены'
+    },
+    buttons: {
+        go_home: 'На главную',
+        go_back: 'Назад'
     }
 }

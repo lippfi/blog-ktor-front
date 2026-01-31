@@ -560,7 +560,12 @@ export default {
     errors: {
         failedToLoadAvatars: 'Failed to load avatars',
         failedToReorderAvatars: 'Failed to reorder avatars',
-        failedToUploadAvatars: 'Failed to upload avatars'
+        failedToUploadAvatars: 'Failed to upload avatars',
+        not_found: 'Page or post not found'
+    },
+    buttons: {
+        go_home: 'Go to home page',
+        go_back: 'Go back'
     },
     styles: {
         preview: {

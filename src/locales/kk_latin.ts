@@ -294,5 +294,12 @@ export default {
         changesCancelled: 'Ozgerister boldyrylmady',
         requiredFields: 'Atauy jane CSS stil mazmuny mindetti',
         previewUrlApplied: 'Aldyn ala qarau suretinin URL mekenjayy satti qoldanyldy'
+    },
+    errors: {
+        not_found: 'Bet nemese jazba tabylmady'
+    },
+    buttons: {
+        go_home: 'Basty betke otu',
+        go_back: 'Artqa'
     }
 }

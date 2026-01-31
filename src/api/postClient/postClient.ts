@@ -10,7 +10,7 @@ import type {
 
 export type Result<T = void> =
     | (T extends void ? { type: 'ok'; data?: T } : { type: 'ok'; data: T })
-    | { type: 'error'; message: string };
+    | { type: 'error'; message: string; status?: number };
 
 export interface IPostClient {
     getDiaryPosts(diary: string, page: number): Promise<Result<DiaryPageDto>>;
@@ -69,7 +69,7 @@ class PostClientImpl implements IPostClient {
                 return { type: 'ok', data };
             } else {
                 const message = await response.text();
-                return { type: 'error', message };
+                return { type: 'error', message, status: response.status };
             }
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
@@ -106,7 +106,7 @@ class PostClientImpl implements IPostClient {
                 return { type: 'ok', data };
             } else {
                 const message = await response.text();
-                return { type: 'error', message };
+                return { type: 'error', message, status: response.status };
             }
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
@@ -121,7 +121,7 @@ class PostClientImpl implements IPostClient {
                 return { type: 'ok', data };
             } else {
                 const message = await response.text();
-                return { type: 'error', message };
+                return { type: 'error', message, status: response.status };
             }
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
@@ -146,7 +146,7 @@ class PostClientImpl implements IPostClient {
                 return { type: 'ok', data };
             } else {
                 const message = await response.text();
-                return { type: 'error', message };
+                return { type: 'error', message, status: response.status };
             }
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
@@ -161,7 +161,7 @@ class PostClientImpl implements IPostClient {
                 return { type: 'ok', data };
             } else {
                 const message = await response.text();
-                return { type: 'error', message };
+                return { type: 'error', message, status: response.status };
             }
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
