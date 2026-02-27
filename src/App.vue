@@ -6,7 +6,12 @@
     <div class="centralized-block">
       <router-view v-if="isLoaded" @reaction-added="reactionsStore.addReaction"/>
     </div>
-    <MenuComponent v-if="signedIn && $route.name !== 'register'" class="right-menu" :collapsed="menuCollapsed"/>
+    <MenuComponent
+      v-if="signedIn && $route.name !== 'register'"
+      class="right-menu"
+      :style="rightMenuStyle"
+      :collapsed="menuCollapsed"
+    />
   </div>
 </template>
 
@@ -14,7 +19,7 @@
 import {RouterView, useRouter} from 'vue-router'
 import MenuComponent from "@/components/MenuComponent.vue";
 import {isSignedIn, authEvents} from "@/api/userService.ts";
-import { ref, onMounted, watch, onUnmounted } from 'vue'
+import { computed, ref, onMounted, watch, onUnmounted, nextTick } from 'vue'
 import { getStyles } from "@/styles/stylesManager";
 import { useReactionsStore } from "@/stores/reactionsStore";
 import HeaderComponent from "@/components/HeaderComponent.vue";
@@ -23,7 +28,34 @@ const router = useRouter()
 const signedIn = ref(isSignedIn())
 const isLoaded = ref(false)
 const menuCollapsed = ref(true)
+const menuTopOffset = ref(74)
+let menuOffsetAnimationFrame: number | null = null
 const reactionsStore = useReactionsStore()
+
+const rightMenuStyle = computed(() => ({
+  transform: `translate3d(0, ${menuTopOffset.value}px, 0)`
+}))
+
+const updateMenuOffset = () => {
+  const header = document.querySelector('.app-header') as HTMLElement | null
+  const headerHeight = header?.offsetHeight ?? 74
+  const nextOffset = Math.max(0, headerHeight - window.scrollY)
+
+  if (menuTopOffset.value !== nextOffset) {
+    menuTopOffset.value = nextOffset
+  }
+}
+
+const scheduleMenuOffsetUpdate = () => {
+  if (menuOffsetAnimationFrame !== null) {
+    return
+  }
+
+  menuOffsetAnimationFrame = window.requestAnimationFrame(() => {
+    menuOffsetAnimationFrame = null
+    updateMenuOffset()
+  })
+}
 
 const toggleMenuCollapse = () => {
   menuCollapsed.value = !menuCollapsed.value;
@@ -32,10 +64,14 @@ const toggleMenuCollapse = () => {
 // Update signedIn state when route changes
 watch(() => router.currentRoute.value, () => {
   signedIn.value = isSignedIn()
+  nextTick(scheduleMenuOffsetUpdate)
 })
 
 onMounted(async () => {
   signedIn.value = isSignedIn()
+  updateMenuOffset()
+  window.addEventListener('scroll', scheduleMenuOffsetUpdate, { passive: true })
+  window.addEventListener('resize', scheduleMenuOffsetUpdate)
   console.log('Signed in:', signedIn.value);
   if (!signedIn.value) {
     isLoaded.value = true;
@@ -51,6 +87,15 @@ onMounted(async () => {
 
   isLoaded.value = true;
 });
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', scheduleMenuOffsetUpdate)
+  window.removeEventListener('resize', scheduleMenuOffsetUpdate)
+
+  if (menuOffsetAnimationFrame !== null) {
+    window.cancelAnimationFrame(menuOffsetAnimationFrame)
+  }
+})
 </script>
 
 <style>
@@ -238,10 +283,10 @@ html {
 }
 
 .right-menu {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  height: 100vh;
-  z-index: 100;
+  z-index: 90;
+  will-change: transform;
 }
 </style>
