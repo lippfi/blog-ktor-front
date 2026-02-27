@@ -229,7 +229,7 @@ async function replaceStyleReferences(text: string): Promise<string> {
 
 function replaceCenterVertically(text: string): string {
   let result = text;
-  const pattern = /\n?\[c-v\]([\s\S]*?)\[\/c-v\]\n?/;
+  const pattern = /\[c-v\]([\s\S]*?)\[\/c-v\]\n?/;
   let match = result.match(pattern);
   while (match !== null) {
     result = result.replace(match[0], '<div style="position: relative; height: 100%;"><div style="position: absolute; top: 0; bottom: 0; margin: auto; height: fit-content;">' + match[1] + '</div></div>');
@@ -288,7 +288,7 @@ function replaceAudio(text: string): string {
 
 function replaceVideo(text: string): string {
   let result = text;
-  const pattern = /\n?\[video link="(.*?)"\]\n?/;
+  const pattern = /\[video link="(.*?)"\]\n?/;
   let match = result.match(pattern);
   while (match !== null) {
     result = result.replace(match[0], '<video src="' + match[1] + '" controls></video>');
@@ -299,7 +299,7 @@ function replaceVideo(text: string): string {
 
 function replaceAvatars(text: string): string {
   let result = text;
-  const pattern = /\n?\[avatars\]([\s\S]*?)\[\/avatars\]\n?/;
+  const pattern = /\[avatars\]([\s\S]*?)\[\/avatars\]\n?/;
   let match = result.match(pattern);
 
   while (match !== null) {
@@ -322,7 +322,7 @@ function replaceAvatars(text: string): string {
 
 function replaceSlider(text: string): string {
   let result = text;
-  const sliderPattern = /\n?\[slider\]([\s\S]*?)\[\/slider\]\n?/;
+  const sliderPattern = /\[slider\]([\s\S]*?)\[\/slider\]\n?/;
   let match = result.match(sliderPattern);
   while (match !== null) {
     result = result.replace(match[0], '<el-carousel indicator-position="outside" :autoplay="false">' + match[1] + '</el-carousel>');
@@ -339,7 +339,7 @@ function replaceSlider(text: string): string {
 
 function replaceReadMore(text: string): string {
   let result = text;
-  const pattern = /\n?\[expandable name="(.*?)"\]\n?([\s\S]*?)\n?\[\/expandable\]\n?/;
+  const pattern = /\[expandable name="(.*?)"\]\n?([\s\S]*?)\n?\[\/expandable\]\n?/;
   let match = result.match(pattern);
   while (match !== null) {
     const title = match[1];
@@ -370,7 +370,7 @@ function replacePatternWithTag(text: string, pattern: RegExp, tag: string, style
 
 function replaceCode(text: string): string {
   let result = text;
-  const pattern = /\n?\[code language="(.*?)"\]\n?([\s\S]*?)\n?\[\/code\]\n?/;
+  const pattern = /\[code language="(.*?)"\]\n?([\s\S]*?)\n?\[\/code\]\n?/;
   let match = result.match(pattern);
   while (match !== null) {
     const language = match[1];
@@ -390,7 +390,7 @@ function replaceQuote(text: string): string {
 
 async function replaceRepost(text: string): Promise<string> {
   let result = text;
-  const pattern = /\n?\[repost author="(.*?)" origin="(.*?)"( collapsed="(.*?)")?\]\n?([\s\S]*?)\n?\[\/repost\]\n?/;
+  const pattern = /\[repost author="(.*?)" origin="(.*?)"( collapsed="(.*?)")?\]\n?([\s\S]*?)\n?\[\/repost\]\n?/;
   let match = result.match(pattern);
 
   if (match === null) {
