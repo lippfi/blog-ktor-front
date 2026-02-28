@@ -6,6 +6,7 @@ import PostClientImpl from "@/api/postClient/postClient";
 import type {CommentCreateRequest, CommentDto, CommentUpdateRequest} from "@/api/dto/postServiceDto";
 import {useI18n} from "vue-i18n";
 import { useReactionsStore } from "@/stores/reactionsStore";
+import {buildDraftKey, clearDraft, readDraft, saveDraft} from "@/utils/draftStorage.ts";
 
 const { t } = useI18n();
 const reactionsStore = useReactionsStore();
@@ -28,6 +29,16 @@ const previewRef = ref<HTMLElement | null>(null);
 const showQuotePopup = ref(false);
 const popupPosition = ref({ top: 0, left: 0 });
 const selectedText = ref('');
+
+type CommentDraft = {
+  content: string;
+  avatar?: string;
+}
+
+const commentDraftKey = buildDraftKey(
+  'comment',
+  `${props.postId}:${props.replyingToComment?.id || 'root'}`
+);
 
 const togglePreview = () => {
   isPreviewExpanded.value = !isPreviewExpanded.value;
@@ -122,6 +133,7 @@ const updateScreenSize = (e: MediaQueryListEvent) => {
 onMounted(() => {
   document.addEventListener('mousedown', documentClickHandler);
   mediaQuery.addEventListener('change', updateScreenSize);
+  restoreCommentDraft();
 });
 
 onUnmounted(() => {
@@ -156,6 +168,40 @@ const emit = defineEmits<{
 const localContent = ref<string>(props.content || '');
 const localAvatar = ref<string | undefined>(props.avatar);
 
+function restoreCommentDraft() {
+  if (props.isEdit) {
+    return;
+  }
+
+  const draft = readDraft<CommentDraft>(commentDraftKey);
+  if (!draft) {
+    return;
+  }
+
+  if (typeof draft.content === 'string') {
+    localContent.value = draft.content;
+  }
+
+  if (typeof draft.avatar === 'string') {
+    localAvatar.value = draft.avatar;
+  }
+}
+
+function saveCommentDraft() {
+  if (props.isEdit || !localContent.value.trim()) {
+    return;
+  }
+
+  saveDraft(commentDraftKey, {
+    content: localContent.value,
+    avatar: localAvatar.value,
+  });
+}
+
+function clearCommentDraft() {
+  clearDraft(commentDraftKey);
+}
+
 function cancelEdit() {
   emit('cancelEdit');
 }
@@ -179,15 +225,18 @@ async function addComment() {
   try {
     const result = await postClient.addComment(commentRequest);
     if (result.type === 'ok') {
+      clearCommentDraft();
       localContent.value = '';
       emit('commentAdded', result.data);
       if (props.replyingToComment) {
         emit('cancel-reply');
       }
     } else {
+      saveCommentDraft();
       errorMessage.value = result.message;
     }
   } catch (error) {
+    saveCommentDraft();
     errorMessage.value = error instanceof Error ? error.message : 'Unknown error occurred';
   } finally {
     isLoading.value = false;

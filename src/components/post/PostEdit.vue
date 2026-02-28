@@ -70,6 +70,7 @@ import type {PostCreateDto, PostViewDto} from "@/api/dto/postServiceDto.ts";
 import {getAccessGroups, getDefaultAccessGroups} from "@/api/accessGroupService.ts";
 import router from "@/router";
 import { useReactionsStore } from "@/stores/reactionsStore";
+import {buildDraftKey, clearDraft, readDraft, saveDraft} from "@/utils/draftStorage.ts";
 
 const reactionsStore = useReactionsStore();
 const {t } = useI18n()
@@ -114,6 +115,19 @@ const localCommentGroup = ref<string>(props.commentGroup || '');
 const localCommentReactionGroup = ref<string>(props.reactionGroup || '');
 const localReadGroup = ref<string>(props.readGroup || '');
 
+type PostDraft = {
+  tags: string[];
+  content: string;
+  classes: string;
+  title: string;
+  avatar?: string;
+  reactionGroup: string;
+  commentGroup: string;
+  readGroup: string;
+}
+
+const postDraftKey = buildDraftKey('post', `${props.type}:${props.diaryLogin}`);
+
 const client = new PostClientImpl()
 const accessGroups = ref<Map<string, string>>(new Map())
 
@@ -126,6 +140,7 @@ const updateScreenSize = (e: MediaQueryListEvent) => {
 
 onMounted(async () => {
   mediaQuery.addEventListener('change', updateScreenSize);
+  restorePostDraft();
   await fetchAccessGroups()
   const language = (await getCurrentSessionInfo()).language
   const defaultGroupsResponse = await getDefaultAccessGroups(props.diaryLogin, language);
@@ -169,6 +184,70 @@ function cancelEdit() {
   emit('cancelEdit');
 }
 
+function restorePostDraft() {
+  if (props.type === 'edit') {
+    return;
+  }
+
+  const draft = readDraft<PostDraft>(postDraftKey);
+  if (!draft) {
+    return;
+  }
+
+  if (Array.isArray(draft.tags)) {
+    localTags.value = draft.tags;
+  }
+
+  if (typeof draft.content === 'string') {
+    localContent.value = draft.content;
+  }
+
+  if (typeof draft.classes === 'string') {
+    localClasses.value = draft.classes;
+  }
+
+  if (typeof draft.title === 'string') {
+    localTitle.value = draft.title;
+  }
+
+  if (typeof draft.avatar === 'string') {
+    localAvatar.value = draft.avatar;
+  }
+
+  if (typeof draft.reactionGroup === 'string') {
+    localReactionGroup.value = draft.reactionGroup;
+  }
+
+  if (typeof draft.commentGroup === 'string') {
+    localCommentGroup.value = draft.commentGroup;
+  }
+
+  if (typeof draft.readGroup === 'string') {
+    localReadGroup.value = draft.readGroup;
+  }
+}
+
+function savePostDraft() {
+  if (props.type === 'edit' || !localContent.value.trim()) {
+    return;
+  }
+
+  saveDraft(postDraftKey, {
+    tags: localTags.value,
+    content: localContent.value,
+    classes: localClasses.value,
+    title: localTitle.value,
+    avatar: localAvatar.value,
+    reactionGroup: localReactionGroup.value,
+    commentGroup: localCommentGroup.value,
+    readGroup: localReadGroup.value,
+  });
+}
+
+function clearPostDraft() {
+  clearDraft(postDraftKey);
+}
+
 const showAdvancedOptions = ref<boolean>()
 
 async function createPost() {
@@ -188,11 +267,18 @@ async function createPost() {
     isHidden: false,
   }
 
-  const res = await client.addPost(newPost)
-  if (res.type == 'ok') {
-    await router.push({name: 'post', params: {'login': props.diaryLogin, 'postUri': res.data.uri}})
-  } else {
-    console.log("add post error")
+  try {
+    const res = await client.addPost(newPost)
+    if (res.type == 'ok') {
+      clearPostDraft();
+      await router.push({name: 'post', params: {'login': props.diaryLogin, 'postUri': res.data.uri}})
+    } else {
+      savePostDraft();
+      console.log("add post error")
+    }
+  } catch (error) {
+    savePostDraft();
+    console.error('Failed to add post', error)
   }
 }
 
