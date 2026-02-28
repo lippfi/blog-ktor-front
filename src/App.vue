@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import {RouterView, useRouter} from 'vue-router'
 import MenuComponent from "@/components/MenuComponent.vue";
-import {isSignedIn, authEvents} from "@/api/userService.ts";
+import {isSignedIn} from "@/api/userService.ts";
 import { computed, ref, onMounted, watch, onUnmounted, nextTick } from 'vue'
 import { getStyles } from "@/styles/stylesManager";
 import { useReactionsStore } from "@/stores/reactionsStore";
@@ -28,18 +28,23 @@ const router = useRouter()
 const signedIn = ref(isSignedIn())
 const isLoaded = ref(false)
 const menuCollapsed = ref(true)
-const menuTopOffset = ref(74)
+const DEFAULT_HEADER_HEIGHT = 74
+const menuTopOffset = ref(DEFAULT_HEADER_HEIGHT)
 let menuOffsetAnimationFrame: number | null = null
 const reactionsStore = useReactionsStore()
 
 const rightMenuStyle = computed(() => ({
-  transform: `translate3d(0, ${menuTopOffset.value}px, 0)`
+  transform: `translate3d(0, ${menuTopOffset.value}px, 0)`,
+  height: `calc(100vh - ${menuTopOffset.value}px)`
 }))
 
-const updateMenuOffset = () => {
+const getHeaderHeight = () => {
   const header = document.querySelector('.app-header') as HTMLElement | null
-  const headerHeight = header?.offsetHeight ?? 74
-  const nextOffset = Math.max(0, headerHeight - window.scrollY)
+  return header?.offsetHeight ?? DEFAULT_HEADER_HEIGHT
+}
+
+const updateMenuOffset = () => {
+  const nextOffset = Math.max(0, getHeaderHeight() - window.scrollY)
 
   if (menuTopOffset.value !== nextOffset) {
     menuTopOffset.value = nextOffset
@@ -62,7 +67,7 @@ const toggleMenuCollapse = () => {
 }
 
 // Update signedIn state when route changes
-watch(() => router.currentRoute.value, () => {
+watch(() => router.currentRoute.value.fullPath, () => {
   signedIn.value = isSignedIn()
   nextTick(scheduleMenuOffsetUpdate)
 })
@@ -72,7 +77,6 @@ onMounted(async () => {
   updateMenuOffset()
   window.addEventListener('scroll', scheduleMenuOffsetUpdate, { passive: true })
   window.addEventListener('resize', scheduleMenuOffsetUpdate)
-  console.log('Signed in:', signedIn.value);
   if (!signedIn.value) {
     isLoaded.value = true;
     return
@@ -94,6 +98,7 @@ onUnmounted(() => {
 
   if (menuOffsetAnimationFrame !== null) {
     window.cancelAnimationFrame(menuOffsetAnimationFrame)
+    menuOffsetAnimationFrame = null
   }
 })
 </script>

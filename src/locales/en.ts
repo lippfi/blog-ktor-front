@@ -535,6 +535,8 @@ export default {
         diary: 'Diary',
         messages: 'Messages',
         search: 'Search',
+        darkTheme: 'Dark theme',
+        lightTheme: 'Light theme',
         designOff: 'Turn off design',
         settings: 'Settings',
         logout: 'Logout',

@@ -4,17 +4,19 @@ import {
   HomeFilled,
   Memo,
   Message,
+  Moon,
   Search,
   Setting,
+  Sunny,
   SwitchButton,
   User
 } from "@element-plus/icons-vue";
 import {useI18n} from "vue-i18n";
 import {useRouter} from 'vue-router';
 import {getCurrentUserLogin, logOut} from "@/api/userService.ts";
-import { defineProps } from 'vue';
+import {computed, onMounted, ref} from 'vue';
 
-const props = defineProps({
+defineProps({
   collapsed: {
     type: Boolean,
     default: true
@@ -24,6 +26,20 @@ const props = defineProps({
 const { t } = useI18n()
 const router = useRouter()
 const currentUser = getCurrentUserLogin()
+const isDarkTheme = ref(false)
+const THEME_STORAGE_KEY = 'theme'
+const DARK_THEME_VALUE = 'dark'
+
+const themeToggleLabel = computed(() =>
+  isDarkTheme.value ? t('menu.lightTheme') : t('menu.darkTheme')
+)
+
+const applyTheme = (darkTheme: boolean) => {
+  isDarkTheme.value = darkTheme
+  document.documentElement.classList.toggle('dark', darkTheme)
+  document.body.classList.toggle('dark', darkTheme)
+  localStorage.setItem(THEME_STORAGE_KEY, darkTheme ? DARK_THEME_VALUE : 'light')
+}
 
 const navigateTo = (path: string) => {
   router.push(path)
@@ -33,13 +49,24 @@ function signOut() {
   logOut()
   router.push('/login')
 }
+
+function toggleTheme() {
+  applyTheme(!isDarkTheme.value)
+}
+
+onMounted(() => {
+  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY)
+  const isSystemDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
+  const shouldUseDarkTheme = savedTheme ? savedTheme === DARK_THEME_VALUE : isSystemDark
+
+  applyTheme(shouldUseDarkTheme)
+})
 </script>
 
 <template>
   <el-menu
       v-if="!collapsed"
       class="el-menu-vertical"
-      :collapse="false"
   >
     <el-menu-item index="1" @click="navigateTo('/')">
       <el-icon><HomeFilled /></el-icon>
@@ -80,18 +107,25 @@ function signOut() {
       <el-icon><SwitchButton /></el-icon>
       <span>{{ t('menu.logout') }}</span>
     </el-menu-item>
+
+    <el-menu-item index="9" class="theme-toggle-item" @click="toggleTheme">
+      <el-icon>
+        <Sunny v-if="isDarkTheme" />
+        <Moon v-else />
+      </el-icon>
+      <span>{{ themeToggleLabel }}</span>
+    </el-menu-item>
   </el-menu>
 </template>
 
 <style scoped>
 .el-menu-vertical {
+  display: flex;
+  flex-direction: column;
   width: 240px;
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
   transition: width 0.3s ease;
-}
-
-.el-menu-vertical.el-menu--collapse {
-  width: 64px;
 }
 
 .el-menu-item {
@@ -105,5 +139,15 @@ function signOut() {
 .el-menu-item:hover {
   background-color: #303030;
   color: white;
+}
+
+.theme-toggle-item {
+  margin-top: auto;
+}
+
+:global(body.dark) .theme-toggle-item,
+:global(html.dark) .theme-toggle-item {
+  color: #f1f1f1;
+  background-color: #1f1f1f;
 }
 </style>
