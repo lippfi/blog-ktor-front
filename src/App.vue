@@ -28,6 +28,7 @@ const router = useRouter()
 const signedIn = ref(isSignedIn())
 const isLoaded = ref(false)
 const menuCollapsed = ref(true)
+const MENU_COLLAPSED_STORAGE_KEY = 'menuCollapsed'
 const DEFAULT_HEADER_HEIGHT = 74
 const menuTopOffset = ref(DEFAULT_HEADER_HEIGHT)
 let menuOffsetAnimationFrame: number | null = null
@@ -63,7 +64,8 @@ const scheduleMenuOffsetUpdate = () => {
 }
 
 const toggleMenuCollapse = () => {
-  menuCollapsed.value = !menuCollapsed.value;
+  menuCollapsed.value = !menuCollapsed.value
+  localStorage.setItem(MENU_COLLAPSED_STORAGE_KEY, String(menuCollapsed.value))
 }
 
 // Update signedIn state when route changes
@@ -73,6 +75,11 @@ watch(() => router.currentRoute.value.fullPath, () => {
 })
 
 onMounted(async () => {
+  const savedMenuCollapsed = localStorage.getItem(MENU_COLLAPSED_STORAGE_KEY)
+  if (savedMenuCollapsed !== null) {
+    menuCollapsed.value = savedMenuCollapsed === 'true'
+  }
+
   signedIn.value = isSignedIn()
   updateMenuOffset()
   window.addEventListener('scroll', scheduleMenuOffsetUpdate, { passive: true })

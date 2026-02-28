@@ -108,13 +108,20 @@ onMounted(() => {
       <span>{{ t('menu.logout') }}</span>
     </el-menu-item>
 
-    <el-menu-item index="9" class="theme-toggle-item" @click="toggleTheme">
-      <el-icon>
-        <Sunny v-if="isDarkTheme" />
-        <Moon v-else />
-      </el-icon>
-      <span>{{ themeToggleLabel }}</span>
-    </el-menu-item>
+    <div class="theme-toggle-item">
+      <button
+        class="theme-toggle-button"
+        type="button"
+        :title="themeToggleLabel"
+        :aria-label="themeToggleLabel"
+        @click="toggleTheme"
+      >
+        <el-icon>
+          <Sunny v-if="isDarkTheme" />
+          <Moon v-else />
+        </el-icon>
+      </button>
+    </div>
   </el-menu>
 </template>
 
@@ -143,11 +150,46 @@ onMounted(() => {
 
 .theme-toggle-item {
   margin-top: auto;
+  display: flex;
+  justify-content: flex-start;
+  padding: 16px;
+}
+
+.theme-toggle-button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background-color: transparent;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.theme-toggle-button:hover {
+  background-color: #303030;
+  color: white;
+}
+
+.theme-toggle-button .el-icon {
+  font-size: 18px;
 }
 
 :global(body.dark) .theme-toggle-item,
 :global(html.dark) .theme-toggle-item {
   color: #f1f1f1;
+}
+
+:global(body.dark) .theme-toggle-button,
+:global(html.dark) .theme-toggle-button {
   background-color: #1f1f1f;
+}
+
+:global(body.dark) .theme-toggle-button:hover,
+:global(html.dark) .theme-toggle-button:hover {
+  background-color: #2a2a2a;
 }
 </style>
