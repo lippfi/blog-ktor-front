@@ -1101,6 +1101,41 @@ const handleMentionSelect = (option: MentionOption) => {
       0 0 0 0 var(--el-input-focus-border-color, var(--el-border-color)) inset,
       1px 0 0 0 var(--el-input-focus-border-color, var(--el-border-color)) inset;
 }
+
+/* Modern thin rounded scrollbar for textarea */
+.textarea .el-textarea__inner {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(144, 144, 144, 0.4) transparent;
+  padding-right: 18px !important;
+}
+.textarea .el-textarea__inner::-webkit-scrollbar {
+  width: 6px;
+  margin-right: 4px;
+}
+.textarea .el-textarea__inner::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px 0;
+}
+.textarea .el-textarea__inner::-webkit-scrollbar-thumb {
+  background-color: rgba(144, 144, 144, 0.4);
+  border-radius: 3px;
+}
+.textarea .el-textarea__inner::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(144, 144, 144, 0.6);
+}
+.textarea .el-textarea__inner::-webkit-scrollbar-button,
+.textarea .el-textarea__inner::-webkit-scrollbar-button:start,
+.textarea .el-textarea__inner::-webkit-scrollbar-button:end,
+.textarea .el-textarea__inner::-webkit-scrollbar-button:start:decrement,
+.textarea .el-textarea__inner::-webkit-scrollbar-button:end:increment,
+.textarea .el-textarea__inner::-webkit-scrollbar-button:vertical:start:decrement,
+.textarea .el-textarea__inner::-webkit-scrollbar-button:vertical:end:increment {
+  display: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+}
 </style>
 <style scoped>
 .textarea {
