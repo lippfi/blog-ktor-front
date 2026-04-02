@@ -1,4 +1,5 @@
 import { backendURL } from "@/constants";
+import { authenticatedRequest } from "@/api/apiUtils";
 import {useI18n} from "vue-i18n";
 import mitt from 'mitt';
 
@@ -150,22 +151,6 @@ type Result<T = void> =
 
 type LoginResult = Result;
 
-export async function authenticatedRequest(
-    endpoint: string,
-    options: RequestInit = {}
-): Promise<Response> {
-    const token = localStorage.getItem('jwt');
-    if (!token) {
-        throw new Error('No authentication token found');
-    }
-
-    const headers = {
-        ...options.headers,
-        'Authorization': `Bearer ${token}`
-    };
-
-    return fetch(`${backendURL}${endpoint}`, { ...options, headers });
-}
 
 export async function signIn(login: string, password: string): Promise<LoginResult> {
     const requestOptions: RequestInit = {

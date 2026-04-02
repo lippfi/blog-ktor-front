@@ -1,5 +1,6 @@
 import type {ReactionPackDto, ReactionViewDto} from "@/api/dto/reactionServiceDto.ts";
 import {backendURL} from "@/constants";
+import { authenticatedRequest } from "@/api/apiUtils";
 import type {RecentReactionResponse} from "@/api/reactionService.ts";
 import type {Result} from "@/api/postClient/postClient.ts";
 
@@ -17,26 +18,10 @@ export interface IReactionClient {
 }
 
 export class ReactionClientImpl implements IReactionClient {
-    private async authenticatedRequest(
-        endpoint: string,
-        options: RequestInit = {}
-    ): Promise<Response> {
-        const token = localStorage.getItem('jwt');
-        if (!token) {
-            throw new Error('No authentication token found');
-        }
-
-        const headers = {
-            ...options.headers,
-            'Authorization': `Bearer ${token}`
-        };
-
-        return fetch(`${backendURL}${endpoint}`, { ...options, headers });
-    }
 
     public async addPostReaction(login: string, uri: string, reactionName: string): Promise<void> {
         try {
-            const response = await reactionClient.authenticatedRequest(`/reactions/post-reaction?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}&name=${encodeURIComponent(reactionName)}`, {
+            const response = await authenticatedRequest(`/reactions/post-reaction?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}&name=${encodeURIComponent(reactionName)}`, {
                 method: 'POST'
             });
 
@@ -54,7 +39,7 @@ export class ReactionClientImpl implements IReactionClient {
 
     public async removePostReaction(login: string, uri: string, reactionName: string): Promise<void> {
         try {
-            const response = await reactionClient.authenticatedRequest(
+            const response = await authenticatedRequest(
                 `/reactions/post-reaction?login=${encodeURIComponent(login)}&uri=${encodeURIComponent(uri)}&name=${encodeURIComponent(reactionName)}`,
                 {
                     method: 'DELETE',
@@ -94,7 +79,7 @@ export class ReactionClientImpl implements IReactionClient {
             const url = limit
                 ? `/reactions/recent?limit=${limit}`
                 : `/reactions/recent`;
-            const response = await reactionClient.authenticatedRequest(url);
+            const response = await authenticatedRequest(url);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
@@ -116,7 +101,7 @@ export class ReactionClientImpl implements IReactionClient {
 
     public async addCommentReaction(commentId: string, reactionName: string): Promise<void> {
         try {
-            const response = await reactionClient.authenticatedRequest(`/reactions/comment-reaction?commentId=${encodeURIComponent(commentId)}&name=${encodeURIComponent(reactionName)}`, {
+            const response = await authenticatedRequest(`/reactions/comment-reaction?commentId=${encodeURIComponent(commentId)}&name=${encodeURIComponent(reactionName)}`, {
                 method: 'POST'
             });
 
@@ -134,7 +119,7 @@ export class ReactionClientImpl implements IReactionClient {
 
     public async removeCommentReaction(commentId: string, reactionName: string): Promise<void> {
         try {
-            const response = await reactionClient.authenticatedRequest(`/reactions/comment-reaction?commentId=${encodeURIComponent(commentId)}&name=${encodeURIComponent(reactionName)}`,
+            const response = await authenticatedRequest(`/reactions/comment-reaction?commentId=${encodeURIComponent(commentId)}&name=${encodeURIComponent(reactionName)}`,
                 {
                     method: 'DELETE',
                 }

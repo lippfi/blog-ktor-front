@@ -1,4 +1,5 @@
 import {backendURL} from "@/constants";
+import { authenticatedRequest } from "@/api/apiUtils";
 
 export interface DiaryStylePreview {
     id: string,
@@ -47,23 +48,9 @@ export interface IDiaryClient {
 }
 
 class DiaryClientImpl implements IDiaryClient {
-    private static async authenticatedRequest(endpoint: string, options: RequestInit = {}): Promise<Response> {
-        const token = localStorage.getItem('jwt');
-        if (!token) {
-            throw new Error('No authentication token found');
-        }
-
-        const headers = {
-            ...options.headers,
-            'Authorization': `Bearer ${token}`
-        };
-
-        return fetch(`${backendURL}${endpoint}`, { ...options, headers });
-    }
-
     async getDiaryStyleText(styleId: string): Promise<string> {
         console.log(`Getting diary style text for ${styleId}`);
-        const response = await DiaryClientImpl.authenticatedRequest(`/diary/styles/${styleId}`);
+        const response = await authenticatedRequest(`/diary/styles/${styleId}`);
         if (!response.ok) {
             throw new Error(`Failed to get diary style text: ${response.statusText}`);
         }
@@ -79,7 +66,7 @@ class DiaryClientImpl implements IDiaryClient {
     }
 
     async getDiaryStyleCollection(diaryLogin: string): Promise<DiaryStyle[]> {
-        const response = await DiaryClientImpl.authenticatedRequest(`/diary/styles?login=${diaryLogin}`);
+        const response = await authenticatedRequest(`/diary/styles?login=${diaryLogin}`);
         if (!response.ok) {
             throw new Error(`Failed to get diary style collection: ${response.statusText}`);
         }
@@ -87,7 +74,7 @@ class DiaryClientImpl implements IDiaryClient {
     }
 
     async addDiaryStyleById(diaryLogin: string, styleId: string, enable: boolean): Promise<DiaryStyle> {
-        const response = await DiaryClientImpl.authenticatedRequest(
+        const response = await authenticatedRequest(
             `/diary/styles/add-style-by-id?login=${diaryLogin}&styleId=${styleId}&enable=${enable.toString()}`,
             {
                 method: 'POST'
@@ -100,7 +87,7 @@ class DiaryClientImpl implements IDiaryClient {
     }
 
     async addDiaryStyle(diaryLogin: string, style: DiaryStyleTextCreate): Promise<DiaryStyle> {
-        const response = await DiaryClientImpl.authenticatedRequest(
+        const response = await authenticatedRequest(
             `/diary/styles?login=${diaryLogin}`,
             {
                 method: 'POST',
@@ -117,7 +104,7 @@ class DiaryClientImpl implements IDiaryClient {
     }
 
     async updateDiaryStyle(diaryLogin: string, style: DiaryStyleTextUpdate): Promise<DiaryStyle> {
-        const response = await DiaryClientImpl.authenticatedRequest(
+        const response = await authenticatedRequest(
             `/diary/styles/${style.id}?login=${diaryLogin}`,
             {
                 method: 'PUT',
@@ -134,7 +121,7 @@ class DiaryClientImpl implements IDiaryClient {
     }
 
     async deleteDiaryStyle(styleId: string, diaryLogin: string): Promise<void> {
-        const response = await DiaryClientImpl.authenticatedRequest(
+        const response = await authenticatedRequest(
             `/diary/styles/${styleId}?login=${diaryLogin}`,
             {
                 method: 'DELETE'
@@ -154,7 +141,7 @@ class DiaryClientImpl implements IDiaryClient {
     }
 
     async reorderDiaryStyles(diaryLogin: string, styleIds: string[]): Promise<void> {
-        const response = await DiaryClientImpl.authenticatedRequest(
+        const response = await authenticatedRequest(
             `/diary/styles/reorder?login=${diaryLogin}`,
             {
                 method: 'POST',

@@ -1,5 +1,5 @@
 import { backendURL } from "@/constants";
-import {authenticatedRequest} from "@/api/userService.ts";
+import {authenticatedRequest} from "@/api/apiUtils";
 
 // Types
 export interface DiaryInfo {

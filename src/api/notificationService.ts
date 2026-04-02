@@ -1,4 +1,4 @@
-import { backendURL } from "@/constants";
+import { authenticatedRequest } from "@/api/apiUtils";
 
 // Types
 export type NotificationType = 
@@ -41,24 +41,6 @@ export type Notification = PostRelatedNotification | FriendRequestNotification |
 type Result<T> = 
     | { type: 'ok'; data: T }
     | { type: 'error'; message: string };
-
-// Helper function for authenticated requests
-async function authenticatedRequest(
-    endpoint: string,
-    options: RequestInit = {}
-): Promise<Response> {
-    const token = localStorage.getItem('jwt');
-    if (!token) {
-        throw new Error('No authentication token found');
-    }
-
-    const headers = {
-        ...options.headers,
-        'Authorization': `Bearer ${token}`
-    };
-
-    return fetch(`${backendURL}${endpoint}`, { ...options, headers });
-}
 
 // API Methods
 

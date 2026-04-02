@@ -1,4 +1,5 @@
 import { backendURL } from "@/constants";
+import { authenticatedRequest, optionalAuthenticatedRequest } from "@/api/apiUtils";
 import type {
     CommentCreateRequest,
     CommentDto,
@@ -34,32 +35,6 @@ export interface IPostClient {
 }
 
 class PostClientImpl implements IPostClient {
-    private static async optionalAuthenticatedRequest(endpoint: string, options: RequestInit = {}): Promise<Response> {
-        let headers = options.headers;
-        const token = localStorage.getItem('jwt');
-        if (token) {
-            headers = {
-                ...options.headers,
-                'Authorization': `Bearer ${token}`
-            };
-        }
-
-        return fetch(`${backendURL}${endpoint}`, { ...options, headers });
-    }
-
-    private static async authenticatedRequest(endpoint: string, options: RequestInit = {}): Promise<Response> {
-        const token = localStorage.getItem('jwt');
-        if (!token) {
-            throw new Error('No authentication token found');
-        }
-
-        const headers = {
-            ...options.headers,
-            'Authorization': `Bearer ${token}`
-        };
-
-        return fetch(`${backendURL}${endpoint}`, { ...options, headers });
-    }
 
     public async getDiaryPosts(diary: string, page: number): Promise<Result<DiaryPageDto>> {
         try {
@@ -67,7 +42,7 @@ class PostClientImpl implements IPostClient {
             queryParams.set('diary', diary);
             queryParams.set('page', page.toString());
             
-            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/diary?${queryParams.toString()}`);
+            const response = await optionalAuthenticatedRequest(`/posts/diary?${queryParams.toString()}`);
 
             if (response.ok) {
                 const data = await response.json();
@@ -83,7 +58,7 @@ class PostClientImpl implements IPostClient {
 
     public async addPost(post: PostCreateDto): Promise<Result<PostViewDto>> {
         try {
-            const response = await PostClientImpl.authenticatedRequest('/posts', {
+            const response = await authenticatedRequest('/posts', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -108,7 +83,7 @@ class PostClientImpl implements IPostClient {
             const queryParams = new URLSearchParams();
             queryParams.set('login', login);
             queryParams.set('uri', uri);
-            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts?${queryParams.toString()}`);
+            const response = await optionalAuthenticatedRequest(`/posts?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
@@ -125,7 +100,7 @@ class PostClientImpl implements IPostClient {
         try {
             const queryParams = new URLSearchParams();
             queryParams.set('commentId', commentId);
-            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/comment?${queryParams.toString()}`);
+            const response = await optionalAuthenticatedRequest(`/posts/comment?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
@@ -150,7 +125,7 @@ class PostClientImpl implements IPostClient {
             if (params.page !== undefined) queryParams.set('page', params.page.toString());
             if (params.sort) queryParams.set('sort', params.sort.toLowerCase() === 'asc' ? 'asc' : 'desc');
 
-            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/diary?${queryParams.toString()}`);
+            const response = await optionalAuthenticatedRequest(`/posts/diary?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
@@ -170,7 +145,7 @@ class PostClientImpl implements IPostClient {
             queryParams.set('size', size.toString());
             queryParams.set('isHidden', 'false');
             
-            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/search?${queryParams.toString()}`);
+            const response = await optionalAuthenticatedRequest(`/posts/search?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
@@ -189,7 +164,7 @@ class PostClientImpl implements IPostClient {
             queryParams.set('page', page.toString());
             queryParams.set('size', size.toString());
 
-            const response = await PostClientImpl.optionalAuthenticatedRequest(`/posts/discussed?${queryParams.toString()}`);
+            const response = await optionalAuthenticatedRequest(`/posts/discussed?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
@@ -208,7 +183,7 @@ class PostClientImpl implements IPostClient {
             queryParams.set('page', page.toString());
             queryParams.set('size', size.toString());
 
-            const response = await PostClientImpl.authenticatedRequest(`/posts/followed?${queryParams.toString()}`);
+            const response = await authenticatedRequest(`/posts/followed?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
@@ -227,7 +202,7 @@ class PostClientImpl implements IPostClient {
             queryParams.set('page', page.toString());
             queryParams.set('size', size.toString());
 
-            const response = await PostClientImpl.authenticatedRequest(`/posts/friends?${queryParams.toString()}`);
+            const response = await authenticatedRequest(`/posts/friends?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
@@ -242,7 +217,7 @@ class PostClientImpl implements IPostClient {
 
     public async getPostForEditing(id: string): Promise<Result<PostEditDto>> {
         try {
-            const response = await PostClientImpl.authenticatedRequest(`/posts?id=${encodeURIComponent(id)}`);
+            const response = await authenticatedRequest(`/posts?id=${encodeURIComponent(id)}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
@@ -257,7 +232,7 @@ class PostClientImpl implements IPostClient {
 
     public async updatePost(post: PostEditDto): Promise<Result<PostViewDto>> {
         try {
-            const response = await PostClientImpl.authenticatedRequest('/posts', {
+            const response = await authenticatedRequest('/posts', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -279,7 +254,7 @@ class PostClientImpl implements IPostClient {
 
     public async deletePost(postId: string): Promise<Result<string>> {
         try {
-            const response = await PostClientImpl.authenticatedRequest(`/posts?postId=${encodeURIComponent(postId)}`, {
+            const response = await authenticatedRequest(`/posts?postId=${encodeURIComponent(postId)}`, {
                 method: 'DELETE'
             });
 
@@ -297,7 +272,7 @@ class PostClientImpl implements IPostClient {
 
     public async hidePost(postId: string): Promise<Result> {
         try {
-            const response = await PostClientImpl.authenticatedRequest(`/posts/hide?postId=${encodeURIComponent(postId)}`, {
+            const response = await authenticatedRequest(`/posts/hide?postId=${encodeURIComponent(postId)}`, {
                 method: 'POST'
             });
 
@@ -314,7 +289,7 @@ class PostClientImpl implements IPostClient {
 
     public async showPost(postId: string): Promise<Result> {
         try {
-            const response = await PostClientImpl.authenticatedRequest(`/posts/show?postId=${encodeURIComponent(postId)}`, {
+            const response = await authenticatedRequest(`/posts/show?postId=${encodeURIComponent(postId)}`, {
                 method: 'POST'
             });
 
@@ -331,7 +306,7 @@ class PostClientImpl implements IPostClient {
 
     public async addComment(comment: CommentCreateRequest): Promise<Result<CommentDto>> {
         try {
-            const response = await PostClientImpl.authenticatedRequest('/posts/comment', {
+            const response = await authenticatedRequest('/posts/comment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -353,7 +328,7 @@ class PostClientImpl implements IPostClient {
 
     public async updateComment(comment: CommentUpdateRequest): Promise<Result<CommentDto>> {
         try {
-            const response = await PostClientImpl.authenticatedRequest('/posts/comment', {
+            const response = await authenticatedRequest('/posts/comment', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -375,7 +350,7 @@ class PostClientImpl implements IPostClient {
 
     public async deleteComment(commentId: string): Promise<Result<string>> {
         try {
-            const response = await PostClientImpl.authenticatedRequest(`/posts/comment?commentId=${encodeURIComponent(commentId)}`, {
+            const response = await authenticatedRequest(`/posts/comment?commentId=${encodeURIComponent(commentId)}`, {
                 method: 'DELETE'
             });
 
