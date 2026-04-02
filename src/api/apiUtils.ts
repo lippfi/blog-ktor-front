@@ -1,4 +1,16 @@
 import { backendURL } from "@/constants";
+import router from "@/router";
+
+function handleUnauthorized(response: Response): Response {
+    if (response.status === 401) {
+        localStorage.removeItem('jwt');
+        localStorage.removeItem('tokenPair');
+        localStorage.removeItem('sessionInfo');
+        localStorage.removeItem('timeToSessionInfo');
+        router.push('/login');
+    }
+    return response;
+}
 
 export async function authenticatedRequest(
     endpoint: string,
@@ -14,7 +26,8 @@ export async function authenticatedRequest(
         'Authorization': `Bearer ${token}`
     };
 
-    return fetch(`${backendURL}${endpoint}`, { ...options, headers });
+    const response = await fetch(`${backendURL}${endpoint}`, { ...options, headers });
+    return handleUnauthorized(response);
 }
 
 export async function optionalAuthenticatedRequest(
@@ -30,5 +43,6 @@ export async function optionalAuthenticatedRequest(
         };
     }
 
-    return fetch(`${backendURL}${endpoint}`, { ...options, headers });
+    const response = await fetch(`${backendURL}${endpoint}`, { ...options, headers });
+    return handleUnauthorized(response);
 }
