@@ -367,7 +367,7 @@ class PostClientImpl implements IPostClient {
     }
 
     public connectToCommentsWebSocket(postId: string): WebSocket {
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const protocol = backendURL.startsWith('https') ? 'wss:' : 'ws:';
         const host = backendURL.replace(/^https?:\/\//, '');
 
         const token = localStorage.getItem("jwt");
