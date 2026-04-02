@@ -717,6 +717,8 @@ const processSpans = () => {
 }
 
 const handleMentionSearch = async (query: string, prefix: MentionPrefix) => {
+  if (dropdownDismissed) return
+
   const textarea = getTextarea()
   if (!textarea) return
 
@@ -771,12 +773,23 @@ const handleMentionSearch = async (query: string, prefix: MentionPrefix) => {
   processSpans()
 }
 
+let dropdownDismissed = false
+
 function hideCompletionDropdown() {
   options.value = []
+  dropdownDismissed = true
 }
 
 function handleKeyDown(event: KeyboardEvent) {
   const mentionDropdown = document.querySelector('.el-mention-dropdown__list')
+
+  // Close completion dropdown on Escape
+  if (event.key === 'Escape' && options.value.length > 0) {
+    hideCompletionDropdown()
+    event.stopPropagation()
+    event.preventDefault()
+    return
+  }
 
   // Only handle keys when there are no options shown (either empty options or dropdown not visible)
   if (options.value.length === 0 || !mentionDropdown) {
@@ -790,11 +803,23 @@ function handleKeyDown(event: KeyboardEvent) {
   }
 }
 
+function handleBlur() {
+  // Delay hiding so that clicks on dropdown items can register before the popup is dismissed
+  setTimeout(() => {
+    const textarea = getTextarea()
+    if (!textarea || document.activeElement !== textarea) {
+      hideCompletionDropdown()
+    }
+  }, 150)
+}
+
 // Set up event listener when component is mounted
 onMounted(() => {
   const textarea = getTextarea()
   if (textarea) {
     textarea.addEventListener('keydown', handleKeyDown, true)  // Use capture phase
+    textarea.addEventListener('blur', handleBlur)
+    textarea.addEventListener('input', () => { dropdownDismissed = false })
   }
 })
 
@@ -803,6 +828,7 @@ onBeforeUnmount(() => {
   const textarea = getTextarea()
   if (textarea) {
     textarea.removeEventListener('keydown', handleKeyDown, true)  // Match capture phase in cleanup
+    textarea.removeEventListener('blur', handleBlur)
   }
 })
 
