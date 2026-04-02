@@ -77,7 +77,11 @@ const submitForm = (form: FormInstance | undefined) => {
       if (loginResult.type === 'ok') {
         const sessionInfo = await getCurrentSessionInfo()
         handleLocaleChange(sessionInfo.language)
-        await reactionsStore.loadAvatars()
+        await Promise.all([
+          reactionsStore.loadAvatars(),
+          reactionsStore.loadBasicReactions(),
+          reactionsStore.loadRecentReactions(60),
+        ])
         await router.push({name: 'diary', params: {login: loginForm.login}})
       } else {
         error.value = loginResult.message
