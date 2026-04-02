@@ -6,7 +6,7 @@ import AdditionalInfoForm from "@/components/AdditionalInfoForm.vue";
 import DiaryInfoForm from "@/components/DiaryInfoForm.vue";
 import LanguageChooser from '@/components/LanguageChooser.vue';
 import ConfirmEmailForm from "@/components/ConfirmEmailForm.vue";
-import {getCurrentUserLogin, isSignedIn, logOut} from "@/api/userService.ts";
+import {getCurrentUserLogin, isSignedIn, logOut} from "@/api/userClient.ts";
 import {useRouter} from "vue-router";
 import {getBasicAccessGroups} from "@/api/accessGroupService.ts";
 

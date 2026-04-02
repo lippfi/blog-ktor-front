@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { diaryClient } from '@/api/diaryClient';
 import { updateStyles } from '@/styles/stylesManager';
-import { getCurrentUserLogin } from '@/api/userService';
+import { getCurrentUserLogin } from '@/api/userClient';
 
 // Initialize i18n
 const { t } = useI18n();

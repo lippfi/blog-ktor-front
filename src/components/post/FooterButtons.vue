@@ -7,7 +7,7 @@ import type {
 } from "@/api/dto/postServiceDto.ts";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {BottomLeft, ChatLineRound, Delete, Edit, Hide, More, MoreFilled, View, Warning} from "@element-plus/icons-vue";
-import {getCurrentUserLogin} from "@/api/userService.ts";
+import {getCurrentUserLogin} from "@/api/userClient.ts";
 import {useI18n} from "vue-i18n";
 import PostClientMock from "@/api/postClient/postClientMock.ts";
 import PostClientImpl from "@/api/postClient/postClient.ts";

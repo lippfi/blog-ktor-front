@@ -9,7 +9,7 @@ import {
   resetPassword,
   sendPasswordResetEmail,
   signIn
-} from "@/api/userService.ts";
+} from "@/api/userClient.ts";
 import router from "@/router";
 
 const { locale, t } = useI18n()

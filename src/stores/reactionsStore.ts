@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { getAvatars } from "@/api/userService.ts"
+import { getAvatars } from "@/api/userClient.ts"
 import { reactionClient } from "@/api/postClient/reactionClient.ts"
 import type { ReactionPackDto } from "@/api/dto/reactionServiceDto.ts"
 import type { BasicReactionResponse } from "@/api/reactionService.ts"

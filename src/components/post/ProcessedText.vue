@@ -8,7 +8,7 @@
 import { ref, onMounted, watch } from 'vue'
 import RuntimeTemplate from 'vue3-runtime-template';
 import { getReactions} from '@/api/reactionService';
-import { getCurrentUserLogin } from '@/api/userService';
+import { getCurrentUserLogin } from '@/api/userClient';
 import { fetchUsersToCache } from '@/api/userMapService';
 import { useI18n } from 'vue-i18n';
 import { diaryClient } from '@/api/diaryClient';

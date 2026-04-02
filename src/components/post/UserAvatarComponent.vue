@@ -8,7 +8,7 @@ import {
   Remove,
   User
 } from "@element-plus/icons-vue";
-import { getCurrentUserLogin, removeFriend as removeFriendApi, sendFriendRequest } from "@/api/userService.ts";
+import { getCurrentUserLogin, removeFriend as removeFriendApi, sendFriendRequest } from "@/api/userClient.ts";
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';

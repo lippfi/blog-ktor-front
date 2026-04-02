@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { isSignedIn, addAvatarByUrl } from '@/api/userService';
+import { isSignedIn, addAvatarByUrl } from '@/api/userClient';
 import { useReactionsStore } from "@/stores/reactionsStore";
 
 const { t } = useI18n();

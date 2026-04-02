@@ -2,7 +2,7 @@
 import PostComponent from "@/components/post/PostComponent.vue";
 import PostEdit from "@/components/post/PostEdit.vue";
 import {computed, onMounted, ref, watch} from 'vue';
-import {isSignedIn} from "@/api/userService.ts";
+import {isSignedIn} from "@/api/userClient.ts";
 import {useRoute} from "vue-router";
 import type {DiaryHeaderInfo, PostViewDto} from "@/api/dto/postServiceDto.ts";
 import DiaryMenuComponent from "@/components/DiaryMenuComponent.vue";

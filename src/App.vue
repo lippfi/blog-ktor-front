@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import {RouterView, useRouter} from 'vue-router'
 import MenuComponent from "@/components/MenuComponent.vue";
-import {isSignedIn} from "@/api/userService.ts";
+import {isSignedIn} from "@/api/userClient.ts";
 import { computed, ref, onMounted, watch, onUnmounted, nextTick } from 'vue'
 import { getStyles } from "@/styles/stylesManager";
 import { useReactionsStore } from "@/stores/reactionsStore";

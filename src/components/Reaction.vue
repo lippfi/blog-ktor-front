@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {getCurrentUserLogin, getCurrentUserNickname} from "@/api/userService.ts"
+import {getCurrentUserLogin, getCurrentUserNickname} from "@/api/userClient.ts"
 import { ref, watch } from 'vue'
 import {useI18n} from "vue-i18n";
 import type { ReactionDto } from '@/api/dto/postServiceDto.ts'

@@ -32,7 +32,7 @@ import PaginationComponent from "@/components/PaginationComponent.vue";
 import type { PostViewDto } from '@/api/dto/postServiceDto.ts';
 import {useI18n} from "vue-i18n";
 import PostClientImpl from "@/api/postClient/postClient.ts";
-import {isSignedIn} from "@/api/userService.ts";
+import {isSignedIn} from "@/api/userClient.ts";
 import {useRoute, useRouter} from "vue-router";
 
 const t = useI18n().t;

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ReactionDto } from '@/api/dto/postServiceDto.ts'
 import type { BasicReactionResponse } from '@/api/reactionService.ts'
-import { getCurrentUserLogin, getCurrentUserNickname } from '@/api/userService.ts'
+import { getCurrentUserLogin, getCurrentUserNickname } from '@/api/userClient.ts'
 import AddReaction from '@/components/post/reaction/AddReaction.vue'
 import {ref, watch} from 'vue'
 import {reactionClient} from "@/api/postClient/reactionClient.ts";

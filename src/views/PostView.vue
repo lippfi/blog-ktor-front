@@ -8,7 +8,7 @@ import PostComponent from "@/components/post/PostComponent.vue";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import PostClientImpl from "@/api/postClient/postClient.ts";
 import type {CommentDto, PostViewDto, ReactionDto} from "@/api/dto/postServiceDto.ts";
-import {getCurrentUserLogin} from "@/api/userService.ts";
+import {getCurrentUserLogin} from "@/api/userClient.ts";
 
 const props = defineProps<{
   login: string;

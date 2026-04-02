@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 import PostEdit from '@/components/post/PostEdit.vue';
-import { getCurrentUserLogin } from '@/api/userService.ts';
+import { getCurrentUserLogin } from '@/api/userClient.ts';
 import { useI18n } from 'vue-i18n';
 import type {CommentDto, PostViewDto} from "@/api/dto/postServiceDto.ts";
 

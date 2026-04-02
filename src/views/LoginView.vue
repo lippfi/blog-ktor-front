@@ -29,7 +29,7 @@
 <script lang="ts" setup>
 import {computed, onMounted, reactive, ref} from 'vue'
 import type {FormInstance, FormRules} from "element-plus";
-import {getCurrentSessionInfo, isEmailBusy, isLoginBusy, isNicknameBusy, signIn, signUp, isSignedIn, getCurrentUserLogin} from "@/api/userService.ts";
+import {getCurrentSessionInfo, isEmailBusy, isLoginBusy, isNicknameBusy, signIn, signUp, isSignedIn, getCurrentUserLogin} from "@/api/userClient.ts";
 import router from "@/router";
 import {useI18n} from "vue-i18n";
 import LanguageChooser from '@/components/LanguageChooser.vue';

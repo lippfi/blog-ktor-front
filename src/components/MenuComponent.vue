@@ -13,7 +13,7 @@ import {
 } from "@element-plus/icons-vue";
 import {useI18n} from "vue-i18n";
 import {useRouter} from 'vue-router';
-import {getCurrentUserLogin, logOut} from "@/api/userService.ts";
+import {getCurrentUserLogin, logOut} from "@/api/userClient.ts";
 import {computed, onMounted, ref} from 'vue';
 
 defineProps({

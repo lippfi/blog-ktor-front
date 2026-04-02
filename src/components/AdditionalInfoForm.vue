@@ -70,8 +70,8 @@ import {
   type Language,
   type UserAdditionalInfo,
   updateCurrentSessionInfo,
-} from "@/api/userService.ts";
-import { updateAdditionalInfo } from "@/api/userService.ts";
+  updateAdditionalInfo,
+} from "@/api/userClient.ts";
 import router from "@/router";
 import {useI18n} from "vue-i18n";
 

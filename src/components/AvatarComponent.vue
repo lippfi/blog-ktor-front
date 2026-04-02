@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { getAvatars, reorderAvatars, addAvatars } from '@/api/userService';
+import { getAvatars, reorderAvatars, addAvatars } from '@/api/userClient';
 import { useReactionsStore } from '@/stores/reactionsStore';
 import { ElMessage } from 'element-plus';
 import { useI18n } from 'vue-i18n';

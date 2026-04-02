@@ -53,7 +53,7 @@ import type {FormInstance, FormRules} from "element-plus";
 import {
   getCurrentUserLogin,
   updateCurrentSessionInfo
-} from "@/api/userService.ts";
+} from "@/api/userClient.ts";
 import router from "@/router";
 import {useI18n} from "vue-i18n";
 import {getBasicAccessGroups} from "@/api/accessGroupService.ts";

@@ -41,7 +41,7 @@
 <script setup lang="ts">
 import {computed, onMounted, reactive, ref} from 'vue'
 import type {FormInstance, FormRules} from "element-plus";
-import {isEmailBusy, isLoginBusy, isNicknameBusy, signUp} from "@/api/userService.ts";
+import {isEmailBusy, isLoginBusy, isNicknameBusy, signUp} from "@/api/userClient.ts";
 import router from "@/router";
 import {useI18n} from "vue-i18n";
 import {inviteCodeRequired} from "@/constants.ts";

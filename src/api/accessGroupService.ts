@@ -1,7 +1,7 @@
 import { backendURL } from "@/constants";
 import { authenticatedRequest } from "@/api/apiUtils";
 import { i18n } from "@/i18n";
-import type {Language} from "@/api/userService.ts";
+import type {Language} from "@/api/userClient.ts";
 
 // Types
 export type AccessGroupType = 'EVERYONE' | 'REGISTERED_USERS' | 'PRIVATE' | 'CUSTOM';

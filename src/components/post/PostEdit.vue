@@ -62,7 +62,7 @@ import {ref, onMounted, onUnmounted} from 'vue'
 import {useI18n} from "vue-i18n";
 import SmartTextArea from "@/components/post/SmartTextArea.vue";
 import AvatarChooser from "@/components/post/AvatarChooser.vue";
-import {getCurrentSessionInfo, getCurrentUserLogin} from "@/api/userService.ts";
+import {getCurrentSessionInfo, getCurrentUserLogin} from "@/api/userClient.ts";
 import PostClientImpl, {type Result} from "@/api/postClient/postClient.ts";
 import type {PostCreateDto, PostEditDto, PostViewDto} from "@/api/dto/postServiceDto.ts";
 import {getAccessGroups, getDefaultAccessGroups} from "@/api/accessGroupService.ts";

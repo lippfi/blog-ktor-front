@@ -8,7 +8,7 @@ import ReactionList from "./reaction/ReactionList.vue";
 import type { BasicReactionResponse } from "@/api/reactionService.ts";
 import { reactionClient } from "@/api/postClient/reactionClient.ts";
 import type { ReactionPackDto, ReactionViewDto } from "@/api/dto/reactionServiceDto.ts";
-import { searchUsers } from "@/api/userService.ts";
+import { searchUsers } from "@/api/userClient.ts";
 
 const { t } = useI18n()
 

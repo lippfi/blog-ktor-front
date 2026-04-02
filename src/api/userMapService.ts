@@ -1,5 +1,5 @@
 import { ref, computed, watchEffect } from 'vue';
-import { getUsers } from '@/api/userService';
+import { getUsers } from '@/api/userClient';
 
 // Define the User interface
 interface User {
