@@ -1,5 +1,6 @@
 import { backendURL } from "@/constants";
 import { authenticatedRequest } from "@/api/apiUtils";
+import { refreshTokens } from "@/api/sessionClient";
 import mitt from 'mitt';
 import type {
     TokenPair,
@@ -71,18 +72,8 @@ async function refreshTokenPair(): Promise<void> {
     if (!tokenPair) return;
 
     try {
-        const response = await fetch(`${backendURL}/user/refresh-token`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(tokenPair),
-        });
-
-        if (response.ok) {
-            const newTokenPair: TokenPair = await response.json();
-            setTokenPair(newTokenPair);
-        } else {
-            console.error('Failed to refresh token pair:', await response.text());
-        }
+        const newTokenPair = await refreshTokens(tokenPair.refreshToken);
+        setTokenPair(newTokenPair);
     } catch (error) {
         console.error('Error refreshing token pair:', error);
     }
