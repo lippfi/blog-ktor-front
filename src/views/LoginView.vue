@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div/>
+    <div class="spacer-top"/>
     <div class="main">
       <div style="text-align: center;">
         <h1>{{$t('login.form.header')}}</h1>
@@ -21,8 +21,8 @@
         <el-link @click="router.push('/reset-password')">{{ t('login.form.forgot_password.label') }}</el-link>
       </div>
     </div>
-    <div/>
-    <LanguageChooser />
+    <LanguageChooser style="margin-top: 32px" />
+    <div class="spacer-bottom"/>
   </div>
 </template>
 
@@ -99,10 +99,19 @@ const submitForm = (form: FormInstance | undefined) => {
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
+  height: calc(100vh - 2rem);
+  box-sizing: border-box;
   align-items: center;
   padding-bottom: 10px;
+  overflow: hidden;
+}
+
+.spacer-top {
+  flex: 1;
+}
+
+.spacer-bottom {
+  flex: 2;
 }
 
 .main {
