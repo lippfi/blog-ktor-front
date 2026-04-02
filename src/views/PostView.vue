@@ -5,12 +5,10 @@ import { ref, nextTick, onMounted, onUnmounted, watch} from "vue";
 import CommentEdit from "@/components/post/CommentEdit.vue";
 import CommentComponent from "@/components/post/CommentComponent.vue";
 import PostComponent from "@/components/post/PostComponent.vue";
-import type {Post, Comment} from "@/models/posts/post.ts";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import PostClientImpl from "@/api/postClient/postClient.ts";
-import {mapCommentDtoToComment} from "@/models/posts/mapper.ts";
-import {mapDtoToReaction} from "@/api/dto/mapper.ts";
-import type {CommentDto} from "@/api/dto/postServiceDto.ts";
+import type {CommentDto, PostViewDto, ReactionDto} from "@/api/dto/postServiceDto.ts";
+import {getCurrentUserLogin} from "@/api/userService.ts";
 
 const props = defineProps<{
   login: string;
@@ -28,17 +26,17 @@ const replyingToComment = ref<any | null>(null);
 const selectedCommentId = ref<string | undefined>(props.commentId);
 
 const route = useRoute();
-const post = ref<Post>(route.meta.post as Post);
-const comments = ref<Comment[]>([]);
+const post = ref<PostViewDto>(route.meta.post as PostViewDto);
+const comments = ref<CommentDto[]>([]);
 
 watch(() => route.meta.post, (newPost) => {
   if (newPost) {
-    post.value = newPost as Post;
+    post.value = newPost as PostViewDto;
   }
 }, { immediate: true });
 
 watch(() => route.meta.comments, (newComments) => {
-  comments.value = [...(newComments as Comment[] || [])];
+  comments.value = [...(newComments as CommentDto[] || [])];
 }, { immediate: true });
 const postClient = new PostClientImpl();
 let commentsSocket: WebSocket | null = null;
@@ -92,17 +90,15 @@ const handleWebSocketMessage = (event: MessageEvent) => {
 };
 
 // Handle comment added message
-const handleCommentAdded = (commentDto: any) => {
-  const comment = mapCommentDtoToComment(commentDto);
-  comments.value.push(comment);
+const handleCommentAdded = (commentDto: CommentDto) => {
+  comments.value.push(commentDto);
 };
 
 // Handle comment updated message
-const handleCommentUpdated = (commentDto: any) => {
-  const updatedComment = mapCommentDtoToComment(commentDto);
-  const index = comments.value.findIndex(c => c.id === updatedComment.id);
+const handleCommentUpdated = (commentDto: CommentDto) => {
+  const index = comments.value.findIndex(c => c.id === commentDto.id);
   if (index !== -1) {
-    comments.value[index] = updatedComment;
+    comments.value[index] = commentDto;
   }
 };
 
@@ -115,23 +111,22 @@ const handleCommentDeleted = (commentId: string) => {
 };
 
 // Handle reaction added message
-const handleReactionAdded = (commentId: string, reactionDto: any) => {
+const handleReactionAdded = (commentId: string, reactionDto: ReactionDto) => {
   const index = comments.value.findIndex(c => c.id === commentId);
   if (index !== -1) {
     const comment = comments.value[index];
-    const reaction = mapDtoToReaction(reactionDto);
 
     // Create a new reactions array to ensure reactivity
-    const newReactions = [...comment.reactions];
+    const newReactions = [...(comment.reactions || [])];
 
     // Check if the reaction already exists
-    const existingReactionIndex = newReactions.findIndex(r => r.name === reaction.name);
+    const existingReactionIndex = newReactions.findIndex(r => r.name === reactionDto.name);
     if (existingReactionIndex !== -1) {
       // Update existing reaction
-      newReactions[existingReactionIndex] = reaction;
+      newReactions[existingReactionIndex] = reactionDto;
     } else {
       // Add new reaction
-      newReactions.push(reaction);
+      newReactions.push(reactionDto);
     }
 
     // Update the comment with the new reactions array
@@ -140,14 +135,14 @@ const handleReactionAdded = (commentId: string, reactionDto: any) => {
 };
 
 // Handle reaction removed message
-const handleReactionRemoved = (commentId: string, reactionDto: any) => {
+const handleReactionRemoved = (commentId: string, reactionDto: ReactionDto) => {
   const index = comments.value.findIndex(c => c.id === commentId);
   if (index !== -1) {
     const comment = comments.value[index];
     const reactionName = reactionDto.name;
 
     // Create a new reactions array to ensure reactivity
-    const newReactions = [...comment.reactions];
+    const newReactions = [...(comment.reactions || [])];
 
     // Remove the reaction
     const reactionIndex = newReactions.findIndex(r => r.name === reactionName);

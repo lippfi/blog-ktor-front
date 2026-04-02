@@ -2,13 +2,13 @@
 import {getCurrentUserLogin, getCurrentUserNickname} from "@/api/userService.ts"
 import { ref, watch } from 'vue'
 import {useI18n} from "vue-i18n";
-import type { Reaction as ReactionModel } from '@/models/posts/post.ts'
+import type { ReactionDto } from '@/api/dto/postServiceDto.ts'
 import {reactionClient} from "@/api/postClient/reactionClient.ts";
 
 const { t } = useI18n()
 
 const props = defineProps<{
-  reaction: ReactionModel
+  reaction: ReactionDto
   postLogin?: string,
   postUri?: string,
   commentId?: string,
@@ -20,31 +20,37 @@ const emit = defineEmits<{
   (e: 'remove'): void
 }>()
 
-const localReaction = ref<ReactionModel>({
+const localReaction = ref<ReactionDto>({
   ...props.reaction,
-  userNicknames: [...props.reaction.userNicknames]
+  users: [...props.reaction.users]
 })
 
 // Keep localReaction in sync with props.reaction
 watch(() => props.reaction, (newReaction) => {
   localReaction.value = {
     ...newReaction,
-    userNicknames: [...newReaction.userNicknames]
+    users: [...newReaction.users]
   }
 }, { deep: true })
 
-async function toggleReaction() {
-  // Update UI immediately
-  localReaction.value.userReacted = !localReaction.value.userReacted
+function userReacted(): boolean {
+  const login = getCurrentUserLogin()
+  return localReaction.value.users.some(u => u.login === login)
+}
 
-  // Update userNicknames list
-  const userNickname = await getCurrentUserNickname()
-  const index = localReaction.value.userNicknames.indexOf(userNickname)
-  if (localReaction.value.userReacted && index === -1) {
-    localReaction.value.userNicknames.push(userNickname)
+async function toggleReaction() {
+  const login = getCurrentUserLogin()
+  const nickname = await getCurrentUserNickname()
+  const reacted = userReacted()
+
+  if (!reacted) {
+    localReaction.value.users.push({ login: login!, nickname })
     localReaction.value.count += 1
-  } else if (!localReaction.value.userReacted && index !== -1) {
-    localReaction.value.userNicknames.splice(index, 1)
+  } else {
+    const index = localReaction.value.users.findIndex(u => u.login === login)
+    if (index !== -1) {
+      localReaction.value.users.splice(index, 1)
+    }
     localReaction.value.count -= 1
 
     if (localReaction.value.count === 0) {
@@ -59,7 +65,7 @@ async function toggleReaction() {
       if (!props.postLogin || !props.postUri) {
         throw new Error('PostComponent login and URI are required for post reactions')
       }
-      if (localReaction.value.userReacted) {
+      if (!reacted) {
         await reactionClient.addPostReaction(props.postLogin, props.postUri, props.reaction.name)
       } else {
         await reactionClient.removePostReaction(props.postLogin, props.postUri, props.reaction.name)
@@ -68,7 +74,7 @@ async function toggleReaction() {
       if (!props.commentId) {
         throw new Error('CommentComponent ID is required for comment reactions')
       }
-      if (localReaction.value.userReacted) {
+      if (!reacted) {
         await reactionClient.addCommentReaction(props.commentId, props.reaction.name)
       } else {
         await reactionClient.removeCommentReaction(props.commentId, props.reaction.name)
@@ -89,7 +95,7 @@ async function toggleReaction() {
   >
     <template #reference>
       <div class="clickable" @click="toggleReaction">
-        <el-tag round size="default" :type="localReaction.userReacted ? 'primary' : 'info'" :effect="localReaction.userReacted ? '' : 'plain'">
+        <el-tag round size="default" :type="userReacted() ? 'primary' : 'info'" :effect="userReacted() ? '' : 'plain'">
           <div class="reaction">
             <img :src="localReaction.iconUri" :alt="localReaction.name">
             <span style="padding-left: 5px;">
@@ -103,7 +109,7 @@ async function toggleReaction() {
       <img :src="localReaction.iconUri" :alt="localReaction.name">
       <div>
         <span class="reaction-name">{{ localReaction.name }}</span><br>
-        {{ localReaction.userNicknames.join(', ') }}
+        {{ localReaction.users.map(u => u.nickname).join(', ') }}
         <span v-if="localReaction.anonymousCount > 0" class="anonymous-count">
         {{$t('reactions.reaction.anonymous') + localReaction.anonymousCount }}
       </span>

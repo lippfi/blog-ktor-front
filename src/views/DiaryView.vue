@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import PostComponent from "@/components/post/PostComponent.vue";
 import PostEdit from "@/components/post/PostEdit.vue";
-import type {Post as PostModel} from "@/models/posts/post.ts";
 import {computed, onMounted, ref, watch} from 'vue';
 import {isSignedIn} from "@/api/userService.ts";
 import {useRoute} from "vue-router";
-import type {DiaryHeaderInfo} from "@/api/dto/postServiceDto.ts";
+import type {DiaryHeaderInfo, PostViewDto} from "@/api/dto/postServiceDto.ts";
 import DiaryMenuComponent from "@/components/DiaryMenuComponent.vue";
 import PaginationComponent from "@/components/PaginationComponent.vue";
 import PostClientImpl from "@/api/postClient/postClient.ts";
-import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
 import {updateStyles} from "@/styles/stylesManager";
 
 const route = useRoute();
@@ -19,7 +17,7 @@ const props = defineProps<{
 }>();
 
 const loggedIn: boolean = isSignedIn();
-const posts = ref<PostModel[]>(route.meta.posts as PostModel[] || []);
+const posts = ref<PostViewDto[]>(route.meta.posts as PostViewDto[] || []);
 const currentPage = ref<number>(route.meta.currentPage as number || 0);
 const totalPages = ref<number>(route.meta.totalPages as number || 0);
 
@@ -29,7 +27,7 @@ const fetchPosts = async () => {
   const result = await postClient.getDiaryPosts(props.login, pageNumber);
   if (result.type === 'ok') {
     const diaryPage = result.data;
-    posts.value = diaryPage.posts.content.map(mapPostDtoToPost);
+    posts.value = diaryPage.posts.content;
     currentPage.value = diaryPage.posts.currentPage;
     totalPages.value = diaryPage.posts.totalPages;
     updateStyles(diaryPage.diary.styles);

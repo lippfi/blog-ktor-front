@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Reaction as ReactionModel} from '@/models/posts/post.ts'
+import type { ReactionDto } from '@/api/dto/postServiceDto.ts'
 import type { BasicReactionResponse } from '@/api/reactionService.ts'
-import { getCurrentUserNickname } from '@/api/userService.ts'
+import { getCurrentUserLogin, getCurrentUserNickname } from '@/api/userService.ts'
 import AddReaction from '@/components/post/reaction/AddReaction.vue'
 import {ref, watch} from 'vue'
 import {reactionClient} from "@/api/postClient/reactionClient.ts";
@@ -9,7 +9,7 @@ import Reaction from "@/components/Reaction.vue";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 
 const props = defineProps<{
-  reactions: ReactionModel[],
+  reactions: ReactionDto[],
   isReactable: boolean,
   type: 'post' | 'comment',
   postLogin?: string,
@@ -23,14 +23,14 @@ const emit = defineEmits<{
   (e: 'reaction-added', reaction: BasicReactionResponse): void
 }>();
 
-const localReactions = ref<ReactionModel[]>([...props.reactions])
+const localReactions = ref<ReactionDto[]>([...props.reactions])
 
 // Keep localReactions in sync with props
 watch(() => props.reactions, (newReactions) => {
   localReactions.value = [...newReactions]
 })
 
-async function handleReactionRemove(reactionToRemove: ReactionModel) {
+async function handleReactionRemove(reactionToRemove: ReactionDto) {
   const index = localReactions.value.findIndex(r => r.name === reactionToRemove.name)
   if (index !== -1) {
     // Store the reaction before removing it from the UI
@@ -64,12 +64,12 @@ async function handleReactionSelect(reaction: BasicReactionResponse) {
   const existingReaction = localReactions.value.find(r => r.name === reaction.name)
 
   if (existingReaction) {
-    if (existingReaction.userReacted) {
+    const login = getCurrentUserLogin()
+    if (existingReaction.users.some(u => u.login === login)) {
       return
     }
 
-    existingReaction.userReacted = true
-    existingReaction.userNicknames.push(await getCurrentUserNickname())
+    existingReaction.users.push({ login: login!, nickname: await getCurrentUserNickname() })
     existingReaction.count++
 
     try {
@@ -87,20 +87,19 @@ async function handleReactionSelect(reaction: BasicReactionResponse) {
     } catch (error) {
       console.error('Error sending reaction update:', error)
       // Revert UI changes on error
-      existingReaction.userReacted = false
-      existingReaction.userNicknames.pop()
+      existingReaction.users.pop()
       existingReaction.count--
     }
     return
   }
 
-  const newReaction: ReactionModel = {
+  const login = getCurrentUserLogin()
+  const newReaction: ReactionDto = {
     name: reaction.name,
     iconUri: reaction.iconUri,
     count: 1,
     anonymousCount: 0,
-    userNicknames: [await getCurrentUserNickname()],
-    userReacted: true,
+    users: [{ login: login!, nickname: await getCurrentUserNickname() }],
   }
 
   localReactions.value.push(newReaction)

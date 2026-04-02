@@ -1,6 +1,10 @@
-import type {ReplyInfo} from "@/models/posts/post.ts";
-
 type TagPolicyDto = 'UNION' | 'INTERSECTION';
+
+export interface ReplyInfo {
+    id: string;
+    login: string;
+    nickname: string;
+}
 
 export interface ReactionDto {
     name: string;

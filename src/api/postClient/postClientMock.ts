@@ -5,12 +5,9 @@ import type {
     CommentUpdateRequest,
     PostViewDto,
     PostEditDto, PostSearchResult,
-    SearchPostsParamsDto, DiaryPageDto, PostPageDto, PostCreateDto
+    SearchPostsParamsDto, DiaryPageDto, PostPageDto, PostCreateDto, ReactionDto
 } from "@/api/dto/postServiceDto.ts";
 import type {IPostClient} from "@/api/postClient/postClient.ts";
-import type {Comment, Post, Reaction} from "@/models/posts/post.ts";
-import {mapPostToViewDto} from "@/api/dto/mapper.ts";
-import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
 
 
 type Result<T = void> =
@@ -19,16 +16,19 @@ type Result<T = void> =
 
 class PostClientMock implements IPostClient {
 
-    stubReaction: Reaction = {
+    stubReaction: ReactionDto = {
         name: 'sad_cat',
         iconUri: 'https://emoji.slack-edge.com/T0288D531/sad_cat/4253f3b1013d6920.png',
         count: 3,
         anonymousCount: 0,
-        userNicknames: ['детектив шимпански', 'птица не спит', 'саша белый'],
-        userReacted: true
+        users: [
+            { login: 'shimpansky', nickname: 'детектив шимпански' },
+            { login: 'bird', nickname: 'птица не спит' },
+            { login: 'sasha', nickname: 'саша белый' }
+        ],
     };
 
-    stubComment: Comment = {
+    stubComment: CommentDto = {
         id: '1',
         avatar: 'https://i.pinimg.com/550x/56/90/72/569072435a51a4c2690e08a3026de5a0.jpg',
         authorLogin: 'john_doe',
@@ -36,13 +36,13 @@ class PostClientMock implements IPostClient {
         diaryLogin: 'shimpansky',
         postUri: 'test-post',
         text: 'This is a test comment',
-        creationTime: new Date('2024-12-20T17:35:00'),
+        creationTime: '2024-12-20T17:35:00.000Z',
         isReactable: true,
         reactions: [this.stubReaction],
         reactionGroupId: 'comment-reactions-1'
     }
 
-    stubComment2: Comment = {
+    stubComment2: CommentDto = {
         id: '2',
         avatar: 'https://i.pinimg.com/550x/56/90/72/569072435a51a4c2690e08a3026de5a0.jpg',
         authorLogin: 'shimpansky',
@@ -50,13 +50,13 @@ class PostClientMock implements IPostClient {
         diaryLogin: 'shimpansky',
         postUri: 'test-post',
         text: 'Я ебал бабра',
-        creationTime: new Date('2024-12-20T17:35:00'),
+        creationTime: '2024-12-20T17:35:00.000Z',
         isReactable: true,
         reactions: [this.stubReaction],
         reactionGroupId: 'comment-reactions-1'
     };
 
-    stubPost: Post = {
+    stubPost: PostViewDto = {
         id: '1',
         uri: 'test-post',
         avatar: 'https://i.pinimg.com/550x/56/90/72/569072435a51a4c2690e08a3026de5a0.jpg',
@@ -67,7 +67,7 @@ class PostClientMock implements IPostClient {
         text: "I'm a little late, but here are the month's totals:heart::heart::smol-serious::\nI finally :heart: made an appointment :heart: with my ENT and had nose surgery in the middle of the month. I haven't fully recovered yet, but I have this feeling that breathing is... cool?\nI've tried hiking, but it was too hard for me. I became exhausted after gaining only 300m of elevation. I'll definitely go again, but I'll practice with easier hikes first.\nThe scenery was very beautiful. Here are some photos:\n[slider]\n[slide][image link=\"https://lipp.fi/static/images/62944b84-4126-4b48-9014-fac7471dc875.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/2306c07a-d67c-4144-8562-a7ca85a0976e.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/42be085e-5389-4b2c-99a4-242ef211b700.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/7732076f-74ab-4327-9991-3ebcc78f817f.jpg\" description=\"\"][/slide]\n[/slider]\n\n[expandable name=\"Read more..\"]\nThis month's recipe is baked artichokes. Although I failed to capture a sexy photo, the artichokes were delicious and definitely deserve a spot here.[slider]\n [slide][image link=\"https://lipp.fi/static/images/a88f8f43-971b-4297-8111-f4537bcba27b.jpg\" description=\"\"][/slide]\n [slide][image link=\"https://lipp.fi/static/images/b90484ee-5f29-40cc-a6e9-71f63ac98615.jpg\" description=\"\"][/slide]\n[/slider][/expandable]",
         // text: 'testtastn oariet narisoetnrsoietnrois entorie ntrosien tarosietn aroiten roisetn ras',
         // creationTime: '17:35 12.20.24',
-        creationTime: new Date(),
+        creationTime: new Date().toISOString(),
         isPreface: false,
         isEncrypted: false,
         classes: 'test-post',
@@ -83,7 +83,7 @@ class PostClientMock implements IPostClient {
         isHidden: false
     };
 
-    stubPost2: Post = {
+    stubPost2: PostViewDto = {
         id: '2',
         uri: 'test-post',
         avatar: 'https://i.pinimg.com/736x/95/e3/c6/95e3c6d76a09ddda2d524771394110ba.jpg',
@@ -92,7 +92,7 @@ class PostClientMock implements IPostClient {
         diaryLogin: 'monkey1',
         title: '2283',
         text: "Ахуеть какой пиздец, я сегодня видел обезьяну, которая сосала хуй",
-        creationTime: subtractDays(new Date(), 5),
+        creationTime: subtractDays(new Date(), 5).toISOString(),
         isPreface: false,
         isEncrypted: false,
         classes: 'test-post',
@@ -108,7 +108,7 @@ class PostClientMock implements IPostClient {
         isHidden: false
     };
 
-    stubPost3: Post = {
+    stubPost3: PostViewDto = {
         id: '3',
         uri: 'test-post',
         avatar: 'https://sun1-30.userapi.com/impg/qAXkOlaHp_QsdlMRSnyPIjuxWGr6YwzJ1A6aDA/VG5LE2i0fuY.jpg?size=604x409&quality=96&sign=bf57c38d7f93884e1f832efd9da7d6eb&type=album',
@@ -117,7 +117,7 @@ class PostClientMock implements IPostClient {
         diaryLogin: 'makaka2',
         title: 'пизда',
         text: "да",
-        creationTime: subtractDays(new Date(), 3),
+        creationTime: subtractDays(new Date(), 3).toISOString(),
         isPreface: false,
         isEncrypted: false,
         classes: 'test-post',
@@ -133,12 +133,12 @@ class PostClientMock implements IPostClient {
         isHidden: false
     };
 
-    stubPosts: Post[] = [ this.stubPost ]
+    stubPosts: PostViewDto[] = [ this.stubPost ]
 
 
     public async getDiaryPosts(diary: string, page: number): Promise<Result<DiaryPageDto>> {
         try {
-            const postRes: PostViewDto[] = this.stubPosts.map((c) => mapPostToViewDto(c))
+            const postRes: PostViewDto[] = this.stubPosts
             const searchResult: PostSearchResult = {
                 content: postRes,
                 currentPage: page,
@@ -167,7 +167,7 @@ class PostClientMock implements IPostClient {
 
     public async getPost(login: string, uri: string): Promise<Result<PostPageDto>> {
         try {
-            const postView = mapPostToViewDto(this.stubPost);
+            const postView = this.stubPost;
             const postPage: PostPageDto = {
                 diary: {
                     name: login,
@@ -223,7 +223,7 @@ class PostClientMock implements IPostClient {
                 latestPosts.push(post);
             }
 
-            const postRes: PostViewDto[] = latestPosts.map((c) => mapPostToViewDto(c))
+            const postRes: PostViewDto[] = latestPosts
             const searchResult: PostSearchResult = {
                 content: postRes,
                 currentPage: page,
@@ -383,7 +383,7 @@ class PostClientMock implements IPostClient {
                 commentReactionGroupId: post.commentReactionGroupId,
                 isHidden: false
             };
-            this.stubPosts.push(mapPostDtoToPost(postView))
+            this.stubPosts.push(postView)
             return { type: 'ok', data: postView };
         } catch (error) {
             return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };

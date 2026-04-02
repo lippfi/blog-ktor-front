@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import UserAvatarComponent from "@/components/post/UserAvatarComponent.vue";
-import {type Comment, type Post} from "@/models/posts/post.ts";
+import type {CommentDto, PostViewDto, ReactionDto} from "@/api/dto/postServiceDto.ts";
 import {computed, ref, watch} from "vue";
 import {backendURL} from "@/constants";
 import Reactions from "@/components/post/reaction/Reactions.vue";
@@ -11,30 +11,29 @@ import NicknameComponent from "@/components/NicknameComponent.vue";
 import type {BasicReactionResponse} from "@/api/reactionService.ts";
 import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 import ProcessedText from "@/components/post/ProcessedText.vue";
-import type {Reaction} from "@/models/posts/post.ts";
 import { useReactionsStore } from "@/stores/reactionsStore";
 
 const reactionsStore = useReactionsStore();
 
 const props = defineProps<{
-  comment: Comment,
-  post: Post,
+  comment: CommentDto,
+  post: PostViewDto,
   isReactable: boolean,
   isSelected?: boolean,
 }>();
 
 const emit = defineEmits<{
   (e: 'comment-deleted'): void
-  (e: 'reply', comment: Comment): void
+  (e: 'reply', comment: CommentDto): void
   (e: 'select-comment', commentId: string): void
 }>();
 
 const formattedCreationTime = computed(() => {
-  return getDateTimeString(props.comment.creationTime.toISOString());
+  return getDateTimeString(props.comment.creationTime);
 });
 
 let isEditing = ref(false);
-const reactions = ref<Reaction[]>([...props.comment.reactions]);
+const reactions = ref<ReactionDto[]>([...(props.comment.reactions || [])]);
 
 // Keep reactions in sync with props
 watch(() => props.comment.reactions, (newReactions) => {

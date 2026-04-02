@@ -65,7 +65,6 @@
 
 <script setup lang="ts">
 import {computed} from 'vue'
-import type { Post } from "@/models/posts/post.ts";
 import Reactions from "@/components/post/reaction/Reactions.vue";
 import { ref } from 'vue';
 import {getDateTimeString} from "@/components/post/util.ts";
@@ -74,7 +73,6 @@ import ProcessedText from "@/components/post/ProcessedText.vue";
 import PostEdit from "@/components/post/PostEdit.vue";
 import type {Result} from "@/api/postClient/postClient.ts";
 import type {PostViewDto} from "@/api/dto/postServiceDto.ts";
-import {mapDtoToReaction} from "@/api/dto/mapper.ts";
 import { useReactionsStore } from "@/stores/reactionsStore";
 import {getCurrentUserLogin} from "@/api/userService.ts";
 
@@ -98,7 +96,7 @@ const postUpdated = (result: Result<PostViewDto>) => {
     props.post.text = post.text;
     props.post.tags = post.tags;
     props.post.classes = post.classes;
-    props.post.reactions = post.reactions.map(mapDtoToReaction);
+    props.post.reactions = post.reactions;
     props.post.readGroupId = post.readGroupId;
     props.post.commentGroupId = post.commentGroupId;
     props.post.reactionGroupId = post.reactionGroupId;
@@ -112,13 +110,13 @@ const postUpdated = (result: Result<PostViewDto>) => {
 }
 
 const props = defineProps<{
-  post: Post,
+  post: PostViewDto,
   showCommentsCount: boolean,
   redirectOnDelete?: string,
 }>();
 
 const formattedCreationTime = computed(() => {
-  return getDateTimeString(props.post.creationTime.toString());
+  return getDateTimeString(props.post.creationTime);
 });
 </script>
 

@@ -29,8 +29,7 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import PostComponent from '@/components/post/PostComponent.vue';
 import PaginationComponent from "@/components/PaginationComponent.vue";
-import type { Post as PostType } from '@/models/posts/post';
-import {mapPostDtoToPost} from "@/models/posts/mapper.ts";
+import type { PostViewDto } from '@/api/dto/postServiceDto.ts';
 import {useI18n} from "vue-i18n";
 import PostClientImpl from "@/api/postClient/postClient.ts";
 import {isSignedIn} from "@/api/userService.ts";
@@ -42,7 +41,7 @@ const router = useRouter();
 
 const loggedIn = isSignedIn()
 const client = new PostClientImpl()
-const posts = ref<PostType[]>(route.meta.posts as PostType[] || []);
+const posts = ref<PostViewDto[]>(route.meta.posts as PostViewDto[] || []);
 const totalPages = ref(route.meta.totalPages as number || 0);
 const loading = ref(false);
 
@@ -73,7 +72,7 @@ const loadPosts = async () => {
 
     if (getPostsResult && getPostsResult.type === 'ok') {
       const postSearchResult = getPostsResult.data;
-      posts.value = postSearchResult.content.map(c => mapPostDtoToPost(c));
+      posts.value = postSearchResult.content;
       totalPages.value = postSearchResult.totalPages;
       
       window.scrollTo({ top: 0, behavior: 'smooth' });

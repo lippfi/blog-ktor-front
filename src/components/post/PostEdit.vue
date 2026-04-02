@@ -62,11 +62,9 @@ import {ref, onMounted, onUnmounted} from 'vue'
 import {useI18n} from "vue-i18n";
 import SmartTextArea from "@/components/post/SmartTextArea.vue";
 import AvatarChooser from "@/components/post/AvatarChooser.vue";
-import type {PostEdit} from "@/models/posts/post.ts";
 import {getCurrentSessionInfo, getCurrentUserLogin} from "@/api/userService.ts";
-import {mapPostEditToPostEditDto} from "@/api/dto/mapper.ts";
 import PostClientImpl, {type Result} from "@/api/postClient/postClient.ts";
-import type {PostCreateDto, PostViewDto} from "@/api/dto/postServiceDto.ts";
+import type {PostCreateDto, PostEditDto, PostViewDto} from "@/api/dto/postServiceDto.ts";
 import {getAccessGroups, getDefaultAccessGroups} from "@/api/accessGroupService.ts";
 import router from "@/router";
 import { useReactionsStore } from "@/stores/reactionsStore";
@@ -287,7 +285,7 @@ async function updatePost() {
     return
   }
 
-  const postEdit: PostEdit = {
+  const postEdit: PostEditDto = {
     avatar: localAvatar.value || "",
     commentGroupId: localCommentGroup.value || "",
     commentReactionGroupId: localReactionGroup.value || "",
@@ -303,7 +301,7 @@ async function updatePost() {
     isHidden: false,
   }
 
-  const res = await client.updatePost(mapPostEditToPostEditDto(postEdit))
+  const res = await client.updatePost(postEdit)
   emit('post-updated', res)
 }
 

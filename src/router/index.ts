@@ -9,7 +9,6 @@ import ProfileView from "@/views/ProfileView.vue";
 import ResetPassword from "@/views/ResetPassword.vue";
 import AvatarComponent from "@/components/AvatarComponent.vue";
 import PostClientImpl from "@/api/postClient/postClient.ts";
-import {mapCommentDtoToComment, mapPostDtoToPost} from "@/models/posts/mapper.ts";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import DiarySearchView, { extractSearchParams } from "@/views/DiarySearchView.vue";
@@ -45,7 +44,7 @@ const router = createRouter({
 
         if (result && result.type === 'ok') {
           const postSearchResult = result.data;
-          to.meta.posts = postSearchResult.content.map(mapPostDtoToPost);
+          to.meta.posts = postSearchResult.content;
           to.meta.currentPage = postSearchResult.currentPage;
           to.meta.totalPages = postSearchResult.totalPages;
           to.meta.currentFeed = feedType;
@@ -144,7 +143,7 @@ const router = createRouter({
             name: diaryPage.diary.name,
             subtitle: diaryPage.diary.subtitle,
           }
-          to.meta.posts = diaryPage.posts.content.map(mapPostDtoToPost);
+          to.meta.posts = diaryPage.posts.content;
           to.meta.currentPage = diaryPage.posts.currentPage;
           to.meta.totalPages = diaryPage.posts.totalPages;
           to.meta.styles = diaryPage.diary.styles;
@@ -179,7 +178,7 @@ const router = createRouter({
             name: diaryPage.diary.name,
             subtitle: diaryPage.diary.subtitle,
           }
-          to.meta.posts = diaryPage.posts.content.map(mapPostDtoToPost);
+          to.meta.posts = diaryPage.posts.content;
           to.meta.currentPage = diaryPage.posts.currentPage;
           to.meta.totalPages = diaryPage.posts.totalPages;
           next();
@@ -208,8 +207,8 @@ const router = createRouter({
             name: postPage.diary.name,
             subtitle: postPage.diary.subtitle,
           }
-          to.meta.post = mapPostDtoToPost(postPage.post);
-          to.meta.comments = postPage.comments.map(mapCommentDtoToComment);
+          to.meta.post = postPage.post;
+          to.meta.comments = postPage.comments;
           updateStyles(postPage.diary.styles);
           next();
         } else {

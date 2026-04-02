@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import {useRouter} from "vue-router";
-import {
-  type Comment,
-  type Post
-} from "@/models/posts/post.ts";
+import type {
+  CommentDto,
+  PostViewDto
+} from "@/api/dto/postServiceDto.ts";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {BottomLeft, ChatLineRound, Delete, Edit, Hide, More, MoreFilled, View, Warning} from "@element-plus/icons-vue";
 import {getCurrentUserLogin} from "@/api/userService.ts";
@@ -109,8 +109,8 @@ async function deleteComment() {
 };
 
 const props = defineProps<{
-  post: Post,
-  comment?: Comment,
+  post: PostViewDto,
+  comment?: CommentDto,
   showCommentsCount?: boolean,
   redirectOnDelete?: string,
 }>();

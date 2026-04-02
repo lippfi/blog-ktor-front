@@ -39,13 +39,12 @@ import { useRoute } from 'vue-router';
 import PostComponent from '@/components/post/PostComponent.vue';
 import PaginationComponent from "@/components/PaginationComponent.vue";
 import PostClientImpl from '@/api/postClient/postClient';
-import type { Post } from '@/models/posts/post';
-import { mapPostDtoToPost } from '@/models/posts/mapper';
+import type { PostViewDto } from '@/api/dto/postServiceDto';
 import PostSearchComponent from '@/components/PostSearchComponent.vue';
 
 const route = useRoute();
 const postClient = new PostClientImpl();
-const posts = ref<Post[]>([]);
+const posts = ref<PostViewDto[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
 const currentPage = ref(0);
@@ -70,7 +69,7 @@ const fetchPosts = async () => {
   try {
     const result = await postClient.searchDiaryPosts(params);
     if (result.type === 'ok') {
-      posts.value = result.data.posts.content.map(mapPostDtoToPost);
+      posts.value = result.data.posts.content;
       currentPage.value = result.data.posts.currentPage;
       totalPages.value = result.data.posts.totalPages;
     } else {
@@ -88,7 +87,7 @@ onMounted(() => {
   // If we have pre-fetched data in route.meta, use it
   const meta = route.meta as any;
   if (meta.posts) {
-    posts.value = meta.posts as Post[];
+    posts.value = meta.posts as PostViewDto[];
     currentPage.value = meta.currentPage as number;
     totalPages.value = meta.totalPages as number;
 
