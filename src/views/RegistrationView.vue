@@ -36,7 +36,7 @@ const finishRegistration = () => {
 </script>
 <template>
   <div class="container">
-    <div/>
+    <div class="spacer-top"/>
     <div class="main">
       <div style="text-align: center;">
         <h1>{{$t('registration.form.header')}}</h1>
@@ -59,8 +59,8 @@ const finishRegistration = () => {
 <!--        <DiaryImportForm v-if="step.value === 3"/>-->
       </div>
     </div>
-    <div/>
-    <LanguageChooser v-if="step === 0"/>
+    <LanguageChooser v-if="step === 0" style="margin-top: 32px" />
+    <div class="spacer-bottom"/>
   </div>
 </template>
 
@@ -76,10 +76,19 @@ const finishRegistration = () => {
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
+  height: calc(100vh - 2rem);
+  box-sizing: border-box;
   align-items: center;
   padding-bottom: 10px;
+  overflow: hidden;
+}
+
+.spacer-top {
+  flex: 1;
+}
+
+.spacer-bottom {
+  flex: 2;
 }
 
 .main {
