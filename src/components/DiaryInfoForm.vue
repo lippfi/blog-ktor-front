@@ -57,7 +57,7 @@ import {
 import router from "@/router";
 import {useI18n} from "vue-i18n";
 import {getBasicAccessGroups} from "@/api/accessGroupService.ts";
-import {updateDiaryInfo} from "@/api/diaryService.ts";
+import {updateDiaryInfo} from "@/api/diaryClient.ts";
 
 const { t } = useI18n()
 
@@ -117,12 +117,12 @@ const submitForm = (form: FormInstance | undefined) => {
           defaultCommentGroup: comment,
           defaultReactGroup: react,
         }
-        const diaryInfoUpdate = await updateDiaryInfo(getCurrentUserLogin()!!, diaryInfo)
-        if (diaryInfoUpdate.type === 'ok') {
+        try {
+          await updateDiaryInfo(getCurrentUserLogin()!!, diaryInfo)
           await updateCurrentSessionInfo()
           emit('on-success')
-        } else {
-          error.value = diaryInfoUpdate.message
+        } catch (e) {
+          error.value = e instanceof Error ? e.message : 'Unknown error occurred'
         }
       } else {
         error.value = accessGroups.message
