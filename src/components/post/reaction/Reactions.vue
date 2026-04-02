@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { ReactionDto } from '@/api/dto/postServiceDto.ts'
-import type { BasicReactionResponse } from '@/api/reactionService.ts'
+import type { ReactionView, ReactionPackDto } from '@/api/dto/reactionServiceDto'
+import { addPostReaction, removePostReaction, addCommentReaction, removeCommentReaction } from '@/api/reactionClient'
 import { getCurrentUserLogin, getCurrentUserNickname } from '@/api/userClient.ts'
 import AddReaction from '@/components/post/reaction/AddReaction.vue'
 import {ref, watch} from 'vue'
-import {reactionClient} from "@/api/postClient/reactionClient.ts";
 import Reaction from "@/components/Reaction.vue";
-import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
 
 const props = defineProps<{
   reactions: ReactionDto[],
@@ -16,11 +15,11 @@ const props = defineProps<{
   postUri?: string,
   commentId?: string,
   basicReactions: ReactionPackDto[],
-  recentReactions: BasicReactionResponse[],
+  recentReactions: ReactionView[],
 }>()
 
 const emit = defineEmits<{
-  (e: 'reaction-added', reaction: BasicReactionResponse): void
+  (e: 'reaction-added', reaction: ReactionView): void
 }>();
 
 const localReactions = ref<ReactionDto[]>([...props.reactions])
@@ -44,12 +43,12 @@ async function handleReactionRemove(reactionToRemove: ReactionDto) {
         if (!props.postLogin || !props.postUri) {
           throw new Error('Post login and URI are required for post reactions')
         }
-        await reactionClient.removePostReaction(props.postLogin, props.postUri, reactionToRemove.name)
+        await removePostReaction(props.postLogin, props.postUri, reactionToRemove.name)
       } else {
         if (!props.commentId) {
           throw new Error('CommentComponent ID is required for comment reactions')
         }
-        await reactionClient.removeCommentReaction(props.commentId, reactionToRemove.name)
+        await removeCommentReaction(props.commentId, reactionToRemove.name)
       }
     } catch (error) {
       console.error('Error removing reaction:', error)
@@ -59,7 +58,7 @@ async function handleReactionRemove(reactionToRemove: ReactionDto) {
   }
 }
 
-async function handleReactionSelect(reaction: BasicReactionResponse) {
+async function handleReactionSelect(reaction: ReactionView) {
   emit('reaction-added', reaction)
   const existingReaction = localReactions.value.find(r => r.name === reaction.name)
 
@@ -77,12 +76,12 @@ async function handleReactionSelect(reaction: BasicReactionResponse) {
         if (!props.postLogin || !props.postUri) {
           throw new Error('PostComponent login and URI are required for post reactions')
         }
-        await reactionClient.addPostReaction(props.postLogin, props.postUri, existingReaction.name)
+        await addPostReaction(props.postLogin, props.postUri, existingReaction.name)
       } else {
         if (!props.commentId) {
           throw new Error('CommentComponent ID is required for comment reactions')
         }
-        await reactionClient.addCommentReaction(props.commentId, existingReaction.name)
+        await addCommentReaction(props.commentId, existingReaction.name)
       }
     } catch (error) {
       console.error('Error sending reaction update:', error)
@@ -108,12 +107,12 @@ async function handleReactionSelect(reaction: BasicReactionResponse) {
       if (!props.postLogin || !props.postUri) {
         throw new Error('PostComponent login and URI are required for post reactions')
       }
-      await reactionClient.addPostReaction(props.postLogin, props.postUri, newReaction.name)
+      await addPostReaction(props.postLogin, props.postUri, newReaction.name)
     } else {
       if (!props.commentId) {
         throw new Error('CommentComponent ID is required for comment reactions')
       }
-      await reactionClient.addCommentReaction(props.commentId, newReaction.name)
+      await addCommentReaction(props.commentId, newReaction.name)
     }
   } catch (error) {
     console.error('Error sending reaction update:', error)

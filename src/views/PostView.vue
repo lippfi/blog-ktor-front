@@ -5,7 +5,7 @@ import { ref, nextTick, onMounted, onUnmounted, watch} from "vue";
 import CommentEdit from "@/components/post/CommentEdit.vue";
 import CommentComponent from "@/components/post/CommentComponent.vue";
 import PostComponent from "@/components/post/PostComponent.vue";
-import type {BasicReactionResponse} from "@/api/reactionService.ts";
+import type {ReactionView} from "@/api/dto/reactionServiceDto";
 import PostClientImpl from "@/api/postClient/postClient.ts";
 import type {CommentDto, PostViewDto, ReactionDto} from "@/api/dto/postServiceDto.ts";
 import {getCurrentUserLogin} from "@/api/userClient.ts";
@@ -18,7 +18,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update-avatars'): void
-  (e: 'reaction-added', reaction: BasicReactionResponse): void
+  (e: 'reaction-added', reaction: ReactionView): void
 }>();
 
 const parentCommentId = ref<string | null>(null);

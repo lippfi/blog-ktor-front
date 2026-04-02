@@ -94,11 +94,10 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import type { BasicReactionResponse } from '@/api/reactionService.ts'
+import { searchReactions } from '@/api/reactionClient'
+import type { ReactionView, ReactionViewDto, ReactionPackDto } from '@/api/dto/reactionServiceDto'
 import {useI18n} from "vue-i18n";
 import { Search, Clock } from '@element-plus/icons-vue';
-import type {ReactionPackDto, ReactionViewDto} from "@/api/dto/reactionServiceDto.ts";
-import { reactionClient } from '@/api/postClient/reactionClient.ts';
 import { useReactionsStore } from "@/stores/reactionsStore";
 
 const { t } = useI18n()
@@ -106,7 +105,7 @@ const reactionsStore = useReactionsStore()
 
 const activeTab = ref(reactionsStore.recentReactions.length > 0 ? 'recent' : '0')
 const searchQuery = ref('')
-const searchResults = ref<BasicReactionResponse[]>([])
+const searchResults = ref<ReactionView[]>([])
 
 watch(searchQuery, async (newQuery) => {
   if (!newQuery.trim()) {
@@ -115,16 +114,11 @@ watch(searchQuery, async (newQuery) => {
   }
 
   try {
-    const result = await reactionClient.search(newQuery.trim())
-    if (result.type === 'ok') {
-      searchResults.value = result.data.map(reaction => ({
-        name: reaction.name,
-        iconUri: String(reaction.iconUri)
-      }))
-    } else {
-      console.error('Error searching for reactions:', result.message)
-      searchResults.value = []
-    }
+    const data = await searchReactions(newQuery.trim())
+    searchResults.value = data.map(reaction => ({
+      name: reaction.name,
+      iconUri: String(reaction.iconUri)
+    }))
   } catch (error) {
     console.error('Error searching for reactions:', error)
     searchResults.value = []
@@ -141,18 +135,18 @@ watch(() => reactionsStore.recentReactions.length, (newLength) => {
 })
 
 const emit = defineEmits<{
-  (e: 'select-reaction', reaction: BasicReactionResponse): void
+  (e: 'select-reaction', reaction: ReactionView): void
 }>()
 
-const handleReactionSelect = (reaction: BasicReactionResponse) => {
+const handleReactionSelect = (reaction: ReactionView) => {
   searchQuery.value = '';
   emit('select-reaction', reaction);
 }
 
 const handleReactionSelectFromPack = (reaction: ReactionViewDto) => {
   searchQuery.value = '';
-  // Convert ReactionViewDto to BasicReactionResponse before emitting
-  const basicReaction: BasicReactionResponse = {
+  // Convert ReactionViewDto to ReactionView before emitting
+  const basicReaction: ReactionView = {
     name: reaction.name,
     iconUri: String(reaction.iconUri)
   }

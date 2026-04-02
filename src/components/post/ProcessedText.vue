@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import RuntimeTemplate from 'vue3-runtime-template';
-import { getReactions} from '@/api/reactionService';
+import { getReactions } from '@/api/reactionClient';
 import { getCurrentUserLogin } from '@/api/userClient';
 import { fetchUsersToCache } from '@/api/userMapService';
 import { useI18n } from 'vue-i18n';
@@ -118,14 +118,13 @@ async function replaceReactions(text: string): Promise<string> {
 
   const reactionNames = [...new Set(matches.map(match => match[1]))];
 
-  const reactionsResult = await getReactions(reactionNames);
-
-  if (reactionsResult.type === 'error') {
-    console.error('Failed to fetch reactions:', reactionsResult.message);
+  let reactions: Awaited<ReturnType<typeof getReactions>>;
+  try {
+    reactions = await getReactions(reactionNames);
+  } catch (error) {
+    console.error('Failed to fetch reactions:', error);
     return result;
   }
-
-  const reactions = reactionsResult.data;
 
   const reactionMap = new Map<string, string>();
   reactions.forEach(reaction => {

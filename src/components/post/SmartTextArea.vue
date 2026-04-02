@@ -5,9 +5,8 @@ import {ElMessage} from "element-plus";
 import {useI18n} from "vue-i18n";
 import {DataBoard, Tickets, Search} from "@element-plus/icons-vue";
 import ReactionList from "./reaction/ReactionList.vue";
-import type { BasicReactionResponse } from "@/api/reactionService.ts";
-import { reactionClient } from "@/api/postClient/reactionClient.ts";
-import type { ReactionPackDto, ReactionViewDto } from "@/api/dto/reactionServiceDto.ts";
+import { searchReactions } from "@/api/reactionClient";
+import type { ReactionView, ReactionPackDto, ReactionViewDto } from "@/api/dto/reactionServiceDto";
 import { searchUsers } from "@/api/userClient.ts";
 
 const { t } = useI18n()
@@ -17,16 +16,16 @@ const props = defineProps<{
   content?: string;
   placeholder?: string;
   basicReactions: ReactionPackDto[],
-  recentReactions: BasicReactionResponse[],
+  recentReactions: ReactionView[],
 }>();
 
 const emit = defineEmits<{
-  (e: 'reaction-added', reaction: BasicReactionResponse): void
+  (e: 'reaction-added', reaction: ReactionView): void
 }>();
 
 // Reuse the same reactions as in AddReaction component
 const basicReactions = ref<ReactionPackDto[]>([]);
-const recentReactions = ref<BasicReactionResponse[]>([]);
+const recentReactions = ref<ReactionView[]>([]);
 const isReactionPopoverVisible = ref(false);
 const showUserPopover = ref(false);
 const userSearchQuery = ref('');
@@ -74,7 +73,7 @@ const filteredUsers = computed(() => {
   return searchedUsers.value;
 });
 
-const handleReactionSelect = (reaction: BasicReactionResponse) => {
+const handleReactionSelect = (reaction: ReactionView) => {
   const textarea = getTextarea();
   if (!textarea) return;
 
@@ -157,7 +156,7 @@ const insertMention = (user: UserMention) => {
   }
 }
 
-const handleReactionSelectAndHideCompletion = (reaction: BasicReactionResponse) => {
+const handleReactionSelectAndHideCompletion = (reaction: ReactionView) => {
   const textarea = getTextarea();
   if (!textarea) return;
   emit("reaction-added", reaction)
@@ -188,11 +187,9 @@ const getUserAvatar = async (text: string): Promise<string> => {
     // If not found, search from backend
     if (!reaction) {
       try {
-        const result = await reactionClient.search(name);
-        if (result.type === 'ok') {
-          searchedReactions.value = result.data;
-          reaction = result.data.find(item => item.name === name);
-        }
+        const data = await searchReactions(name);
+        searchedReactions.value = data;
+        reaction = data.find(item => item.name === name);
       } catch (error) {
         console.error('Error searching for reaction:', error);
       }
@@ -756,21 +753,16 @@ const handleMentionSearch = async (query: string, prefix: MentionPrefix) => {
     }
   } else {
     try {
-      const result = await reactionClient.search(query);
-      if (result.type === 'ok') {
-        searchedReactions.value = result.data;
-        options.value = result.data.map((reaction): MentionOption => {
-          const reactionName: ReactionName = `:${reaction.name}:`
-          return {
-            value: reaction.name,
-            label: reactionName,
-            avatar: reaction.iconUri
-          }
-        });
-      } else {
-        console.error('Failed to search reactions:', result.message);
-        options.value = [];
-      }
+      const data = await searchReactions(query);
+      searchedReactions.value = data;
+      options.value = data.map((reaction): MentionOption => {
+        const reactionName: ReactionName = `:${reaction.name}:`
+        return {
+          value: reaction.name,
+          label: reactionName,
+          avatar: reaction.iconUri
+        }
+      });
     } catch (error) {
       console.error('Error searching reactions:', error);
       options.value = [];

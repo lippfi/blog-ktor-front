@@ -18,14 +18,13 @@
 
 <script setup lang="ts">
 import ReactionList from "./ReactionList.vue";
-import type { BasicReactionResponse } from "@/api/reactionService.ts";
+import type { ReactionView } from "@/api/dto/reactionServiceDto";
 import { ref, watch, onMounted } from 'vue';
-import { reactionClient } from "@/api/postClient/reactionClient.ts";
 import { useReactionsStore } from "@/stores/reactionsStore";
 
 const reactionsStore = useReactionsStore()
 
-const searchResults = ref<BasicReactionResponse[]>([]);
+const searchResults = ref<ReactionView[]>([]);
 const searchQuery = ref('');
 const isPopoverVisible = ref(false);
 
@@ -37,10 +36,10 @@ watch(searchQuery, (newQuery) => {
 });
 
 const emit = defineEmits<{
-  (e: 'reaction-selected', reaction: BasicReactionResponse): void
+  (e: 'reaction-selected', reaction: ReactionView): void
 }>();
 
-const handleReactionSelect = (reaction: BasicReactionResponse) => {
+const handleReactionSelect = (reaction: ReactionView) => {
   emit('reaction-selected', reaction);
   isPopoverVisible.value = false;
 };

@@ -3,7 +3,7 @@ import {getCurrentUserLogin, getCurrentUserNickname} from "@/api/userClient.ts"
 import { ref, watch } from 'vue'
 import {useI18n} from "vue-i18n";
 import type { ReactionDto } from '@/api/dto/postServiceDto.ts'
-import {reactionClient} from "@/api/postClient/reactionClient.ts";
+import { addPostReaction, removePostReaction, addCommentReaction, removeCommentReaction } from "@/api/reactionClient";
 
 const { t } = useI18n()
 
@@ -66,18 +66,18 @@ async function toggleReaction() {
         throw new Error('PostComponent login and URI are required for post reactions')
       }
       if (!reacted) {
-        await reactionClient.addPostReaction(props.postLogin, props.postUri, props.reaction.name)
+        await addPostReaction(props.postLogin, props.postUri, props.reaction.name)
       } else {
-        await reactionClient.removePostReaction(props.postLogin, props.postUri, props.reaction.name)
+        await removePostReaction(props.postLogin, props.postUri, props.reaction.name)
       }
     } else {
       if (!props.commentId) {
         throw new Error('CommentComponent ID is required for comment reactions')
       }
       if (!reacted) {
-        await reactionClient.addCommentReaction(props.commentId, props.reaction.name)
+        await addCommentReaction(props.commentId, props.reaction.name)
       } else {
-        await reactionClient.removeCommentReaction(props.commentId, props.reaction.name)
+        await removeCommentReaction(props.commentId, props.reaction.name)
       }
     }
   } catch (error) {

@@ -1,15 +1,14 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { getAvatars } from "@/api/userClient.ts"
-import { reactionClient } from "@/api/postClient/reactionClient.ts"
-import type { ReactionPackDto } from "@/api/dto/reactionServiceDto.ts"
-import type { BasicReactionResponse } from "@/api/reactionService.ts"
+import { getAvatars } from "@/api/userClient"
+import { getBasicReactions, getRecentReactions } from "@/api/reactionClient"
+import type { ReactionPack, ReactionView } from "@/api/dto/reactionServiceDto"
 
 export const useReactionsStore = defineStore('reactions', () => {
   // State
   const avatars = ref<string[]>([])
-  const basicReactions = ref<ReactionPackDto[]>([])
-  const recentReactions = ref<BasicReactionResponse[]>([])
+  const basicReactions = ref<ReactionPack[]>([])
+  const recentReactions = ref<ReactionView[]>([])
 
   // Actions
   const loadAvatars = async () => {
@@ -20,32 +19,28 @@ export const useReactionsStore = defineStore('reactions', () => {
   }
 
   const loadBasicReactions = async () => {
-    const basicReactionsResponse = await reactionClient.getBasicReactions()
-    if (basicReactionsResponse.type === 'ok') {
-      basicReactions.value = Array.isArray(basicReactionsResponse.data)
-        ? basicReactionsResponse.data
-        : [basicReactionsResponse.data]
+    try {
+      const data = await getBasicReactions()
+      basicReactions.value = Array.isArray(data) ? data : [data]
       return basicReactions.value
-    } else {
-      console.error('Failed to load basic reactions:', basicReactionsResponse.message)
+    } catch (error) {
+      console.error('Failed to load basic reactions:', error)
       return []
     }
   }
 
   const loadRecentReactions = async (limit = 60) => {
-    const recentReactionsResponse = await reactionClient.getRecentReactions(limit)
-    if (recentReactionsResponse.type === 'ok') {
-      recentReactions.value = Array.isArray(recentReactionsResponse.data)
-        ? recentReactionsResponse.data
-        : [recentReactionsResponse.data]
+    try {
+      const data = await getRecentReactions(limit)
+      recentReactions.value = Array.isArray(data) ? data : [data]
       return recentReactions.value
-    } else {
-      console.error('Failed to load recent reactions:', recentReactionsResponse.message)
+    } catch (error) {
+      console.error('Failed to load recent reactions:', error)
       return []
     }
   }
 
-  const addReaction = (reaction: BasicReactionResponse) => {
+  const addReaction = (reaction: ReactionView) => {
     const existingIndex = recentReactions.value.findIndex(r => r.name === reaction.name)
     if (existingIndex !== -1) {
       recentReactions.value.splice(existingIndex, 1)

@@ -4,8 +4,7 @@ import { ElMessage } from 'element-plus';
 import type { DiaryStyle, DiaryStyleTextCreate, DiaryStyleTextUpdate } from "@/api/diaryClient.ts";
 import { diaryClient } from "@/api/diaryClient.ts";
 import SmartTextArea from "@/components/post/SmartTextArea.vue";
-import type { BasicReactionResponse } from "@/api/reactionService.ts";
-import type { ReactionPackDto } from "@/api/dto/reactionServiceDto.ts";
+import type { ReactionView, ReactionPackDto } from "@/api/dto/reactionServiceDto";
 import {useI18n} from "vue-i18n";
 
 const { t } = useI18n();
@@ -15,13 +14,13 @@ const props = defineProps<{
   diaryLogin: string,
   style?: DiaryStyle,
   basicReactions: ReactionPackDto[],
-  recentReactions: BasicReactionResponse[],
+  recentReactions: ReactionView[],
 }>();
 
 const emit = defineEmits<{
   (e: 'cancel'): void,
   (e: 'saved', style: DiaryStyle): void
-  (e: 'reaction-added', reaction: BasicReactionResponse): void
+  (e: 'reaction-added', reaction: ReactionView): void
 }>();
 
 const name = ref('');

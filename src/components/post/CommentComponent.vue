@@ -8,8 +8,7 @@ import FooterButtons from "@/components/post/FooterButtons.vue";
 import CommentEdit from "@/components/post/CommentEdit.vue";
 import {getDateTimeString} from "@/components/post/util.ts";
 import NicknameComponent from "@/components/NicknameComponent.vue";
-import type {BasicReactionResponse} from "@/api/reactionService.ts";
-import type {ReactionPackDto} from "@/api/dto/reactionServiceDto.ts";
+import type {ReactionView, ReactionPackDto} from "@/api/dto/reactionServiceDto";
 import ProcessedText from "@/components/post/ProcessedText.vue";
 import { useReactionsStore } from "@/stores/reactionsStore";
 
