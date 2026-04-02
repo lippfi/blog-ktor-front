@@ -15,7 +15,7 @@
     <el-form-item prop="passwordConfirmation">
       <el-input :placeholder="t('registration.form.fields.password_confirmation.label')" type="password" v-model="registrationForm.passwordConfirmation" />
     </el-form-item>
-    <el-space fill>
+    <el-space v-if="inviteCodeRequired" fill>
       <el-alert type="info" :closable="false">
         <p>
           {{ $t('registration.form.fields.invite_code.code_required')}}<br>
@@ -44,6 +44,7 @@ import type {FormInstance, FormRules} from "element-plus";
 import {isEmailBusy, isLoginBusy, isNicknameBusy, signUp} from "@/api/userService.ts";
 import router from "@/router";
 import {useI18n} from "vue-i18n";
+import {inviteCodeRequired} from "@/constants.ts";
 
 const { locale, t } = useI18n()
 const currentLocale = ref(locale.value)
@@ -140,7 +141,7 @@ const rules = computed<FormRules<RegistrationForm>>(() => ({
   email: [{ asyncValidator: validateEmail, trigger: 'blur' }],
   password: [{ validator: validatePassword, trigger: 'blur' }],
   passwordConfirmation: [{ validator: validatePasswordConfirmation, trigger: 'blur' }],
-  inviteCode: [{ required: true, message: t('registration.form.errors.invite_code_required'), trigger: 'blur' }],
+  inviteCode: inviteCodeRequired ? [{ required: true, message: t('registration.form.errors.invite_code_required'), trigger: 'blur' }] : [],
 }))
 
 const emit = defineEmits(['registration-success']);
@@ -151,7 +152,7 @@ const submitForm = (form: FormInstance | undefined) => {
     if (valid) {
       loading.value = true
       try {
-        let registrationResult = await signUp(registrationForm.login, registrationForm.nickname, registrationForm.email, registrationForm.password, registrationForm.inviteCode, currentLocale.value)
+        let registrationResult = await signUp(registrationForm.login, registrationForm.nickname, registrationForm.email, registrationForm.password, inviteCodeRequired ? registrationForm.inviteCode : '', currentLocale.value)
         if (registrationResult.type === 'ok') {
           emit('registration-success');
         } else {
