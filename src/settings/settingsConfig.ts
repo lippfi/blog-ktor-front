@@ -139,6 +139,15 @@ export const settingsCategories: SettingsCategory[] = [
           'settings.categories.diary.items.hiddenPosts.triggers.visibility',
         ],
       },
+      {
+        id: 'deletedPosts',
+        titleKey: 'settings.categories.diary.items.deletedPosts.title',
+        triggers: [
+          'settings.categories.diary.items.deletedPosts.triggers.deleted',
+          'settings.categories.diary.items.deletedPosts.triggers.trash',
+          'settings.categories.diary.items.deletedPosts.triggers.removed',
+        ],
+      },
     ],
   },
   {

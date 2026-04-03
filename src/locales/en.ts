@@ -686,6 +686,14 @@ export default {
                             visibility: 'visibility',
                         },
                     },
+                    deletedPosts: {
+                        title: 'Deleted Posts',
+                        triggers: {
+                            deleted: 'deleted',
+                            trash: 'trash',
+                            removed: 'removed',
+                        },
+                    },
                 },
             },
             avatars: {

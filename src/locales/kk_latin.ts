@@ -299,6 +299,7 @@ export default {
                     defaultGroups: { title: 'Adepkі toptar', triggers: { default: 'adepkі', autoAssign: 'avto tagyinau' } },
                     manageGroups: { title: 'Toptardy basqaru', triggers: { manage: 'basqaru', groups: 'toptar', memberGroups: 'mushe toptary' } },
                     hiddenPosts: { title: 'Zhasyryn jazbalar', triggers: { hidden: 'zhasyryn', private: 'zheke', visibility: 'korinіmdіlіk' } },
+                    deletedPosts: { title: 'Zhoyylghan jazbalar', triggers: { deleted: 'zhoyylghan', trash: 'sebet', removed: 'zhoyylghan' } },
                 },
             },
             avatars: {

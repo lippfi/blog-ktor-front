@@ -401,6 +401,14 @@ export default {
                             visibility: 'видимость',
                         },
                     },
+                    deletedPosts: {
+                        title: 'Удалённые записи',
+                        triggers: {
+                            deleted: 'удалённые',
+                            trash: 'корзина',
+                            removed: 'удалённые',
+                        },
+                    },
                 },
             },
             avatars: {

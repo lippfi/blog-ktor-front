@@ -299,6 +299,7 @@ export default {
                     defaultGroups: { title: 'Әдепкі топтар', triggers: { default: 'әдепкі', autoAssign: 'авто тағайындау' } },
                     manageGroups: { title: 'Топтарды басқару', triggers: { manage: 'басқару', groups: 'топтар', memberGroups: 'мүше топтары' } },
                     hiddenPosts: { title: 'Жасырын жазбалар', triggers: { hidden: 'жасырын', private: 'жеке', visibility: 'көрінімділік' } },
+                    deletedPosts: { title: 'Жойылған жазбалар', triggers: { deleted: 'жойылған', trash: 'себет', removed: 'жойылған' } },
                 },
             },
             avatars: {
