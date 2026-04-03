@@ -16,6 +16,7 @@ export type NotificationType =
 interface BaseNotification {
     id: string;
     type: NotificationType;
+    createdAt: string;
 }
 
 interface PostRelatedNotification extends BaseNotification {

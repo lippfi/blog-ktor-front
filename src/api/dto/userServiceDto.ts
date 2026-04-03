@@ -41,6 +41,7 @@ export interface UserSessionInfo {
     nickname: string;
     language: Language;
     nsfw: NsfwPolicy;
+    timezone: string;
 }
 
 export interface UpdateUserRequest {

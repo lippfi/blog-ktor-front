@@ -1,12 +1,12 @@
-export function getDateTimeString(localDateTime: string) {
-    const creationDate = new Date(localDateTime);
-    const now = new Date();
-    const diffHours = (now.getTime() - creationDate.getTime()) / (1000 * 60 * 60);
+import { formatInstant, formatInstantDateOnly } from '@/utils/dateTime';
 
-    const time = creationDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+export function getDateTimeString(instant: string) {
+    const date = new Date(instant);
+    const now = new Date();
+    const diffHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
     if (diffHours > 24) {
-        return `${creationDate.toLocaleDateString(undefined)}`
+        return formatInstantDateOnly(instant);
     } else {
-        return time
+        return formatInstant(instant);
     }
 }
