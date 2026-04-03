@@ -358,6 +358,17 @@ export default {
             alreadyExists: 'Лақап ат бос емес',
         },
     },
+    signatureSettings: {
+        placeholder: 'Қолтаңбаңызды енгізіңіз',
+        save: 'Сақтау',
+        cancel: 'Болдырмау',
+        saveSuccess: 'Қолтаңба сәтті жаңартылды',
+        saveError: 'Қолтаңбаны жаңарту сәтсіз аяқталды',
+        loadError: 'Қолтаңбаны жүктеу сәтсіз аяқталды',
+        errors: {
+            tooLong: 'Қолтаңба тым ұзын (ең көбі 200 таңба)',
+        },
+    },
     styles: {
         title: 'Күнделік стильдері',
         addNew: 'Жаңа стиль қосу',

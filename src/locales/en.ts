@@ -836,6 +836,17 @@ export default {
             alreadyExists: 'Nickname already exists',
         },
     },
+    signatureSettings: {
+        placeholder: 'Enter your signature',
+        save: 'Save',
+        cancel: 'Cancel',
+        saveSuccess: 'Signature updated successfully',
+        saveError: 'Failed to update signature',
+        loadError: 'Failed to load signature',
+        errors: {
+            tooLong: 'Signature is too long (max 200 characters)',
+        },
+    },
     styles: {
         preview: {
             save: 'Add to my collection',

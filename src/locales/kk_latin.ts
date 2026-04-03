@@ -358,6 +358,17 @@ export default {
             alreadyExists: 'Laqap at bos emes',
         },
     },
+    signatureSettings: {
+        placeholder: 'Qoltańbańyzdy engiziníz',
+        save: 'Saqtau',
+        cancel: 'Boldyrmau',
+        saveSuccess: 'Qoltańba sátti janartyldy',
+        saveError: 'Qoltańbany janartu sátsiz ayaqtaldy',
+        loadError: 'Qoltańbany júkteu sátsiz ayaqtaldy',
+        errors: {
+            tooLong: 'Qoltańba tym uzyn (eń kóbi 200 tańba)',
+        },
+    },
     styles: {
         title: 'Kundelik stilderi',
         addNew: 'Jana stil qosu',

@@ -551,6 +551,17 @@ export default {
             alreadyExists: 'Никнейм уже существует',
         },
     },
+    signatureSettings: {
+        placeholder: 'Введите подпись',
+        save: 'Сохранить',
+        cancel: 'Отмена',
+        saveSuccess: 'Подпись успешно обновлена',
+        saveError: 'Не удалось обновить подпись',
+        loadError: 'Не удалось загрузить подпись',
+        errors: {
+            tooLong: 'Подпись слишком длинная (максимум 200 символов)',
+        },
+    },
     styles: {
         title: 'Стили дневника',
         addNew: 'Добавить новый стиль',
