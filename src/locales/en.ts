@@ -570,6 +570,259 @@ export default {
         go_home: 'Go to home page',
         go_back: 'Go back'
     },
+    settings: {
+        title: 'Settings',
+        search: {
+            placeholder: 'Search settings...',
+        },
+        notYetImplemented: 'Not yet implemented',
+        categories: {
+            user: {
+                title: 'User',
+                triggers: {
+                    account: 'account',
+                    profile: 'profile',
+                    userSettings: 'user settings',
+                },
+                items: {
+                    nickname: {
+                        title: 'Nickname',
+                        triggers: {
+                            username: 'username',
+                            changeUsername: 'change username',
+                            changeNickname: 'change nickname',
+                        },
+                    },
+                    signature: {
+                        title: 'Signature',
+                        triggers: {
+                            bio: 'bio',
+                            status: 'status',
+                        },
+                    },
+                    timezone: {
+                        title: 'Timezone',
+                        triggers: {
+                            time: 'time',
+                            zone: 'zone',
+                            clock: 'clock',
+                        },
+                    },
+                    inviteCode: {
+                        title: 'Invite Code',
+                        triggers: {
+                            invite: 'invite',
+                            code: 'code',
+                            invitation: 'invitation',
+                        },
+                    },
+                    language: {
+                        title: 'Language',
+                        triggers: {
+                            language: 'language',
+                            locale: 'locale',
+                            changeLanguage: 'change language',
+                        },
+                    },
+                    ignoreList: {
+                        title: 'Ignore List',
+                        triggers: {
+                            ignore: 'ignore',
+                            block: 'block',
+                            blockedUsers: 'blocked users',
+                        },
+                    },
+                    hiddenUsers: {
+                        title: 'Hidden Users',
+                        triggers: {
+                            hide: 'hide',
+                            hidden: 'hidden',
+                            muteUsers: 'mute users',
+                        },
+                    },
+                },
+            },
+            diary: {
+                title: 'Diary',
+                triggers: {
+                    blog: 'blog',
+                    journal: 'journal',
+                },
+                items: {
+                    diaryTitle: {
+                        title: 'Diary Title',
+                        triggers: {
+                            blogName: 'blog name',
+                            diaryName: 'diary name',
+                        },
+                    },
+                    preface: {
+                        title: 'Preface',
+                        triggers: {
+                            intro: 'intro',
+                            description: 'description',
+                        },
+                    },
+                    defaultGroups: {
+                        title: 'Default Groups',
+                        triggers: {
+                            default: 'default',
+                            autoAssign: 'auto assign',
+                        },
+                    },
+                    manageGroups: {
+                        title: 'Manage Groups',
+                        triggers: {
+                            manage: 'manage',
+                            groups: 'groups',
+                            memberGroups: 'member groups',
+                        },
+                    },
+                    hiddenPosts: {
+                        title: 'Hidden Posts',
+                        triggers: {
+                            hidden: 'hidden',
+                            private: 'private',
+                            visibility: 'visibility',
+                        },
+                    },
+                },
+            },
+            avatars: {
+                title: 'Avatars',
+                triggers: {
+                    avatar: 'avatar',
+                    profilePicture: 'profile picture',
+                    photo: 'photo',
+                },
+                items: {
+                    avatars: {
+                        title: 'Avatars',
+                        triggers: {
+                            manage: 'manage',
+                            upload: 'upload',
+                        },
+                    },
+                },
+            },
+            reactions: {
+                title: 'Reactions',
+                triggers: {
+                    emoji: 'emoji',
+                    react: 'react',
+                },
+                items: {
+                    createReactionPack: {
+                        title: 'Create Reaction Pack',
+                        triggers: {
+                            create: 'create',
+                            newPack: 'new pack',
+                        },
+                    },
+                    myReactionPacks: {
+                        title: 'My Reaction Packs',
+                        triggers: {
+                            packs: 'packs',
+                            manage: 'manage',
+                        },
+                    },
+                },
+            },
+            notifications: {
+                title: 'Notifications',
+                triggers: {
+                    alerts: 'alerts',
+                    notify: 'notify',
+                },
+                items: {
+                    onsiteNotifications: {
+                        title: 'On-site Notifications',
+                        triggers: {
+                            onsite: 'on-site',
+                            web: 'web',
+                        },
+                    },
+                    emailNotifications: {
+                        title: 'Email Notifications',
+                        triggers: {
+                            email: 'email',
+                            mail: 'mail',
+                        },
+                    },
+                },
+            },
+            security: {
+                title: 'Security',
+                triggers: {
+                    safety: 'safety',
+                    protection: 'protection',
+                },
+                items: {
+                    password: {
+                        title: 'Password',
+                        triggers: {
+                            changePassword: 'change password',
+                            resetPassword: 'reset password',
+                        },
+                    },
+                    emailAddress: {
+                        title: 'Email Address',
+                        triggers: {
+                            changeEmail: 'change email',
+                            email: 'email',
+                        },
+                    },
+                    activeSessions: {
+                        title: 'Active Sessions',
+                        triggers: {
+                            sessions: 'sessions',
+                            devices: 'devices',
+                            loggedIn: 'logged in',
+                        },
+                    },
+                    twoFactorAuth: {
+                        title: 'Two-Factor Authentication',
+                        triggers: {
+                            twoFactor: 'two-factor',
+                            totp: 'totp',
+                            authenticator: 'authenticator',
+                        },
+                    },
+                },
+            },
+            preferences: {
+                title: 'Preferences',
+                triggers: {
+                    customize: 'customize',
+                    options: 'options',
+                },
+                items: {
+                    appearance: {
+                        title: 'Appearance',
+                        triggers: {
+                            theme: 'theme',
+                            darkMode: 'dark mode',
+                            look: 'look',
+                        },
+                    },
+                    accessibility: {
+                        title: 'Accessibility',
+                        triggers: {
+                            a11y: 'a11y',
+                            screenReader: 'screen reader',
+                        },
+                    },
+                    layout: {
+                        title: 'Layout',
+                        triggers: {
+                            columns: 'columns',
+                            arrangement: 'arrangement',
+                        },
+                    },
+                },
+            },
+        },
+    },
     styles: {
         preview: {
             save: 'Add to my collection',

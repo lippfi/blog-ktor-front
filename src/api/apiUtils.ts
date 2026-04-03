@@ -1,7 +1,7 @@
 import { backendURL } from "@/constants";
 import type { TokenPair } from "@/api/dto/userServiceDto";
 
-let refreshPromise: Promise<TokenPair> | null = null;
+let refreshPromise: Promise<{ tokenPair: TokenPair | null; hardFailure: boolean }> | null = null;
 
 function clearAuthData(): void {
     localStorage.removeItem('jwt');
@@ -25,9 +25,9 @@ function setTokenPair(tokenPair: TokenPair): void {
     localStorage.setItem('jwt', tokenPair.accessToken);
 }
 
-async function tryRefreshToken(): Promise<boolean> {
+async function tryRefreshToken(): Promise<{ success: boolean; hardFailure: boolean }> {
     const refreshToken = getRefreshToken();
-    if (!refreshToken) return false;
+    if (!refreshToken) return { success: false, hardFailure: true };
 
     try {
         if (!refreshPromise) {
@@ -37,17 +37,23 @@ async function tryRefreshToken(): Promise<boolean> {
                 body: JSON.stringify({ refreshToken }),
             }).then(async (response) => {
                 if (!response.ok) {
-                    throw new Error('Refresh failed');
+                    // 4xx means the refresh token is truly invalid/expired
+                    const hardFailure = response.status >= 400 && response.status < 500;
+                    return { tokenPair: null, hardFailure };
                 }
-                return await response.json() as TokenPair;
+                return { tokenPair: await response.json() as TokenPair, hardFailure: false };
             });
         }
 
-        const newTokenPair = await refreshPromise;
-        setTokenPair(newTokenPair);
-        return true;
+        const result = await refreshPromise;
+        if (result.tokenPair) {
+            setTokenPair(result.tokenPair);
+            return { success: true, hardFailure: false };
+        }
+        return { success: false, hardFailure: result.hardFailure };
     } catch {
-        return false;
+        // Network error or other transient failure — don't treat as hard failure
+        return { success: false, hardFailure: false };
     } finally {
         refreshPromise = null;
     }
@@ -55,20 +61,29 @@ async function tryRefreshToken(): Promise<boolean> {
 
 function redirectToLogin(): void {
     clearAuthData();
-    window.location.href = '/login';
+    const base = import.meta.env.BASE_URL || '/';
+    window.location.href = `${base}login`;
 }
 
 async function handleUnauthorizedWithRetry(
     response: Response,
     endpoint: string,
     options: RequestInit,
-    buildHeaders: () => HeadersInit | undefined
+    buildHeaders: () => HeadersInit | undefined,
+    isOptional: boolean = false
 ): Promise<Response> {
     if (response.status !== 401) return response;
 
-    const refreshed = await tryRefreshToken();
-    if (!refreshed) {
-        redirectToLogin();
+    const refreshResult = await tryRefreshToken();
+    if (!refreshResult.success) {
+        if (isOptional) {
+            // For optional auth requests, just return the original response
+            return response;
+        }
+        if (refreshResult.hardFailure) {
+            // Refresh token is truly invalid — clear auth and redirect
+            redirectToLogin();
+        }
         return response;
     }
 
@@ -94,7 +109,7 @@ export async function authenticatedRequest(
     return handleUnauthorizedWithRetry(response, endpoint, options, () => ({
         ...options.headers,
         'Authorization': `Bearer ${localStorage.getItem('jwt')}`
-    }));
+    }), false);
 }
 
 export async function optionalAuthenticatedRequest(
@@ -117,5 +132,5 @@ export async function optionalAuthenticatedRequest(
             return { ...options.headers, 'Authorization': `Bearer ${freshToken}` };
         }
         return options.headers;
-    });
+    }, true);
 }

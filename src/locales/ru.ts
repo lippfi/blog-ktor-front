@@ -285,6 +285,259 @@ export default {
             },
         }
     },
+    settings: {
+        title: 'Настройки',
+        search: {
+            placeholder: 'Поиск настроек...',
+        },
+        notYetImplemented: 'Ещё не реализовано',
+        categories: {
+            user: {
+                title: 'Пользователь',
+                triggers: {
+                    account: 'аккаунт',
+                    profile: 'профиль',
+                    userSettings: 'настройки пользователя',
+                },
+                items: {
+                    nickname: {
+                        title: 'Никнейм',
+                        triggers: {
+                            username: 'имя пользователя',
+                            changeUsername: 'изменить имя пользователя',
+                            changeNickname: 'изменить никнейм',
+                        },
+                    },
+                    signature: {
+                        title: 'Подпись',
+                        triggers: {
+                            bio: 'био',
+                            status: 'статус',
+                        },
+                    },
+                    timezone: {
+                        title: 'Часовой пояс',
+                        triggers: {
+                            time: 'время',
+                            zone: 'зона',
+                            clock: 'часы',
+                        },
+                    },
+                    language: {
+                        title: 'Язык',
+                        triggers: {
+                            language: 'язык',
+                            locale: 'локаль',
+                            changeLanguage: 'сменить язык',
+                        },
+                    },
+                    ignoreList: {
+                        title: 'Список игнорируемых',
+                        triggers: {
+                            ignore: 'игнорировать',
+                            block: 'заблокировать',
+                            blockedUsers: 'заблокированные пользователи',
+                        },
+                    },
+                    hiddenUsers: {
+                        title: 'Скрытые пользователи',
+                        triggers: {
+                            hide: 'скрыть',
+                            hidden: 'скрытые',
+                            muteUsers: 'заглушить пользователей',
+                        },
+                    },
+                    inviteCode: {
+                        title: 'Инвайт-код',
+                        triggers: {
+                            invite: 'инвайт',
+                            code: 'код',
+                            invitation: 'приглашение',
+                        },
+                    },
+                },
+            },
+            diary: {
+                title: 'Дневник',
+                triggers: {
+                    blog: 'блог',
+                    journal: 'журнал',
+                },
+                items: {
+                    diaryTitle: {
+                        title: 'Название дневника',
+                        triggers: {
+                            blogName: 'название блога',
+                            diaryName: 'название дневника',
+                        },
+                    },
+                    preface: {
+                        title: 'Предисловие',
+                        triggers: {
+                            intro: 'введение',
+                            description: 'описание',
+                        },
+                    },
+                    defaultGroups: {
+                        title: 'Группы по умолчанию',
+                        triggers: {
+                            default: 'по умолчанию',
+                            autoAssign: 'автоназначение',
+                        },
+                    },
+                    manageGroups: {
+                        title: 'Управление группами',
+                        triggers: {
+                            manage: 'управление',
+                            groups: 'группы',
+                            memberGroups: 'группы участников',
+                        },
+                    },
+                    hiddenPosts: {
+                        title: 'Скрытые записи',
+                        triggers: {
+                            hidden: 'скрытые',
+                            private: 'приватные',
+                            visibility: 'видимость',
+                        },
+                    },
+                },
+            },
+            avatars: {
+                title: 'Аватары',
+                triggers: {
+                    avatar: 'аватар',
+                    profilePicture: 'фото профиля',
+                    photo: 'фото',
+                },
+                items: {
+                    avatars: {
+                        title: 'Аватары',
+                        triggers: {
+                            manage: 'управление',
+                            upload: 'загрузить',
+                        },
+                    },
+                },
+            },
+            reactions: {
+                title: 'Реакции',
+                triggers: {
+                    emoji: 'эмодзи',
+                    react: 'реакция',
+                },
+                items: {
+                    createReactionPack: {
+                        title: 'Создать набор реакций',
+                        triggers: {
+                            create: 'создать',
+                            newPack: 'новый набор',
+                        },
+                    },
+                    myReactionPacks: {
+                        title: 'Мои наборы реакций',
+                        triggers: {
+                            packs: 'наборы',
+                            manage: 'управление',
+                        },
+                    },
+                },
+            },
+            notifications: {
+                title: 'Уведомления',
+                triggers: {
+                    alerts: 'оповещения',
+                    notify: 'уведомить',
+                },
+                items: {
+                    onsiteNotifications: {
+                        title: 'Уведомления на сайте',
+                        triggers: {
+                            onsite: 'на сайте',
+                            web: 'веб',
+                        },
+                    },
+                    emailNotifications: {
+                        title: 'Уведомления по почте',
+                        triggers: {
+                            email: 'почта',
+                            mail: 'письмо',
+                        },
+                    },
+                },
+            },
+            security: {
+                title: 'Безопасность',
+                triggers: {
+                    safety: 'безопасность',
+                    protection: 'защита',
+                },
+                items: {
+                    password: {
+                        title: 'Пароль',
+                        triggers: {
+                            changePassword: 'изменить пароль',
+                            resetPassword: 'сбросить пароль',
+                        },
+                    },
+                    emailAddress: {
+                        title: 'Адрес электронной почты',
+                        triggers: {
+                            changeEmail: 'изменить почту',
+                            email: 'почта',
+                        },
+                    },
+                    activeSessions: {
+                        title: 'Активные сессии',
+                        triggers: {
+                            sessions: 'сессии',
+                            devices: 'устройства',
+                            loggedIn: 'вошли',
+                        },
+                    },
+                    twoFactorAuth: {
+                        title: 'Двухфакторная аутентификация',
+                        triggers: {
+                            twoFactor: 'двухфакторная',
+                            totp: 'totp',
+                            authenticator: 'аутентификатор',
+                        },
+                    },
+                },
+            },
+            preferences: {
+                title: 'Предпочтения',
+                triggers: {
+                    customize: 'настроить',
+                    options: 'параметры',
+                },
+                items: {
+                    appearance: {
+                        title: 'Внешний вид',
+                        triggers: {
+                            theme: 'тема',
+                            darkMode: 'тёмная тема',
+                            look: 'оформление',
+                        },
+                    },
+                    accessibility: {
+                        title: 'Доступность',
+                        triggers: {
+                            a11y: 'доступность',
+                            screenReader: 'экранный диктор',
+                        },
+                    },
+                    layout: {
+                        title: 'Макет',
+                        triggers: {
+                            columns: 'колонки',
+                            arrangement: 'расположение',
+                        },
+                    },
+                },
+            },
+        },
+    },
     styles: {
         title: 'Стили дневника',
         addNew: 'Добавить новый стиль',

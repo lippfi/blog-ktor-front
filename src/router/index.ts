@@ -18,6 +18,7 @@ import {diaryClient} from "@/api/diaryClient.ts";
 import {updateStyles} from "@/styles/stylesManager";
 import NotFoundView from "@/views/NotFoundView.vue";
 import FeedView from "@/views/FeedView.vue";
+import SettingsView from "@/views/SettingsView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -82,6 +83,11 @@ const router = createRouter({
       path: '/avatars',
       name: 'avatars',
       component: AvatarComponent,
+    },
+    {
+      path: '/settings/:categoryId?/:itemId?',
+      name: 'settings',
+      component: SettingsView,
     },
     {
       path: '/:login/diary',
@@ -312,6 +318,10 @@ NProgress.configure({
 });
 
 router.beforeEach((to, from, next) => {
+  if (to.name === from.name) {
+    next();
+    return;
+  }
   NProgress.start();
   next();
 });

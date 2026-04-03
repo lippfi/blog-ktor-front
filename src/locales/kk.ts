@@ -270,6 +270,81 @@ export default {
             },
         }
     },
+    settings: {
+        title: 'Параметрлер',
+        search: {
+            placeholder: 'Параметрлерді іздеу...',
+        },
+        notYetImplemented: 'Әлі іске асырылмады',
+        categories: {
+            user: {
+                title: 'Қолданушы',
+                triggers: { account: 'аккаунт', profile: 'профиль', userSettings: 'қолданушы параметрлері' },
+                items: {
+                    nickname: { title: 'Лақап ат', triggers: { username: 'қолданушы аты', changeUsername: 'қолданушы атын өзгерту', changeNickname: 'лақап атты өзгерту' } },
+                    signature: { title: 'Қолтаңба', triggers: { bio: 'био', status: 'мәртебесі' } },
+                    timezone: { title: 'Уақыт белгісі', triggers: { time: 'уақыт', zone: 'аймақ', clock: 'сағат' } },
+                    language: { title: 'Тіл', triggers: { language: 'тіл', locale: 'тіл параметрі', changeLanguage: 'тілді өзгерту' } },
+                    ignoreList: { title: 'Елемеу тізімі', triggers: { ignore: 'елемеу', block: 'бұғаттау', blockedUsers: 'бұғатталған қолданушылар' } },
+                    hiddenUsers: { title: 'Жасырын қолданушылар', triggers: { hide: 'жасыру', hidden: 'жасырын', muteUsers: 'қолданушыларды өшіру' } },
+                    inviteCode: { title: 'Шақыру коды', triggers: { invite: 'шақыру', code: 'код', invitation: 'шақыру коды' } },
+                },
+            },
+            diary: {
+                title: 'Күнделік',
+                triggers: { blog: 'блог', journal: 'журнал' },
+                items: {
+                    diaryTitle: { title: 'Күнделік атауы', triggers: { blogName: 'блог атауы', diaryName: 'күнделік атауы' } },
+                    preface: { title: 'Алғы сөз', triggers: { intro: 'кіріспе', description: 'сипаттама' } },
+                    defaultGroups: { title: 'Әдепкі топтар', triggers: { default: 'әдепкі', autoAssign: 'авто тағайындау' } },
+                    manageGroups: { title: 'Топтарды басқару', triggers: { manage: 'басқару', groups: 'топтар', memberGroups: 'мүше топтары' } },
+                    hiddenPosts: { title: 'Жасырын жазбалар', triggers: { hidden: 'жасырын', private: 'жеке', visibility: 'көрінімділік' } },
+                },
+            },
+            avatars: {
+                title: 'Аватарлар',
+                triggers: { avatar: 'аватар', profilePicture: 'профиль суреті', photo: 'фото' },
+                items: {
+                    avatars: { title: 'Аватарлар', triggers: { manage: 'басқару', upload: 'жүктеу' } },
+                },
+            },
+            reactions: {
+                title: 'Реакциялар',
+                triggers: { emoji: 'эмодзи', react: 'реакция' },
+                items: {
+                    createReactionPack: { title: 'Реакция жинағы жасау', triggers: { create: 'жасау', newPack: 'жаңа жинақ' } },
+                    myReactionPacks: { title: 'Менің реакция жинақтарым', triggers: { packs: 'жинақтар', manage: 'басқару' } },
+                },
+            },
+            notifications: {
+                title: 'Хабарлама',
+                triggers: { alerts: 'ескертулер', notify: 'хабарландыру' },
+                items: {
+                    onsiteNotifications: { title: 'Сайтта хабарландыру', triggers: { onsite: 'сайтта', web: 'веб' } },
+                    emailNotifications: { title: 'Email хабарландыру', triggers: { email: 'email', mail: 'пошта' } },
+                },
+            },
+            security: {
+                title: 'Қауіпсіздік',
+                triggers: { safety: 'қауіпсіздік', protection: 'қорғау' },
+                items: {
+                    password: { title: 'Құпия сөз', triggers: { changePassword: 'құпия сөзді өзгерту', resetPassword: 'құпия сөзді қалпына келтіру' } },
+                    emailAddress: { title: 'Email мекенжайы', triggers: { changeEmail: 'emailді өзгерту', email: 'email' } },
+                    activeSessions: { title: 'Белсенді сессиялар', triggers: { sessions: 'сессиялар', devices: 'құрылғылар', loggedIn: 'кірген' } },
+                    twoFactorAuth: { title: 'Екі факторлы аутентификация', triggers: { twoFactor: 'екі факторлы', totp: 'totp', authenticator: 'аутентификатор' } },
+                },
+            },
+            preferences: {
+                title: 'Қалаулар',
+                triggers: { customize: 'баптау', options: 'параметрлер' },
+                items: {
+                    appearance: { title: 'Сыртқы көрініс', triggers: { theme: 'тема', darkMode: 'қараңғы режим', look: 'көрініс' } },
+                    accessibility: { title: 'Қол жетімділік', triggers: { a11y: 'қол жетімділік', screenReader: 'экран оқығышы' } },
+                    layout: { title: 'Орналасу', triggers: { columns: 'бағандалар', arrangement: 'реттелуі' } },
+                },
+            },
+        },
+    },
     styles: {
         title: 'Күнделік стильдері',
         addNew: 'Жаңа стиль қосу',

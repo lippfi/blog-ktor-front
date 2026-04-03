@@ -270,6 +270,81 @@ export default {
             },
         }
     },
+    settings: {
+        title: 'Parametrler',
+        search: {
+            placeholder: 'Parametrlerdi izdeu...',
+        },
+        notYetImplemented: 'Ali іske asyrylmady',
+        categories: {
+            user: {
+                title: 'Qoldanushy',
+                triggers: { account: 'akkaunt', profile: 'profil', userSettings: 'qoldanushy parametrleri' },
+                items: {
+                    nickname: { title: 'Laqap at', triggers: { username: 'qoldanushy aty', changeUsername: 'qoldanushy atyn ozgertu', changeNickname: 'laqap atty ozgertu' } },
+                    signature: { title: 'Qoltanba', triggers: { bio: 'bio', status: 'mertebesі' } },
+                    timezone: { title: 'Uaqyt belgіsі', triggers: { time: 'uaqyt', zone: 'aimaq', clock: 'sagat' } },
+                    language: { title: 'Til', triggers: { language: 'til', locale: 'til parametri', changeLanguage: 'tildi ozgertu' } },
+                    ignoreList: { title: 'Elemeu tizimi', triggers: { ignore: 'elemeu', block: 'bugattau', blockedUsers: 'bugattalgan qoldanushylar' } },
+                    hiddenUsers: { title: 'Zhasyryn qoldanushylar', triggers: { hide: 'zhasyru', hidden: 'zhasyryn', muteUsers: 'qoldanushylardy oshiru' } },
+                    inviteCode: { title: 'Shaqyru kody', triggers: { invite: 'shaqyru', code: 'kod', invitation: 'shaqyru kody' } },
+                },
+            },
+            diary: {
+                title: 'Kundelіk',
+                triggers: { blog: 'blog', journal: 'jurnal' },
+                items: {
+                    diaryTitle: { title: 'Kundelіk atauy', triggers: { blogName: 'blog atauy', diaryName: 'kundelіk atauy' } },
+                    preface: { title: 'Algy soz', triggers: { intro: 'kіrіspe', description: 'sipattama' } },
+                    defaultGroups: { title: 'Adepkі toptar', triggers: { default: 'adepkі', autoAssign: 'avto tagyinau' } },
+                    manageGroups: { title: 'Toptardy basqaru', triggers: { manage: 'basqaru', groups: 'toptar', memberGroups: 'mushe toptary' } },
+                    hiddenPosts: { title: 'Zhasyryn jazbalar', triggers: { hidden: 'zhasyryn', private: 'zheke', visibility: 'korinіmdіlіk' } },
+                },
+            },
+            avatars: {
+                title: 'Avatarlar',
+                triggers: { avatar: 'avatar', profilePicture: 'profil suretі', photo: 'foto' },
+                items: {
+                    avatars: { title: 'Avatarlar', triggers: { manage: 'basqaru', upload: 'jukteu' } },
+                },
+            },
+            reactions: {
+                title: 'Reaktsiyalar',
+                triggers: { emoji: 'emodji', react: 'reaktsiya' },
+                items: {
+                    createReactionPack: { title: 'Reaktsiya jiynagy jasau', triggers: { create: 'jasau', newPack: 'jana jiynaq' } },
+                    myReactionPacks: { title: 'Menіn reaktsiya jiynaqtarym', triggers: { packs: 'jiynaqtar', manage: 'basqaru' } },
+                },
+            },
+            notifications: {
+                title: 'Habarlama',
+                triggers: { alerts: 'eskertular', notify: 'habarlandyru' },
+                items: {
+                    onsiteNotifications: { title: 'Saitta habarlandyru', triggers: { onsite: 'saitta', web: 'veb' } },
+                    emailNotifications: { title: 'Email habarlandyru', triggers: { email: 'email', mail: 'poshta' } },
+                },
+            },
+            security: {
+                title: 'Qaupsizdik',
+                triggers: { safety: 'qaupsizdik', protection: 'qorgau' },
+                items: {
+                    password: { title: 'Kupiya soz', triggers: { changePassword: 'kupiya sozdi ozgertu', resetPassword: 'kupiya sozdi qalpyna keltiru' } },
+                    emailAddress: { title: 'Email mekenjaiy', triggers: { changeEmail: 'emaildi ozgertu', email: 'email' } },
+                    activeSessions: { title: 'Belsendy sessiyalar', triggers: { sessions: 'sessiyalar', devices: 'qurylgylar', loggedIn: 'kirgen' } },
+                    twoFactorAuth: { title: 'Eki faktorly autentifikatsiya', triggers: { twoFactor: 'eki faktorly', totp: 'totp', authenticator: 'autentifikator' } },
+                },
+            },
+            preferences: {
+                title: 'Qalaudar',
+                triggers: { customize: 'baptyau', options: 'parametrler' },
+                items: {
+                    appearance: { title: 'Syrtqy korinіs', triggers: { theme: 'tema', darkMode: 'qarangy rejim', look: 'korinіs' } },
+                    accessibility: { title: 'Qol jetіmdіlіk', triggers: { a11y: 'qol jetіmdіlіk', screenReader: 'ekran oqyghyshy' } },
+                    layout: { title: 'Ornalasu', triggers: { columns: 'bagandalar', arrangement: 'rettelui' } },
+                },
+            },
+        },
+    },
     styles: {
         title: 'Kundelik stilderi',
         addNew: 'Jana stil qosu',
