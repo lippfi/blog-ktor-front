@@ -39,6 +39,11 @@ export interface DiaryStyle {
     authorNickname: string;
 }
 
+export interface DiaryTitleSubtitle {
+    title: string;
+    subtitle: string;
+}
+
 export interface UpdateTitleSubtitleRequest {
     title: string;
     subtitle: string;

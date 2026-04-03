@@ -6,6 +6,7 @@ import type {
     DiaryStyleUpdate,
     DiaryStylePreview,
     DiaryStyle,
+    DiaryTitleSubtitle,
     UpdateTitleSubtitleRequest,
     UpdateDefaultGroupsRequest,
     UserProfilePage,
@@ -17,6 +18,7 @@ export type {
     DiaryStyleUpdate,
     DiaryStylePreview,
     DiaryStyle,
+    DiaryTitleSubtitle,
     UpdateTitleSubtitleRequest,
     UpdateDefaultGroupsRequest,
     UserProfilePage,
@@ -41,6 +43,16 @@ export async function updateDiaryInfo(login: string, diaryInfo: DiaryInfo): Prom
         throw new Error(`Failed to update diary info: ${await response.text()}`);
     }
     return await response.text();
+}
+
+export async function getTitleSubtitle(login: string): Promise<DiaryTitleSubtitle> {
+    const response = await authenticatedRequest(
+        `/diary/title-subtitle?login=${encodeURIComponent(login)}`
+    );
+    if (!response.ok) {
+        throw new Error(`Failed to get title/subtitle: ${await response.text()}`);
+    }
+    return await response.json() as DiaryTitleSubtitle;
 }
 
 export async function updateTitleSubtitle(login: string, request: UpdateTitleSubtitleRequest): Promise<string> {

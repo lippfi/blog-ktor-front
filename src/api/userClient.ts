@@ -344,6 +344,48 @@ export async function updateSignature(signature: string): Promise<Result> {
         : { type: 'error', message: await response.text() };
 }
 
+export async function getNickname(): Promise<string> {
+    const response = await authenticatedRequest('/user/nickname');
+    if (!response.ok) throw new Error(await response.text());
+    return response.text();
+}
+
+export async function getSignature(): Promise<string> {
+    const response = await authenticatedRequest('/user/signature');
+    if (!response.ok) throw new Error(await response.text());
+    return response.text();
+}
+
+export async function getLanguage(): Promise<Language> {
+    const response = await authenticatedRequest('/user/language');
+    if (!response.ok) throw new Error(await response.text());
+    return response.json();
+}
+
+export async function getTimezone(): Promise<string> {
+    const response = await authenticatedRequest('/user/timezone');
+    if (!response.ok) throw new Error(await response.text());
+    return response.text();
+}
+
+export async function getSex(): Promise<Sex> {
+    const response = await authenticatedRequest('/user/sex');
+    if (!response.ok) throw new Error(await response.text());
+    return response.json();
+}
+
+export async function getNsfwPolicy(): Promise<NsfwPolicy> {
+    const response = await authenticatedRequest('/user/nsfw-policy');
+    if (!response.ok) throw new Error(await response.text());
+    return response.json();
+}
+
+export async function getBirthdate(): Promise<string> {
+    const response = await authenticatedRequest('/user/birthdate');
+    if (!response.ok) throw new Error(await response.text());
+    return response.json();
+}
+
 export async function updateNickname(nickname: string): Promise<Result> {
     const response = await authenticatedRequest('/user/update-nickname', {
         method: 'POST',
