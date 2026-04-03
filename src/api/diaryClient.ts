@@ -6,6 +6,8 @@ import type {
     DiaryStyleUpdate,
     DiaryStylePreview,
     DiaryStyle,
+    UpdateTitleSubtitleRequest,
+    UpdateDefaultGroupsRequest,
     UserProfilePage,
 } from "@/api/dto/diaryServiceDto";
 
@@ -15,6 +17,8 @@ export type {
     DiaryStyleUpdate,
     DiaryStylePreview,
     DiaryStyle,
+    UpdateTitleSubtitleRequest,
+    UpdateDefaultGroupsRequest,
     UserProfilePage,
 };
 
@@ -35,6 +39,36 @@ export async function updateDiaryInfo(login: string, diaryInfo: DiaryInfo): Prom
     );
     if (!response.ok) {
         throw new Error(`Failed to update diary info: ${await response.text()}`);
+    }
+    return await response.text();
+}
+
+export async function updateTitleSubtitle(login: string, request: UpdateTitleSubtitleRequest): Promise<string> {
+    const response = await authenticatedRequest(
+        `/diary/update-title-subtitle?login=${encodeURIComponent(login)}`,
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(request),
+        }
+    );
+    if (!response.ok) {
+        throw new Error(`Failed to update title/subtitle: ${await response.text()}`);
+    }
+    return await response.text();
+}
+
+export async function updateDefaultGroups(login: string, request: UpdateDefaultGroupsRequest): Promise<string> {
+    const response = await authenticatedRequest(
+        `/diary/update-default-groups?login=${encodeURIComponent(login)}`,
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(request),
+        }
+    );
+    if (!response.ok) {
+        throw new Error(`Failed to update default groups: ${await response.text()}`);
     }
     return await response.text();
 }

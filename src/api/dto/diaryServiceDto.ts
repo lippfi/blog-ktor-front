@@ -39,6 +39,17 @@ export interface DiaryStyle {
     authorNickname: string;
 }
 
+export interface UpdateTitleSubtitleRequest {
+    title: string;
+    subtitle: string;
+}
+
+export interface UpdateDefaultGroupsRequest {
+    defaultReadGroup: string;
+    defaultCommentGroup: string;
+    defaultReactGroup: string;
+}
+
 export interface UserProfilePage {
     login: string;
     nickname: string;

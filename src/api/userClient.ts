@@ -10,13 +10,19 @@ import type {
     UserAdditionalInfo,
     UserSessionInfo,
     UpdateUserRequest,
+    UpdatePasswordRequest,
     SerializableStringMap,
     NotificationSettings,
     FriendRequestCreate,
     FriendRequest,
+    IgnoredUserView,
+    Language,
+    Sex,
+    NsfwPolicy,
+    UserPermission,
 } from "@/api/dto/userServiceDto";
 
-export type { Language, Sex, NsfwPolicy } from "@/api/dto/userServiceDto";
+export type { Language, Sex, NsfwPolicy, UserPermission } from "@/api/dto/userServiceDto";
 export type { NsfwPolicy as NSFWPolicy } from "@/api/dto/userServiceDto";
 export type {
     TokenPair,
@@ -26,10 +32,12 @@ export type {
     UserAdditionalInfo,
     UserSessionInfo,
     UpdateUserRequest,
+    UpdatePasswordRequest,
     SerializableStringMap,
     NotificationSettings,
     FriendRequestCreate,
     FriendRequest,
+    IgnoredUserView,
 };
 
 export const authEvents = mitt();
@@ -325,10 +333,94 @@ export async function updateAdditionalInfo(info: UserAdditionalInfo): Promise<Re
 }
 
 export async function updateSignature(signature: string): Promise<Result> {
-    const response = await authenticatedRequest('/user/signature', {
+    const response = await authenticatedRequest('/user/update-signature', {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
         body: signature,
+    });
+
+    return response.ok
+        ? { type: 'ok' }
+        : { type: 'error', message: await response.text() };
+}
+
+export async function updateNickname(nickname: string): Promise<Result> {
+    const response = await authenticatedRequest('/user/update-nickname', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: nickname,
+    });
+
+    return response.ok
+        ? { type: 'ok' }
+        : { type: 'error', message: await response.text() };
+}
+
+export async function updateLanguage(language: Language): Promise<Result> {
+    const response = await authenticatedRequest('/user/update-language', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(language),
+    });
+
+    return response.ok
+        ? { type: 'ok' }
+        : { type: 'error', message: await response.text() };
+}
+
+export async function updateTimezone(timezone: string): Promise<Result> {
+    const response = await authenticatedRequest('/user/update-timezone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: timezone,
+    });
+
+    return response.ok
+        ? { type: 'ok' }
+        : { type: 'error', message: await response.text() };
+}
+
+export async function updatePassword(request: UpdatePasswordRequest): Promise<Result> {
+    const response = await authenticatedRequest('/user/update-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request),
+    });
+
+    return response.ok
+        ? { type: 'ok' }
+        : { type: 'error', message: await response.text() };
+}
+
+export async function updateSex(sex: Sex): Promise<Result> {
+    const response = await authenticatedRequest('/user/update-sex', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sex),
+    });
+
+    return response.ok
+        ? { type: 'ok' }
+        : { type: 'error', message: await response.text() };
+}
+
+export async function updateNsfwPolicy(nsfw: NsfwPolicy): Promise<Result> {
+    const response = await authenticatedRequest('/user/update-nsfw-policy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nsfw),
+    });
+
+    return response.ok
+        ? { type: 'ok' }
+        : { type: 'error', message: await response.text() };
+}
+
+export async function updateBirthdate(date: string): Promise<Result> {
+    const response = await authenticatedRequest('/user/update-birthdate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(date),
     });
 
     return response.ok
@@ -537,7 +629,7 @@ export async function unignoreUser(login: string): Promise<Result> {
         : { type: 'error', message: await response.text() };
 }
 
-export async function getIgnoredUsers(): Promise<UserView[]> {
+export async function getIgnoredUsers(): Promise<IgnoredUserView[]> {
     const response = await authenticatedRequest('/user/ignored-users');
     if (!response.ok) throw new Error(await response.text());
     return response.json();

@@ -1,6 +1,7 @@
 export type Language = 'RU' | 'EN' | 'KK' | 'KK_CYRILLIC';
 export type Sex = 'MALE' | 'FEMALE' | 'UNDEFINED';
 export type NsfwPolicy = 'SHOW' | 'HIDE' | 'WARN';
+export type UserPermission = 'SVG_UPLOAD' | 'WRITE_BASIC_REACTIONS' | 'ISSUE_INVITE_CODES';
 
 export interface TokenPair {
     accessToken: string;
@@ -42,6 +43,7 @@ export interface UserSessionInfo {
     language: Language;
     nsfw: NsfwPolicy;
     timezone: string;
+    permissions: UserPermission[];
 }
 
 export interface UpdateUserRequest {
@@ -77,4 +79,16 @@ export interface FriendRequest {
     message: string;
     label?: string | null;
     createdAt: string;
+}
+
+export interface UpdatePasswordRequest {
+    newPassword: string;
+    oldPassword: string;
+}
+
+export interface IgnoredUserView {
+    login: string;
+    nickname: string;
+    avatarUri?: string | null;
+    reason?: string | null;
 }
