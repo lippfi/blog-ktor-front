@@ -38,8 +38,10 @@
               :title="t(item.titleKey)"
               :name="item.id"
             >
-              <AvatarComponent v-if="item.id === 'avatars'" />
-              <p v-else>{{ t('settings.notYetImplemented') }}</p>
+              <template v-if="isItemActivated(category.id, item.id)">
+                <AvatarComponent v-if="item.id === 'avatars'" />
+                <p v-else>{{ t('settings.notYetImplemented') }}</p>
+              </template>
             </el-collapse-item>
           </el-collapse>
         </div>
@@ -62,8 +64,10 @@
               :title="t(item.titleKey)"
               :name="item.id"
             >
-              <AvatarComponent v-if="item.id === 'avatars'" />
-              <p v-else>{{ t('settings.notYetImplemented') }}</p>
+              <template v-if="isItemActivated(category.id, item.id)">
+                <AvatarComponent v-if="item.id === 'avatars'" />
+                <p v-else>{{ t('settings.notYetImplemented') }}</p>
+              </template>
             </el-collapse-item>
           </el-collapse>
         </el-collapse-item>
@@ -99,6 +103,20 @@ const mobileExpandedItems = reactive<Record<string, string[]>>(
   Object.fromEntries(settingsCategories.map(c => [c.id, []]))
 )
 
+// Track items that have been expanded at least once (for lazy mounting)
+const activatedItems = reactive<Record<string, Set<string>>>(
+  Object.fromEntries(settingsCategories.map(c => [c.id, new Set<string>()]))
+)
+
+function isItemActivated(categoryId: string, itemId: string): boolean {
+  return activatedItems[categoryId]?.has(itemId) ?? false
+}
+
+function markItemActivated(categoryId: string, itemId: string) {
+  if (!activatedItems[categoryId]) activatedItems[categoryId] = new Set()
+  activatedItems[categoryId].add(itemId)
+}
+
 const MOBILE_BREAKPOINT = 768
 
 function checkMobile() {
@@ -126,6 +144,7 @@ function getFirstExpandedDesktopItem(): { categoryId: string; itemId: string } |
 
 function onDesktopCollapseChange(categoryId: string, expandedItems: string[]) {
   desktopExpandedItems[categoryId] = expandedItems
+  expandedItems.forEach(id => markItemActivated(categoryId, id))
   if (expandedItems.length > 0) {
     updateRouteUrl(categoryId, expandedItems[expandedItems.length - 1])
   } else {
@@ -156,6 +175,7 @@ function onMobileCategoryChange(expandedCategories: string | string[]) {
 
 function onMobileItemChange(categoryId: string, expandedItems: string[]) {
   mobileExpandedItems[categoryId] = expandedItems
+  expandedItems.forEach(id => markItemActivated(categoryId, id))
   if (expandedItems.length > 0) {
     updateRouteUrl(categoryId, expandedItems[expandedItems.length - 1])
   } else {
@@ -180,6 +200,7 @@ function navigateToRouteParams() {
         if (!mobileExpandedItems[categoryId].includes(itemId)) {
           mobileExpandedItems[categoryId] = [...mobileExpandedItems[categoryId], itemId]
         }
+        markItemActivated(categoryId, itemId)
       }
     } else {
       scrollToCategory(categoryId)
@@ -188,6 +209,7 @@ function navigateToRouteParams() {
         if (!desktopExpandedItems[categoryId].includes(itemId)) {
           desktopExpandedItems[categoryId] = [...desktopExpandedItems[categoryId], itemId]
         }
+        markItemActivated(categoryId, itemId)
       }
     }
   })
@@ -229,10 +251,12 @@ watch(filteredCategories, (categories) => {
       }
       if (cat.filteredItems.length === 1) {
         mobileExpandedItems[cat.id] = [cat.filteredItems[0].id]
+        markItemActivated(cat.id, cat.filteredItems[0].id)
       }
     } else {
       if (cat.filteredItems.length === 1) {
         desktopExpandedItems[cat.id] = [cat.filteredItems[0].id]
+        markItemActivated(cat.id, cat.filteredItems[0].id)
       }
     }
   } else {
@@ -246,8 +270,10 @@ watch(filteredCategories, (categories) => {
             expandedMobileCategories.value = [cat.id]
           }
           mobileExpandedItems[cat.id] = [allItems[0].id]
+          markItemActivated(cat.id, allItems[0].id)
         } else {
           desktopExpandedItems[cat.id] = [allItems[0].id]
+          markItemActivated(cat.id, allItems[0].id)
         }
       }
     }
