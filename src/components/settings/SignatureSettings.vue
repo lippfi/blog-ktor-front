@@ -78,17 +78,17 @@ function cancel() {
         clearable
         @keyup.enter="save"
       />
+      <div class="signature-actions" v-if="hasChanges">
+        <el-button type="primary" :loading="saving" @click="save">
+          {{ t('signatureSettings.save') }}
+        </el-button>
+        <el-button @click="cancel">
+          {{ t('signatureSettings.cancel') }}
+        </el-button>
+      </div>
     </div>
     <div v-if="signatureError" class="signature-error">
       {{ signatureError }}
-    </div>
-    <div class="signature-actions" v-if="hasChanges">
-      <el-button type="primary" :loading="saving" @click="save">
-        {{ t('signatureSettings.save') }}
-      </el-button>
-      <el-button @click="cancel">
-        {{ t('signatureSettings.cancel') }}
-      </el-button>
     </div>
   </div>
 </template>
@@ -99,6 +99,12 @@ function cancel() {
 }
 
 .signature-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.signature-input-row .el-input {
   max-width: 400px;
 }
 
@@ -109,8 +115,8 @@ function cancel() {
 }
 
 .signature-actions {
-  margin-top: 12px;
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
 }
 </style>

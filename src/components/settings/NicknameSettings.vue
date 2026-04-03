@@ -95,17 +95,17 @@ function cancel() {
         clearable
         @keyup.enter="save"
       />
+      <div class="nickname-actions" v-if="hasChanges">
+        <el-button type="primary" :loading="saving" @click="save">
+          {{ t('nicknameSettings.save') }}
+        </el-button>
+        <el-button @click="cancel">
+          {{ t('nicknameSettings.cancel') }}
+        </el-button>
+      </div>
     </div>
     <div v-if="nicknameError" class="nickname-error">
       {{ nicknameError }}
-    </div>
-    <div class="nickname-actions" v-if="hasChanges">
-      <el-button type="primary" :loading="saving" @click="save">
-        {{ t('nicknameSettings.save') }}
-      </el-button>
-      <el-button @click="cancel">
-        {{ t('nicknameSettings.cancel') }}
-      </el-button>
     </div>
   </div>
 </template>
@@ -116,6 +116,12 @@ function cancel() {
 }
 
 .nickname-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nickname-input-row .el-input {
   max-width: 400px;
 }
 
@@ -126,8 +132,8 @@ function cancel() {
 }
 
 .nickname-actions {
-  margin-top: 12px;
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
 }
 </style>

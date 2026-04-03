@@ -562,6 +562,22 @@ export default {
             tooLong: 'Подпись слишком длинная (максимум 200 символов)',
         },
     },
+    languageSettings: {
+        placeholder: 'Выберите язык',
+        save: 'Сохранить',
+        cancel: 'Отмена',
+        saveSuccess: 'Язык успешно обновлён',
+        saveError: 'Не удалось обновить язык',
+        loadError: 'Не удалось загрузить язык',
+    },
+    timezoneSettings: {
+        placeholder: 'Выберите часовой пояс',
+        save: 'Сохранить',
+        cancel: 'Отмена',
+        saveSuccess: 'Часовой пояс успешно обновлён',
+        saveError: 'Не удалось обновить часовой пояс',
+        loadError: 'Не удалось загрузить часовой пояс',
+    },
     styles: {
         title: 'Стили дневника',
         addNew: 'Добавить новый стиль',

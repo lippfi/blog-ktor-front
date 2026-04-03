@@ -369,6 +369,22 @@ export default {
             tooLong: 'Qoltańba tym uzyn (eń kóbi 200 tańba)',
         },
     },
+    languageSettings: {
+        placeholder: 'Tildi tańdańyz',
+        save: 'Saqtau',
+        cancel: 'Boldyrmau',
+        saveSuccess: 'Til sátti janartyldy',
+        saveError: 'Tildi janartu sátsiz ayaqtaldy',
+        loadError: 'Tildi júkteu sátsiz ayaqtaldy',
+    },
+    timezoneSettings: {
+        placeholder: 'Uaqyt beldeuín tańdańyz',
+        save: 'Saqtau',
+        cancel: 'Boldyrmau',
+        saveSuccess: 'Uaqyt beldeui sátti janartyldy',
+        saveError: 'Uaqyt beldeuín janartu sátsiz ayaqtaldy',
+        loadError: 'Uaqyt beldeuín júkteu sátsiz ayaqtaldy',
+    },
     styles: {
         title: 'Kundelik stilderi',
         addNew: 'Jana stil qosu',

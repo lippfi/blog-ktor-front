@@ -18,7 +18,8 @@
 <script setup lang="ts">
 import {RouterView, useRouter} from 'vue-router'
 import MenuComponent from "@/components/MenuComponent.vue";
-import {isSignedIn} from "@/api/userClient.ts";
+import {isSignedIn, getCurrentSessionInfo} from "@/api/userClient.ts";
+import { i18n } from "@/i18n";
 import { computed, ref, onMounted, watch, onUnmounted, nextTick } from 'vue'
 import { getStyles } from "@/styles/stylesManager";
 import { useReactionsStore } from "@/stores/reactionsStore";
@@ -87,6 +88,16 @@ onMounted(async () => {
   if (!signedIn.value) {
     isLoaded.value = true;
     return
+  }
+
+  // Set UI language from user session info
+  try {
+    const sessionInfo = await getCurrentSessionInfo()
+    if (sessionInfo?.language) {
+      i18n.global.locale.value = sessionInfo.language
+    }
+  } catch (e) {
+    // Ignore — will use default locale
   }
 
   // Load all data from the store

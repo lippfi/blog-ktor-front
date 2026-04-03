@@ -42,6 +42,8 @@
                 <AvatarComponent v-if="item.id === 'avatars'" />
                 <NicknameSettings v-else-if="item.id === 'nickname'" />
                 <SignatureSettings v-else-if="item.id === 'signature'" />
+                <LanguageSettings v-else-if="item.id === 'language'" />
+                <TimezoneSettings v-else-if="item.id === 'timezone'" />
                 <p v-else>{{ t('settings.notYetImplemented') }}</p>
               </template>
             </el-collapse-item>
@@ -70,6 +72,8 @@
                 <AvatarComponent v-if="item.id === 'avatars'" />
                 <NicknameSettings v-else-if="item.id === 'nickname'" />
                 <SignatureSettings v-else-if="item.id === 'signature'" />
+                <LanguageSettings v-else-if="item.id === 'language'" />
+                <TimezoneSettings v-else-if="item.id === 'timezone'" />
                 <p v-else>{{ t('settings.notYetImplemented') }}</p>
               </template>
             </el-collapse-item>
@@ -91,6 +95,8 @@ import { useScrollSync } from '@/settings/useScrollSync'
 import AvatarComponent from '@/components/AvatarComponent.vue'
 import NicknameSettings from '@/components/settings/NicknameSettings.vue'
 import SignatureSettings from '@/components/settings/SignatureSettings.vue'
+import LanguageSettings from '@/components/settings/LanguageSettings.vue'
+import TimezoneSettings from '@/components/settings/TimezoneSettings.vue'
 
 const { t } = useI18n()
 const route = useRoute()

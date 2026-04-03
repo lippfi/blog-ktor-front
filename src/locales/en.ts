@@ -847,6 +847,22 @@ export default {
             tooLong: 'Signature is too long (max 200 characters)',
         },
     },
+    languageSettings: {
+        placeholder: 'Select language',
+        save: 'Save',
+        cancel: 'Cancel',
+        saveSuccess: 'Language updated successfully',
+        saveError: 'Failed to update language',
+        loadError: 'Failed to load language',
+    },
+    timezoneSettings: {
+        placeholder: 'Select timezone',
+        save: 'Save',
+        cancel: 'Cancel',
+        saveSuccess: 'Timezone updated successfully',
+        saveError: 'Failed to update timezone',
+        loadError: 'Failed to load timezone',
+    },
     styles: {
         preview: {
             save: 'Add to my collection',
