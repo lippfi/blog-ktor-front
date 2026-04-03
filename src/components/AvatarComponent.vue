@@ -276,7 +276,7 @@ const handleFileUpload = async (event: Event) => {
 
 .avatar-grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Responsive grid */
+  grid-template-columns: repeat(auto-fill, 100px); /* Fixed-width columns to maintain consistent 16px gap */
   grid-auto-rows: 100px; /* Fixed row height */
   gap: 16px;
   width: 100%;
