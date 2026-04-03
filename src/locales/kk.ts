@@ -422,5 +422,25 @@ export default {
     buttons: {
         go_home: 'Басты бетке өту',
         go_back: 'Артқа'
-    }
+    },
+    ignoreListSettings: {
+        empty: 'Жоқ тізіміңіз бос.',
+        loading: 'Жүктелуде...',
+        loadError: 'Жоқ тізімін жүктеу мүмкін болмады.',
+        confirmTitle: 'Жоқтан алу',
+        confirmUnignore: '{nickname} пайдаланушысын жоқтан алғыңыз келеді ме?',
+        confirm: 'Жоқтан алу',
+        cancel: 'Болдырмау',
+        unignoreSuccess: '{nickname} жоқ тізімінен алынды.',
+    },
+    hiddenUsersSettings: {
+        loading: 'Жүктелуде...',
+        loadError: 'Жасырылған пайдаланушылар тізімін жүктеу мүмкін болмады.',
+        empty: 'Жасырылған пайдаланушылар тізімі бос.',
+        confirmTitle: 'Пайдаланушыны көрсету',
+        confirmUnhide: '{nickname} пайдаланушысын көрсеткіңіз келеді ме?',
+        confirm: 'Көрсету',
+        cancel: 'Болдырмау',
+        unhideSuccess: '{nickname} жасырылған тізімнен алынды.',
+    },
 }

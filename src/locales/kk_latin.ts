@@ -422,5 +422,25 @@ export default {
     buttons: {
         go_home: 'Basty betke otu',
         go_back: 'Artqa'
-    }
+    },
+    ignoreListSettings: {
+        empty: 'Joq tizimiñiz bos.',
+        loading: 'Jüktelwde...',
+        loadError: 'Joq tizimin jüktew mümkin bolmadı.',
+        confirmTitle: 'Joqtan alw',
+        confirmUnignore: '{nickname} paydalanwshısın joqtan alğıñız keledi me?',
+        confirm: 'Joqtan alw',
+        cancel: 'Boldırmaw',
+        unignoreSuccess: '{nickname} joq tiziminen alındı.',
+    },
+    hiddenUsersSettings: {
+        loading: 'Jüktelwde...',
+        loadError: 'Jasırılğan paydalanwshılar tizimin jüktew mümkin bolmadı.',
+        empty: 'Jasırılğan paydalanwshılar tizimi bos.',
+        confirmTitle: 'Paydalanwshını körsetw',
+        confirmUnhide: '{nickname} paydalanwshısın körsetkiñiz keledi me?',
+        confirm: 'Körsetw',
+        cancel: 'Boldırmaw',
+        unhideSuccess: '{nickname} jasırılğan tizimnen alındı.',
+    },
 }

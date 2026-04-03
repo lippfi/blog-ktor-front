@@ -615,5 +615,25 @@ export default {
     buttons: {
         go_home: 'На главную',
         go_back: 'Назад'
-    }
+    },
+    ignoreListSettings: {
+        empty: 'Ваш список игнорируемых пуст.',
+        loading: 'Загрузка...',
+        loadError: 'Не удалось загрузить список игнорируемых.',
+        confirmTitle: 'Разигнорировать пользователя',
+        confirmUnignore: 'Вы уверены, что хотите разигнорировать {nickname}?',
+        confirm: 'Разигнорировать',
+        cancel: 'Отмена',
+        unignoreSuccess: '{nickname} удалён из списка игнорируемых.',
+    },
+    hiddenUsersSettings: {
+        loading: 'Загрузка...',
+        loadError: 'Не удалось загрузить список скрытых пользователей.',
+        empty: 'Ваш список скрытых пользователей пуст.',
+        confirmTitle: 'Показать пользователя',
+        confirmUnhide: 'Вы уверены, что хотите показать {nickname}?',
+        confirm: 'Показать',
+        cancel: 'Отмена',
+        unhideSuccess: '{nickname} удалён из списка скрытых пользователей.',
+    },
 }

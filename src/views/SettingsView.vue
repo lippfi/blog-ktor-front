@@ -44,6 +44,8 @@
                 <SignatureSettings v-else-if="item.id === 'signature'" />
                 <LanguageSettings v-else-if="item.id === 'language'" />
                 <TimezoneSettings v-else-if="item.id === 'timezone'" />
+                <IgnoreListSettings v-else-if="item.id === 'ignoreList'" />
+                <HiddenUsersSettings v-else-if="item.id === 'hiddenUsers'" />
                 <p v-else>{{ t('settings.notYetImplemented') }}</p>
               </template>
             </el-collapse-item>
@@ -74,6 +76,8 @@
                 <SignatureSettings v-else-if="item.id === 'signature'" />
                 <LanguageSettings v-else-if="item.id === 'language'" />
                 <TimezoneSettings v-else-if="item.id === 'timezone'" />
+                <IgnoreListSettings v-else-if="item.id === 'ignoreList'" />
+                <HiddenUsersSettings v-else-if="item.id === 'hiddenUsers'" />
                 <p v-else>{{ t('settings.notYetImplemented') }}</p>
               </template>
             </el-collapse-item>
@@ -97,6 +101,8 @@ import NicknameSettings from '@/components/settings/NicknameSettings.vue'
 import SignatureSettings from '@/components/settings/SignatureSettings.vue'
 import LanguageSettings from '@/components/settings/LanguageSettings.vue'
 import TimezoneSettings from '@/components/settings/TimezoneSettings.vue'
+import IgnoreListSettings from '@/components/settings/IgnoreListSettings.vue'
+import HiddenUsersSettings from '@/components/settings/HiddenUsersSettings.vue'
 
 const { t } = useI18n()
 const route = useRoute()

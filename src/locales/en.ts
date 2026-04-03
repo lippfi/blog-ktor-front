@@ -923,5 +923,25 @@ export default {
         changesCancelled: 'Changes cancelled',
         requiredFields: 'Name and CSS Style Content are required',
         previewUrlApplied: 'Preview image URL applied successfully'
-    }
+    },
+    ignoreListSettings: {
+        empty: 'Your ignore list is empty.',
+        loading: 'Loading...',
+        loadError: 'Failed to load ignore list.',
+        confirmTitle: 'Unignore User',
+        confirmUnignore: 'Are you sure you want to unignore {nickname}?',
+        confirm: 'Unignore',
+        cancel: 'Cancel',
+        unignoreSuccess: '{nickname} has been removed from your ignore list.',
+    },
+    hiddenUsersSettings: {
+        loading: 'Loading...',
+        loadError: 'Failed to load hidden users list.',
+        empty: 'Your hidden users list is empty.',
+        confirmTitle: 'Unhide User',
+        confirmUnhide: 'Are you sure you want to unhide {nickname}?',
+        confirm: 'Unhide',
+        cancel: 'Cancel',
+        unhideSuccess: '{nickname} has been removed from your hidden users list.',
+    },
 }
