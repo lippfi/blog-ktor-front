@@ -345,6 +345,19 @@ export default {
             },
         },
     },
+    nicknameSettings: {
+        placeholder: 'Лақап атыңызды енгізіңіз',
+        save: 'Сақтау',
+        cancel: 'Болдырмау',
+        saveSuccess: 'Лақап ат сәтті жаңартылды',
+        saveError: 'Лақап атты жаңарту сәтсіз аяқталды',
+        loadError: 'Лақап атты жүктеу сәтсіз аяқталды',
+        errors: {
+            required: 'Лақап ат қажет',
+            tooLong: 'Лақап ат тым ұзын',
+            alreadyExists: 'Лақап ат бос емес',
+        },
+    },
     styles: {
         title: 'Күнделік стильдері',
         addNew: 'Жаңа стиль қосу',

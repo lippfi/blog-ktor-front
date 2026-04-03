@@ -538,6 +538,19 @@ export default {
             },
         },
     },
+    nicknameSettings: {
+        placeholder: 'Введите никнейм',
+        save: 'Сохранить',
+        cancel: 'Отмена',
+        saveSuccess: 'Никнейм успешно обновлён',
+        saveError: 'Не удалось обновить никнейм',
+        loadError: 'Не удалось загрузить никнейм',
+        errors: {
+            required: 'Необходимо указать никнейм',
+            tooLong: 'Слишком длинный никнейм',
+            alreadyExists: 'Никнейм уже существует',
+        },
+    },
     styles: {
         title: 'Стили дневника',
         addNew: 'Добавить новый стиль',

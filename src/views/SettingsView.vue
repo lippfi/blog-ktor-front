@@ -40,6 +40,7 @@
             >
               <template v-if="isItemActivated(category.id, item.id)">
                 <AvatarComponent v-if="item.id === 'avatars'" />
+                <NicknameSettings v-else-if="item.id === 'nickname'" />
                 <p v-else>{{ t('settings.notYetImplemented') }}</p>
               </template>
             </el-collapse-item>
@@ -66,6 +67,7 @@
             >
               <template v-if="isItemActivated(category.id, item.id)">
                 <AvatarComponent v-if="item.id === 'avatars'" />
+                <NicknameSettings v-else-if="item.id === 'nickname'" />
                 <p v-else>{{ t('settings.notYetImplemented') }}</p>
               </template>
             </el-collapse-item>
@@ -85,6 +87,7 @@ import { settingsCategories } from '@/settings/settingsConfig'
 import { filterAndSortSettings } from '@/settings/settingsSearch'
 import { useScrollSync } from '@/settings/useScrollSync'
 import AvatarComponent from '@/components/AvatarComponent.vue'
+import NicknameSettings from '@/components/settings/NicknameSettings.vue'
 
 const { t } = useI18n()
 const route = useRoute()

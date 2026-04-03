@@ -823,6 +823,19 @@ export default {
             },
         },
     },
+    nicknameSettings: {
+        placeholder: 'Enter your nickname',
+        save: 'Save',
+        cancel: 'Cancel',
+        saveSuccess: 'Nickname updated successfully',
+        saveError: 'Failed to update nickname',
+        loadError: 'Failed to load nickname',
+        errors: {
+            required: 'Nickname is required',
+            tooLong: 'Nickname is too long',
+            alreadyExists: 'Nickname already exists',
+        },
+    },
     styles: {
         preview: {
             save: 'Add to my collection',

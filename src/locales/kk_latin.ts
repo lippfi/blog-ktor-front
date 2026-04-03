@@ -345,6 +345,19 @@ export default {
             },
         },
     },
+    nicknameSettings: {
+        placeholder: 'Laqap atyńyzdy engiziníz',
+        save: 'Saqtau',
+        cancel: 'Boldyrmau',
+        saveSuccess: 'Laqap at satti janartyldy',
+        saveError: 'Laqap atty janartu satsiz ayaqtaldy',
+        loadError: 'Laqap atty jukteu satsiz ayaqtaldy',
+        errors: {
+            required: 'Laqap at qajet',
+            tooLong: 'Laqap at tym uzyn',
+            alreadyExists: 'Laqap at bos emes',
+        },
+    },
     styles: {
         title: 'Kundelik stilderi',
         addNew: 'Jana stil qosu',
