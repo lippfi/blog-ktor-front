@@ -636,4 +636,13 @@ export default {
         cancel: 'Отмена',
         unhideSuccess: '{nickname} удалён из списка скрытых пользователей.',
     },
+    diaryTitleSettings: {
+        titlePlaceholder: 'Название дневника',
+        subtitlePlaceholder: 'Подзаголовок дневника',
+        save: 'Сохранить',
+        cancel: 'Отмена',
+        saveSuccess: 'Название дневника обновлено',
+        saveError: 'Не удалось обновить название дневника',
+        loadError: 'Не удалось загрузить название дневника',
+    },
 }

@@ -944,4 +944,13 @@ export default {
         cancel: 'Cancel',
         unhideSuccess: '{nickname} has been removed from your hidden users list.',
     },
+    diaryTitleSettings: {
+        titlePlaceholder: 'Diary title',
+        subtitlePlaceholder: 'Diary subtitle',
+        save: 'Save',
+        cancel: 'Cancel',
+        saveSuccess: 'Diary title updated successfully',
+        saveError: 'Failed to update diary title',
+        loadError: 'Failed to load diary title',
+    },
 }

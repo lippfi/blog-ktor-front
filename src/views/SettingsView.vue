@@ -46,6 +46,7 @@
                 <TimezoneSettings v-else-if="item.id === 'timezone'" />
                 <IgnoreListSettings v-else-if="item.id === 'ignoreList'" />
                 <HiddenUsersSettings v-else-if="item.id === 'hiddenUsers'" />
+                <DiaryTitleSettings v-else-if="item.id === 'diaryTitle'" />
                 <p v-else>{{ t('settings.notYetImplemented') }}</p>
               </template>
             </el-collapse-item>
@@ -78,6 +79,7 @@
                 <TimezoneSettings v-else-if="item.id === 'timezone'" />
                 <IgnoreListSettings v-else-if="item.id === 'ignoreList'" />
                 <HiddenUsersSettings v-else-if="item.id === 'hiddenUsers'" />
+                <DiaryTitleSettings v-else-if="item.id === 'diaryTitle'" />
                 <p v-else>{{ t('settings.notYetImplemented') }}</p>
               </template>
             </el-collapse-item>
@@ -103,6 +105,7 @@ import LanguageSettings from '@/components/settings/LanguageSettings.vue'
 import TimezoneSettings from '@/components/settings/TimezoneSettings.vue'
 import IgnoreListSettings from '@/components/settings/IgnoreListSettings.vue'
 import HiddenUsersSettings from '@/components/settings/HiddenUsersSettings.vue'
+import DiaryTitleSettings from '@/components/settings/DiaryTitleSettings.vue'
 
 const { t } = useI18n()
 const route = useRoute()

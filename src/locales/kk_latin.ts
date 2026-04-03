@@ -443,4 +443,13 @@ export default {
         cancel: 'Boldırmaw',
         unhideSuccess: '{nickname} jasırılğan tizimnen alındı.',
     },
+    diaryTitleSettings: {
+        titlePlaceholder: 'Kündelik atawı',
+        subtitlePlaceholder: 'Kündelik taqırıbı',
+        save: 'Saqtaw',
+        cancel: 'Boldırmaw',
+        saveSuccess: 'Kündelik atawı jañartıldı',
+        saveError: 'Kündelik atawın jañartw sätsiz ayaqtaldı',
+        loadError: 'Kündelik atawın jüktew sätsiz ayaqtaldı',
+    },
 }

@@ -443,4 +443,13 @@ export default {
         cancel: 'Болдырмау',
         unhideSuccess: '{nickname} жасырылған тізімнен алынды.',
     },
+    diaryTitleSettings: {
+        titlePlaceholder: 'Күнделік атауы',
+        subtitlePlaceholder: 'Күнделік тақырыбы',
+        save: 'Сақтау',
+        cancel: 'Болдырмау',
+        saveSuccess: 'Күнделік атауы жаңартылды',
+        saveError: 'Күнделік атауын жаңарту сәтсіз аяқталды',
+        loadError: 'Күнделік атауын жүктеу сәтсіз аяқталды',
+    },
 }
