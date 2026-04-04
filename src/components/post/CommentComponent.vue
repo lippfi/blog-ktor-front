@@ -134,7 +134,7 @@ const scrollToComment = (commentId: string) => {
   width: 100%;
 }
 .el-link {
-  font-size: 16px;
+  font-size: 15px;
 }
 .date {
   color: var(--comment);

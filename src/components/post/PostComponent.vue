@@ -145,7 +145,7 @@ const formattedCreationTime = computed(() => {
   --icon-hover-color: #b15100;
 }
 .el-link {
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .tag > .el-link {
@@ -202,7 +202,7 @@ const formattedCreationTime = computed(() => {
   margin-top: 6px;
   text-align: center;
   color: var(--comment);
-  font-size: 12px;
+  font-size: 10px;
   line-height: 1.3;
   white-space: normal;
   overflow-wrap: anywhere;
@@ -236,7 +236,7 @@ h1.title {
 
 .mobile-author-signature {
   color: var(--comment);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.3;
   white-space: normal;
   overflow-wrap: anywhere;
