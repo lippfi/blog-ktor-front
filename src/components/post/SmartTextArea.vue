@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref, nextTick, onMounted, onBeforeUnmount, computed, watchEffect} from 'vue'
-import {uploadFiles} from "@/api/storageService.ts";
+import {storageClient} from "@/api/storageClient.ts";
 import {ElMessage} from "element-plus";
 import {useI18n} from "vue-i18n";
 import {DataBoard, Tickets, Search} from "@element-plus/icons-vue";
@@ -8,6 +8,7 @@ import ReactionList from "./reaction/ReactionList.vue";
 import { searchReactions } from "@/api/reactionClient";
 import type { ReactionView, ReactionPackDto, ReactionViewDto } from "@/api/dto/reactionServiceDto";
 import { searchUsers } from "@/api/userClient.ts";
+import { isCaretInsideAvatarsBlock } from "@/components/post/avatarBlockUtils.ts";
 
 const { t } = useI18n()
 
@@ -31,6 +32,7 @@ const showUserPopover = ref(false);
 const userSearchQuery = ref('');
 const tooltipDelay = 300;
 const mentionRef = ref<InstanceType<typeof import('element-plus')['ElMention']> | null>(null);
+const isInsertAvatarMode = ref(false);
 
 // Function to get the textarea element from the ref
 const getTextarea = (): HTMLTextAreaElement | null => {
@@ -251,6 +253,25 @@ const observer = new MutationObserver((mutations) => {
 })
 const content = defineModel<string>('content', { default: ""})
 
+const updateInsertAvatarMode = () => {
+  const textarea = getTextarea()
+  if (!textarea) {
+    isInsertAvatarMode.value = false
+    return
+  }
+
+  isInsertAvatarMode.value = isCaretInsideAvatarsBlock(textarea.value, textarea.selectionStart)
+}
+
+const handleImageInsert = async () => {
+  if (isInsertAvatarMode.value) {
+    await wrapWithAvatar()
+    return
+  }
+
+  await wrapWithImage()
+}
+
 const wrapSelectedText = (prefix: string, suffix: string) => {
   const textarea = getTextarea()
   if (!textarea) return
@@ -432,7 +453,7 @@ const wrapWithImage = async () => {
     if (!files || files.length === 0) return
 
     try {
-      const result = await uploadFiles(Array.from(files))
+      const result = await storageClient.uploadFiles(Array.from(files))
       if (result.type === 'ok') {
         const urls = result.data
         const insertPosition = textarea.selectionStart
@@ -473,6 +494,87 @@ const wrapWithImage = async () => {
       }
     } catch (error) {
       ElMessage.error('Failed to upload images')
+    }
+  }
+
+  fileInput.click()
+}
+
+const wrapWithAvatar = async () => {
+  const textarea = getTextarea()
+  if (!textarea) return
+
+  const start = textarea.selectionStart
+  const end = textarea.selectionEnd
+  const selectedText = textarea.value.substring(start, end)
+
+  if (selectedText) {
+    const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i
+    const isUrl = urlPattern.test(selectedText.trim())
+
+    if (isUrl) {
+      const prefix = '[avatar img="'
+      const suffix = '"]'
+      const newPosition = start + prefix.length + selectedText.length + suffix.length
+
+      textarea.focus()
+
+      try {
+        document.execCommand('insertText', false, prefix + selectedText + suffix)
+        textarea.setSelectionRange(newPosition, newPosition)
+        textarea.dispatchEvent(new Event('input', { bubbles: true }))
+      } catch (e) {
+        const newText = textarea.value.substring(0, start) +
+            prefix + selectedText + suffix +
+            textarea.value.substring(end)
+        textarea.value = newText
+        textarea.setSelectionRange(newPosition, newPosition)
+        textarea.dispatchEvent(new Event('input', { bubbles: true }))
+      }
+      return
+    }
+  }
+
+  const fileInput = document.createElement('input')
+  fileInput.type = 'file'
+  fileInput.multiple = true
+  fileInput.accept = 'image/*'
+
+  fileInput.onchange = async (event) => {
+    const files = (event.target as HTMLInputElement).files
+    if (!files || files.length === 0) return
+
+    try {
+      const result = await storageClient.uploadAvatarFiles(Array.from(files))
+      if (result.type === 'ok') {
+        const urls = result.data
+        const insertPosition = textarea.selectionStart
+        const avatarTags = urls.map(url => `[avatar img="${url}"]`).join('\n')
+
+        textarea.focus()
+
+        try {
+          document.execCommand('insertText', false, avatarTags)
+
+          const newPosition = insertPosition + avatarTags.length
+          textarea.setSelectionRange(newPosition, newPosition)
+          textarea.dispatchEvent(new Event('input', { bubbles: true }))
+        } catch (e) {
+          const prefix = textarea.value.substring(0, insertPosition)
+          const suffix = textarea.value.substring(insertPosition)
+          const newText = prefix + avatarTags + suffix
+
+          textarea.value = newText
+
+          const newPosition = insertPosition + avatarTags.length
+          textarea.setSelectionRange(newPosition, newPosition)
+          textarea.dispatchEvent(new Event('input', { bubbles: true }))
+        }
+      } else {
+        ElMessage.error(result.message)
+      }
+    } catch (error) {
+      ElMessage.error('Failed to upload avatars')
     }
   }
 
@@ -809,8 +911,20 @@ function handleBlur() {
     const textarea = getTextarea()
     if (!textarea || document.activeElement !== textarea) {
       hideCompletionDropdown()
+      isInsertAvatarMode.value = false
+    } else {
+      updateInsertAvatarMode()
     }
   }, 150)
+}
+
+function handleTextareaInput() {
+  dropdownDismissed = false
+  updateInsertAvatarMode()
+}
+
+function handleTextareaCaretChange() {
+  updateInsertAvatarMode()
 }
 
 // Set up event listener when component is mounted
@@ -819,7 +933,12 @@ onMounted(() => {
   if (textarea) {
     textarea.addEventListener('keydown', handleKeyDown, true)  // Use capture phase
     textarea.addEventListener('blur', handleBlur)
-    textarea.addEventListener('input', () => { dropdownDismissed = false })
+    textarea.addEventListener('input', handleTextareaInput)
+    textarea.addEventListener('keyup', handleTextareaCaretChange)
+    textarea.addEventListener('click', handleTextareaCaretChange)
+    textarea.addEventListener('select', handleTextareaCaretChange)
+    textarea.addEventListener('focus', handleTextareaCaretChange)
+    updateInsertAvatarMode()
   }
 })
 
@@ -829,6 +948,11 @@ onBeforeUnmount(() => {
   if (textarea) {
     textarea.removeEventListener('keydown', handleKeyDown, true)  // Match capture phase in cleanup
     textarea.removeEventListener('blur', handleBlur)
+    textarea.removeEventListener('input', handleTextareaInput)
+    textarea.removeEventListener('keyup', handleTextareaCaretChange)
+    textarea.removeEventListener('click', handleTextareaCaretChange)
+    textarea.removeEventListener('select', handleTextareaCaretChange)
+    textarea.removeEventListener('focus', handleTextareaCaretChange)
   }
 })
 
@@ -925,8 +1049,8 @@ const handleMentionSelect = (option: MentionOption) => {
           </el-icon>
         </el-button>
       </el-tooltip>
-      <el-tooltip :content="$t('post.form.fields.textarea.buttons.image.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapWithImage" class="format-btn" tabindex="-1">
+      <el-tooltip :content="isInsertAvatarMode ? 'Insert avatar' : $t('post.form.fields.textarea.buttons.image.tooltip')" :show-after="tooltipDelay" placement="top">
+        <el-button @click="handleImageInsert" :class="['format-btn', {'format-btn--avatar': isInsertAvatarMode}]" tabindex="-1">
           <el-icon size="18">
             <Picture/>
           </el-icon>
@@ -1215,6 +1339,11 @@ const handleMentionSelect = (option: MentionOption) => {
   justify-content: center;
 }
 
+.format-btn--avatar {
+  background-color: #f5f5f5;
+  color: #000000;
+}
+
 .user-list {
   max-height: 300px;
   overflow-y: auto;
@@ -1280,6 +1409,11 @@ const handleMentionSelect = (option: MentionOption) => {
 }
 .footer-buttons .format-btn:hover {
   background-color: #dddddd;
+}
+
+.text-buttons .format-btn.format-btn--avatar:hover {
+  background-color: #ffffff;
+  color: #000000;
 }
 
 /* Ensure proper z-index for the reaction popover */
