@@ -1,47 +1,65 @@
 <template>
   <div :class="'post ' + post.classes" v-if="!isEditing">
     <div class="top">
-<!--      <NicknameComponent :nickname="post.authorNickname" :login="post.authorLogin"/>-->
+      <NicknameComponent :nickname="post.authorNickname" :login="post.authorLogin"/>
       <span v-if="!post.isPreface" class="date"> {{ formattedCreationTime }}</span>
     </div>
     <div class="columns">
-  <!--      <UserAvatarComponent-->
-  <!--        class="post-avatar"-->
-  <!--        avatar-size="100px"-->
-  <!--        :avatar-url="post.avatar"-->
-  <!--        :login="post.authorLogin"-->
-  <!--        :label="post.authorNickname"-->
-  <!--        :nickname="post.authorNickname"-->
-  <!--      />-->
+      <div class="avatar-column post-avatar">
+        <UserAvatarComponent
+          avatar-size="100px"
+          :avatar-url="post.avatar"
+          :login="post.authorLogin"
+          :label="post.authorNickname"
+          :nickname="post.authorNickname"
+        />
+        <div v-if="post.authorSignature" class="author-signature">
+          {{ post.authorSignature }}
+        </div>
+      </div>
       <div class="post-content">
-        <router-link :to="{name: 'post', params: {'login': post.diaryLogin, 'postUri': post.uri}}">
+        <div class="mobile-header">
+          <div class="mobile-top">
+            <NicknameComponent :nickname="post.authorNickname" :login="post.authorLogin"/>
+            <span v-if="!post.isPreface" class="date"> {{ formattedCreationTime }}</span>
+          </div>
+          <div v-if="post.authorSignature" class="mobile-author-signature">
+            {{ post.authorSignature }}
+          </div>
+          <router-link :to="{name: 'post', params: {'login': post.diaryLogin, 'postUri': post.uri}}">
+            <h1 class="title mobile-title"> {{ post.title }} </h1>
+          </router-link>
+        </div>
+        <router-link class="desktop-title" :to="{name: 'post', params: {'login': post.diaryLogin, 'postUri': post.uri}}">
           <h1 class="title"> {{ post.title }} </h1>
         </router-link>
-        <ProcessedText :text="post.text" :avatars="reactionsStore.avatars" @update-avatars="reactionsStore.loadAvatars"/>
-        <div v-if="post.tags.length > 0" class="tags">
-          <div class="tag">
-            <template v-for="(tag, index) in post.tags" :key="tag">
-              <router-link :to="{name: 'diary search', params: {'diary': post.diaryLogin}, query: {tags: [tag]} }">
-                #{{ tag }}
-              </router-link><span v-if="index < post.tags.length - 1">, </span>
-            </template>
+        <div class="post-body">
+          <ProcessedText :text="post.text" :avatars="reactionsStore.avatars" @update-avatars="reactionsStore.loadAvatars"/>
+          <div v-if="post.tags.length > 0" class="tags">
+            <div class="tag">
+              <template v-for="(tag, index) in post.tags" :key="tag">
+                <router-link :to="{name: 'diary search', params: {'diary': post.diaryLogin}, query: {tags: [tag]} }">
+                  #{{ tag }}
+                </router-link><span v-if="index < post.tags.length - 1">, </span>
+              </template>
+            </div>
           </div>
-        </div>
-        <el-divider v-if="getCurrentUserLogin() || post.commentsCount > 0"/>
-        <div class="icon-buttons">
-          <div class="left-buttons">
-            <Reactions
-              type="post"
-              :reactions="post.reactions"
-              :isReactable="post.isReactable"
-              :post-login="post.authorLogin"
-              :post-uri="post.uri"
-              :basic-reactions="reactionsStore.basicReactions"
-              :recent-reactions="reactionsStore.recentReactions"
-              @reaction-added="reactionsStore.addReaction"
-            />
+          <el-divider v-if="getCurrentUserLogin() || post.commentsCount > 0"/>
+          <div class="icon-buttons">
+            <div class="left-buttons">
+              <Reactions
+                type="post"
+                :reactions="post.reactions"
+                :isReactable="post.isReactable"
+                :post-login="post.authorLogin"
+                :post-uri="post.uri"
+                :basic-reactions="reactionsStore.basicReactions"
+                :recent-reactions="reactionsStore.recentReactions"
+                @reaction-added="reactionsStore.addReaction"
+              />
+            </div>
+            <FooterButtons :post="post" :show-comments-count="showCommentsCount" @startEdit="startEditing"/>
           </div>
-          <FooterButtons :post="post" :show-comments-count="showCommentsCount" @startEdit="startEditing"/>
         </div>
       </div>
     </div>
@@ -75,6 +93,8 @@ import type {Result} from "@/api/postClient/postClient.ts";
 import type {PostViewDto} from "@/api/dto/postServiceDto.ts";
 import { useReactionsStore } from "@/stores/reactionsStore";
 import {getCurrentUserLogin} from "@/api/userClient.ts";
+import NicknameComponent from "@/components/NicknameComponent.vue";
+import UserAvatarComponent from "@/components/post/UserAvatarComponent.vue";
 
 const reactionsStore = useReactionsStore();
 let isEditing = ref(false);
@@ -134,7 +154,7 @@ const formattedCreationTime = computed(() => {
 
 .post > .top {
   display: flex;
-  justify-content: end;
+  justify-content: space-between;
   margin-bottom: 5px;
 
 }
@@ -172,6 +192,23 @@ const formattedCreationTime = computed(() => {
   gap: 10px;
 }
 
+.avatar-column {
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.author-signature {
+  width: 100px;
+  margin-top: 6px;
+  text-align: center;
+  color: var(--comment);
+  font-size: 12px;
+  line-height: 1.3;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 h1.title {
   line-height: 24px;
   margin-top: 0;
@@ -184,6 +221,27 @@ h1.title {
 
 .post-content {
   width: 100%;
+}
+
+.mobile-header {
+  display: none;
+}
+
+.mobile-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.mobile-author-signature {
+  color: var(--comment);
+  font-size: 12px;
+  line-height: 1.3;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  margin-bottom: 6px;
 }
 
 .el-divider--horizontal {
@@ -199,8 +257,45 @@ h1.title {
 }
 
 @media (max-width: 799px) {
-  .post-avatar {
+  .post > .top {
     display: none;
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 100px minmax(0, 1fr);
+    column-gap: 10px;
+    align-items: start;
+  }
+
+  .post-content {
+    display: contents;
+  }
+
+  .author-signature,
+  .desktop-title {
+    display: none;
+  }
+
+  .mobile-header {
+    display: flex;
+    flex-direction: column;
+    grid-column: 2;
+    min-width: 0;
+    min-height: 100px;
+  }
+
+  .mobile-header > a:last-child {
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+  .post-body {
+    grid-column: 1 / -1;
+  }
+
+  h1.mobile-title {
+    margin-bottom: 0;
   }
 }
 

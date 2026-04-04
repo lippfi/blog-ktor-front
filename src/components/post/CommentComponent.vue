@@ -75,13 +75,13 @@ const scrollToComment = (commentId: string) => {
       </a>
     </div>
     <div :id="'comment-' + comment.id" class="comment" :class="{ 'selected-comment': isSelected }" v-if="!isEditing">
-  <!--      <UserAvatarComponent-->
-  <!--          avatar-size="80px"-->
-  <!--          :avatar-url="comment.avatar"-->
-  <!--          :login="comment.authorLogin"-->
-  <!--          :label="comment.authorNickname"-->
-  <!--          :nickname="comment.authorNickname"-->
-  <!--      />-->
+        <UserAvatarComponent
+            avatar-size="80px"
+            :avatar-url="comment.avatar"
+            :login="comment.authorLogin"
+            :label="comment.authorNickname"
+            :nickname="comment.authorNickname"
+        />
       <div class="right">
         <div class="header">
           <NicknameComponent :nickname="comment.authorNickname" :login="comment.authorLogin"/>

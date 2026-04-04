@@ -63,6 +63,7 @@ export interface PostViewDto {
     avatar: string;
     authorLogin: string;
     authorNickname: string;
+    authorSignature?: string | null;
     diaryLogin: string;
     title: string;
     text: string;

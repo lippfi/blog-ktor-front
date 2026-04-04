@@ -152,6 +152,12 @@ watch(() => props.isMobile, (isMobile) => {
   display: flex;
   flex-direction: column;
   height: 100%;
+  background-color: var(--el-menu-bg-color);
+  border-right: 1px solid var(--el-menu-border-color);
+}
+
+.el-menu {
+  border-right: none;
 }
 
 .el-menu-vertical:not(.el-menu--collapse) {
