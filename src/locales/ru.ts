@@ -1,4 +1,44 @@
 export default {
+    search: {
+        placeholder: 'Искать записи...',
+        advanced: {
+            label: 'Расширенный поиск',
+            tags: {
+                label: 'Теги',
+                placeholder: 'Введите теги'
+            },
+            tagPolicy: {
+                label: 'Совпадение тегов',
+                union: 'любой тег (OR)',
+                intersection: 'все теги (AND)'
+            },
+            from: {
+                label: 'Дата от',
+                placeholder: 'Выберите начальную дату'
+            },
+            to: {
+                label: 'Дата до',
+                placeholder: 'Выберите конечную дату'
+            },
+            sorting: {
+                label: 'Сортировка',
+                field: {
+                    label: 'Поле',
+                    creationTime: 'Дата',
+                    title: 'Заголовок'
+                },
+                order: {
+                    label: 'Порядок',
+                    asc: 'сначала старые',
+                    desc: 'сначала новые'
+                }
+            }
+        },
+        button: {
+            search: 'Искать',
+            clear: 'Очистить'
+        }
+    },
     registration: {
         title: 'Регистрация',
         form: {
@@ -11,7 +51,7 @@ export default {
                     label: 'никнейм',
                 },
                 email: {
-                    label: 'email',
+                    label: 'электронная почта',
                 },
                 password: {
                     label: 'пароль',
@@ -20,40 +60,58 @@ export default {
                     label: 'подтверждение пароля',
                 },
                 invite_code: {
-                    code_required: 'Требуется код приглашения',
-                    before_admin: 'Получите его у пользователя сайта или свяжитесь с ',
-                    admin: 'администратором',
+                    code_required: 'Требуется инвайт-код',
+                    before_admin: 'Получите его у участника сайта или напишите ',
+                    admin: 'администратору',
                     after_admin: '.',
-                    label: 'код приглашения'
+                    label: 'инвайт-код'
                 },
             },
             button: {
                 label: 'зарегистрироваться',
             },
             errors: {
-                login_required: 'Необходимо указать логин',
-                login_too_long: 'Слишком длинный логин',
+                login_required: 'Логин обязателен',
+                login_too_long: 'Логин слишком длинный',
                 login_exists: 'Логин уже существует',
-                nickname_required: 'Необходимо указать никнейм',
-                nickname_too_long: 'Слишком длинный никнейм',
+                nickname_required: 'Никнейм обязателен',
+                nickname_too_long: 'Никнейм слишком длинный',
                 nickname_exists: 'Никнейм уже существует',
-                email_required: 'Необходимо указать email',
-                email_invalid: 'Некорректный email',
-                email_exists: 'Email уже существует',
-                email_too_long: 'Слишком длинный email',
-                password_required: 'Необходимо указать пароль',
-                password_confirmation_required: 'Необходимо подтвердить пароль',
+                email_required: 'Электронная почта обязательна',
+                email_invalid: 'Некорректная электронная почта',
+                email_exists: 'Электронная почта уже существует',
+                email_too_long: 'Электронная почта слишком длинная',
+                password_required: 'Пароль обязателен',
+                password_confirmation_required: 'Требуется подтверждение пароля',
                 passwords_mismatch: 'Пароли не совпадают',
-                invite_code_required: 'Необходимо указать код приглашения',
+                invite_code_required: 'Инвайт-код обязателен',
             },
             exceptions: {
-                email_exists: 'Email уже существует',
+                email_exists: 'Электронная почта уже существует',
                 nickname_exists: 'Никнейм уже существует',
                 login_exists: 'Логин уже существует',
-                invalid_invite_code: 'Неверный код приглашения',
+                invalid_invite_code: 'Неверный инвайт-код',
                 unknown: 'Неизвестная ошибка. Попробуйте позже или свяжитесь с администратором',
             },
         },
+    },
+    email_confirmation: {
+        title: "Подтверждение электронной почты",
+        form: {
+            header: "Подтверждение электронной почты",
+            fields: {
+                code: {
+                    label: "код подтверждения",
+                },
+                message: {
+                    line1: "Код подтверждения был отправлен на вашу электронную почту.",
+                    line2: "Пожалуйста, введите код, чтобы подтвердить электронную почту.",
+                }
+            },
+            button: {
+                label: "подтвердить",
+            }
+        }
     },
     login: {
         title: 'Вход',
@@ -71,11 +129,49 @@ export default {
                 label: 'войти',
             },
             errors: {
-                login_required: 'Необходимо указать логин',
-                password_required: 'Необходимо указать пароль',
+                login_required: 'Логин обязателен',
+                password_required: 'Пароль обязателен',
             },
             exceptions: {
-                invalid_credentials: 'Неверный логин или пароль',
+                invalid_credentials: 'Неверные учетные данные',
+            },
+            forgot_password: {
+                label: 'забыли пароль',
+            }
+        },
+    },
+    reset: {
+        title: 'Сброс пароля',
+        form: {
+            header: 'Сброс пароля',
+            fields: {
+                identifier: {
+                    label: 'электронная почта или логин',
+                },
+                code: {
+                    label: 'код подтверждения',
+                },
+                password: {
+                    label: 'пароль',
+                },
+                password_confirmation: {
+                    label: 'подтверждение пароля',
+                },
+            },
+            description: {
+                line1: 'Код подтверждения был отправлен на вашу электронную почту.',
+            },
+            errors: {
+                field_required: 'Поле обязательно',
+                password_required: 'Пароль обязателен',
+                password_confirmation_required: 'Требуется подтверждение пароля',
+                passwords_mismatch: 'Пароли не совпадают',
+            },
+            button: {
+                label: 'дальше',
+            },
+            button2: {
+                label: 'подтвердить',
             },
         },
     },
@@ -84,14 +180,14 @@ export default {
         form: {
             description: {
                 line1: 'Вы зарегистрированы.',
-                line2: 'Пожалуйста, заполните следующую информацию для завершения профиля.',
+                line2: 'Пожалуйста, заполните следующую информацию, чтобы завершить профиль.',
             },
             fields: {
                 sex: {
                     label: 'пол',
                     male: 'мужской',
                     female: 'женский',
-                    unknown: 'не указан',
+                    unknown: 'неизвестно',
                 },
                 timezone: {
                     label: 'часовой пояс',
@@ -104,7 +200,7 @@ export default {
                     ru: 'Русский',
                 },
                 nsfw: {
-                    label: 'NSFW контент',
+                    label: 'Политика NSFW',
                     show: 'показывать',
                     hide: 'не показывать',
                     warn: 'размывать перед показом',
@@ -115,19 +211,19 @@ export default {
             },
             buttons: {
                 send: {
-                    label: 'отправить',
+                    label: 'подтвердить',
                 },
                 skip: {
                     label: 'пропустить',
                 },
             },
-        },
+        }
     },
     diaryInfo: {
         title: 'Регистрация',
         form: {
             description: {
-                line1: 'Теперь заполните информацию о дневнике и настройки по умолчанию.',
+                line1: 'Теперь заполните информацию о дневнике и значения по умолчанию.',
             },
             fields: {
                 name: {
@@ -137,14 +233,21 @@ export default {
                     label: 'подзаголовок',
                 },
                 read_privacy: {
-                    label: 'кто может читать',
+                    label: 'приватность чтения по умолчанию',
                     registered: 'зарегистрированные пользователи',
                     everyone: 'все',
                     friends: 'друзья',
                     nobody: 'только я',
                 },
                 comment_privacy: {
-                    label: 'кто может комментировать',
+                    label: 'приватность комментариев по умолчанию',
+                    registered: 'зарегистрированные пользователи',
+                    everyone: 'все',
+                    friends: 'друзья',
+                    nobody: 'только я',
+                },
+                react_privacy: {
+                    label: 'приватность реакций по умолчанию',
                     registered: 'зарегистрированные пользователи',
                     everyone: 'все',
                     friends: 'друзья',
@@ -161,23 +264,70 @@ export default {
             },
         }
     },
+    diaryImport: {
+        title: 'Импорт дневника',
+        form: {
+            description: {
+                line1: 'Вы можете импортировать свой дневник с другого сайта.',
+            },
+            fields: {
+                website: {
+                    label: 'сайт',
+                },
+                login: {
+                    label: 'логин',
+                },
+                password: {
+                    label: 'пароль',
+                },
+            },
+            buttons: {
+                send: {
+                    label: 'импортировать',
+                },
+                skip: {
+                    label: 'пропустить',
+                },
+                continue: {
+                    label: 'продолжить',
+                },
+            }
+        },
+        import: {
+            title: 'Импорт выполняется..'
+        }
+    },
     reactions: {
         reaction: {
-            anonymous: 'анонимно: '
+            anonymous: 'аноним: '
         },
         add_reaction: {
-            search: 'Поиск реакций...',
+            search: 'Искать реакции...',
             no_reactions: 'Реакции не найдены',
             recent: 'Недавние реакции',
-            basic: 'Основные реакции',
+            basic: 'Базовые реакции',
         },
+        error: {
+            'failed-to-load-basic': 'Не удалось загрузить базовые реакции',
+            'failed-to-load-recent': 'Не удалось загрузить недавние реакции'
+        },
+    },
+    avatarChooser: {
+        oneTimeAvatar: 'ссылка',
     },
     post: {
         form: {
-            title: 'Новый пост:',
+            title: {
+                add: 'Новая запись:',
+                edit: 'Редактирование:',
+                repost: 'Репост:',
+                repostTemplate: 'Репост:',
+                repostCommentTemplate: 'Репост комментария'
+            },
             fields: {
                 title: {
                     label: 'Заголовок:',
+                    defaultValue: 'Без названия',
                 },
                 textarea: {
                     buttons: {
@@ -188,15 +338,16 @@ export default {
                             tooltip: 'Курсив',
                         },
                         underline: {
-                            tooltip: 'Подчёркнутый текст',
+                            tooltip: 'Подчеркнутый текст',
                         },
                         strikethrough: {
-                            tooltip: 'Зачёркнутый текст',
+                            tooltip: 'Зачеркнутый текст',
                         },
                         expandable: {
-                            tooltip: 'Добавить раздел \'Читать далее...\'',
+                            tooltip: 'Добавить секцию \'Читать дальше..\'',
                         },
                         link: {
+                            default_text: 'описание ссылки',
                             tooltip: 'Вставить ссылку',
                         },
                         image: {
@@ -206,28 +357,13 @@ export default {
                             tooltip: 'Вставить слайдер',
                         },
                         left: {
-                            tooltip: 'Выровнять по левому краю',
+                            tooltip: 'Выровнять текст по левому краю',
                         },
                         center: {
-                            tooltip: 'Выровнять по центру',
+                            tooltip: 'Выровнять текст по центру',
                         },
                         right: {
-                            tooltip: 'Выровнять по правому краю',
-                        },
-                        justify: {
-                            tooltip: 'Выровнять по ширине',
-                        },
-                        quote: {
-                            tooltip: 'Цитата',
-                        },
-                        code: {
-                            tooltip: 'Код',
-                        },
-                        spoiler: {
-                            tooltip: 'Спойлер',
-                        },
-                        nsfw: {
-                            tooltip: 'NSFW контент',
+                            tooltip: 'Выровнять текст по правому краю',
                         },
                         bigger: {
                             tooltip: 'Увеличить размер текста',
@@ -238,16 +374,25 @@ export default {
                         gothic: {
                             tooltip: 'Готический шрифт',
                         },
-                        css: {
-                            tooltip: 'Добавить пользовательские CSS классы',
+                        code: {
+                            tooltip: 'Вставить блок кода',
                         },
+                        css: {
+                            tooltip: 'Добавить пользовательские CSS-классы',
+                        },
+                        mention: {
+                            placeholder: 'Искать пользователей...',
+                        },
+                        quote: {
+                            tooltip: 'Цитировать выделенное'
+                        }
                     },
                 },
                 tags: {
                     label: 'теги:',
                 },
                 classes: {
-                    label: 'html классы:',
+                    label: 'html-классы:',
                 },
                 read: {
                     label: 'чтение:',
@@ -259,15 +404,60 @@ export default {
                     label: 'реакции:',
                 },
                 advanced: {
-                    label: 'дополнительные настройки',
+                    label: 'дополнительные параметры',
                 },
             },
             button: {
-                send: 'опубликовать',
+                send: 'отправить',
                 cancel: 'отмена',
-                repost: 'репост'
+                repost: 'репост',
+                update: 'обновить',
             }
         },
+        repost: {
+            from: 'Репост из',
+        },
+        view: {
+            footer: {
+                buttons: {
+                    delete: {
+                        question: 'Вы уверены, что хотите удалить эту запись?',
+                        confirm: 'Удалить',
+                        cancel: 'Отмена',
+                    },
+                }
+            }
+        }
+    },
+    comment: {
+        form: {
+            title: 'Комментировать запись:',
+            button: {
+                send: 'добавить комментарий',
+                cancel: 'отмена',
+                apply: 'применить',
+                reply: 'ответить',
+                'cancel-reply': 'отмена',
+                'quote': 'Цитата'
+            },
+            'replying-to': 'Ответ на',
+            'show-preview': 'Показать комментарий',
+            'hide-preview': 'Скрыть комментарий'
+        },
+        view: {
+            footer: {
+                buttons: {
+                    delete: {
+                        question: 'Вы уверены, что хотите удалить этот комментарий?',
+                        confirm: 'Удалить',
+                        cancel: 'Отмена',
+                    },
+                    reply: {
+                        text: 'ответить',
+                    },
+                }
+            }
+        }
     },
     groups: {
         basic: {
@@ -285,12 +475,108 @@ export default {
             },
         }
     },
+    userAvatar: {
+        menu: {
+            profile: 'Профиль',
+            diary: 'Дневник',
+            privateMessage: 'Личное сообщение',
+            addFriend: 'Добавить в друзья',
+            removeFriend: 'Удалить из друзей',
+            block: 'Заблокировать'
+        },
+        dialog: {
+            addFriend: {
+                title: 'Добавить в друзья',
+                label: 'Метка друга (необязательно)',
+                message: 'Сообщение (необязательно)',
+                cancel: 'Отмена',
+                confirm: 'Добавить в друзья'
+            },
+            block: {
+                title: 'Заблокировать пользователя',
+                message: 'Вы уверены, что хотите заблокировать {nickname}?',
+                warning: 'Вы не сможете видеть его записи, и отменить это действие будет невозможно в течение следующих 7 дней.',
+                hideFromFeed: {
+                    suggestion: 'Возможно, вы хотите скрыть его записи из своей ленты?',
+                    button: 'Скрыть из ленты'
+                },
+                cancel: 'Отмена',
+                confirm: 'Заблокировать'
+            },
+            removeFriend: {
+                message: 'Вы уверены, что хотите удалить {nickname} из списка друзей?',
+                title: 'Удалить из друзей',
+                confirm: 'Да',
+                cancel: 'Нет'
+            }
+        },
+        notifications: {
+            block: {
+                success: 'Пользователь {nickname} был заблокирован',
+                error: 'Не удалось заблокировать пользователя'
+            },
+            hideFromFeed: {
+                success: 'Записи {nickname} будут скрыты из вашей ленты',
+                error: 'Не удалось скрыть записи из ленты'
+            },
+            addFriend: {
+                success: 'Запрос в друзья успешно отправлен',
+                error: 'Не удалось отправить запрос в друзья'
+            },
+            removeFriend: {
+                success: '{nickname} был удален из списка друзей',
+                error: 'Не удалось удалить из друзей'
+            }
+        }
+    },
+    menu: {
+        home: 'Главная',
+        profile: 'Профиль',
+        diary: 'Дневник',
+        messages: 'Сообщения',
+        search: 'Поиск',
+        darkTheme: 'Темная тема',
+        lightTheme: 'Светлая тема',
+        designOff: 'Отключить дизайн',
+        settings: 'Настройки',
+        logout: 'Выйти',
+        collapse: 'Свернуть',
+    },
+    feed: {
+        latest: 'Новые',
+        popular: 'Популярные',
+        following: 'Подписки',
+        friends: 'Друзья'
+    },
+    avatars: {
+        noAvatarsAvailable: 'Нет доступных аватаров',
+        loading: 'Загрузка аватаров...',
+        save: 'Сохранить',
+        cancel: 'Отмена',
+        changesSaved: 'Порядок аватаров успешно сохранен',
+        addAvatar: 'Добавить аватар',
+        uploadSuccess: 'Аватар(ы) успешно загружены',
+        alreadyAdded: 'Аватар добавлен',
+        addToCollection: 'Добавить в мою коллекцию',
+        adding: 'Добавление...',
+        added: 'Успешно добавлено',
+    },
+    errors: {
+        failedToLoadAvatars: 'Не удалось загрузить аватары',
+        failedToReorderAvatars: 'Не удалось изменить порядок аватаров',
+        failedToUploadAvatars: 'Не удалось загрузить аватары',
+        not_found: 'Страница или запись не найдена'
+    },
+    buttons: {
+        go_home: 'На главную',
+        go_back: 'Назад'
+    },
     settings: {
         title: 'Настройки',
         search: {
-            placeholder: 'Поиск настроек...',
+            placeholder: 'Искать настройки...',
         },
-        notYetImplemented: 'Ещё не реализовано',
+        notYetImplemented: 'Пока не реализовано',
         categories: {
             user: {
                 title: 'Пользователь',
@@ -323,19 +609,27 @@ export default {
                             clock: 'часы',
                         },
                     },
+                    inviteCode: {
+                        title: 'Инвайт-код',
+                        triggers: {
+                            invite: 'инвайт',
+                            code: 'код',
+                            invitation: 'приглашение',
+                        },
+                    },
                     language: {
                         title: 'Язык',
                         triggers: {
                             language: 'язык',
                             locale: 'локаль',
-                            changeLanguage: 'сменить язык',
+                            changeLanguage: 'изменить язык',
                         },
                     },
                     ignoreList: {
-                        title: 'Список игнорируемых',
+                        title: 'Список игнора',
                         triggers: {
-                            ignore: 'игнорировать',
-                            block: 'заблокировать',
+                            ignore: 'игнор',
+                            block: 'блок',
                             blockedUsers: 'заблокированные пользователи',
                         },
                     },
@@ -344,15 +638,7 @@ export default {
                         triggers: {
                             hide: 'скрыть',
                             hidden: 'скрытые',
-                            muteUsers: 'заглушить пользователей',
-                        },
-                    },
-                    inviteCode: {
-                        title: 'Инвайт-код',
-                        triggers: {
-                            invite: 'инвайт',
-                            code: 'код',
-                            invitation: 'приглашение',
+                            muteUsers: 'замьюченные пользователи',
                         },
                     },
                 },
@@ -374,7 +660,7 @@ export default {
                     preface: {
                         title: 'Предисловие',
                         triggers: {
-                            intro: 'введение',
+                            intro: 'вступление',
                             description: 'описание',
                         },
                     },
@@ -382,7 +668,7 @@ export default {
                         title: 'Группы по умолчанию',
                         triggers: {
                             default: 'по умолчанию',
-                            autoAssign: 'автоназначение',
+                            autoAssign: 'автоматическое назначение',
                         },
                     },
                     manageGroups: {
@@ -402,11 +688,11 @@ export default {
                         },
                     },
                     deletedPosts: {
-                        title: 'Удалённые записи',
+                        title: 'Удаленные записи',
                         triggers: {
-                            deleted: 'удалённые',
+                            deleted: 'удаленные',
                             trash: 'корзина',
-                            removed: 'удалённые',
+                            removed: 'убранные',
                         },
                     },
                 },
@@ -423,7 +709,7 @@ export default {
                         title: 'Аватары',
                         triggers: {
                             manage: 'управление',
-                            upload: 'загрузить',
+                            upload: 'загрузка',
                         },
                     },
                 },
@@ -455,7 +741,7 @@ export default {
                 title: 'Уведомления',
                 triggers: {
                     alerts: 'оповещения',
-                    notify: 'уведомить',
+                    notify: 'уведомления',
                 },
                 items: {
                     onsiteNotifications: {
@@ -466,10 +752,10 @@ export default {
                         },
                     },
                     emailNotifications: {
-                        title: 'Уведомления по почте',
+                        title: 'Уведомления по электронной почте',
                         triggers: {
-                            email: 'почта',
-                            mail: 'письмо',
+                            email: 'электронная почта',
+                            mail: 'почта',
                         },
                     },
                 },
@@ -489,10 +775,10 @@ export default {
                         },
                     },
                     emailAddress: {
-                        title: 'Адрес электронной почты',
+                        title: 'Электронная почта',
                         triggers: {
-                            changeEmail: 'изменить почту',
-                            email: 'почта',
+                            changeEmail: 'изменить электронную почту',
+                            email: 'электронная почта',
                         },
                     },
                     activeSessions: {
@@ -500,7 +786,7 @@ export default {
                         triggers: {
                             sessions: 'сессии',
                             devices: 'устройства',
-                            loggedIn: 'вошли',
+                            loggedIn: 'вход выполнен',
                         },
                     },
                     twoFactorAuth: {
@@ -524,14 +810,14 @@ export default {
                         title: 'Внешний вид',
                         triggers: {
                             theme: 'тема',
-                            darkMode: 'тёмная тема',
-                            look: 'оформление',
+                            darkMode: 'темный режим',
+                            look: 'вид',
                         },
                     },
                     accessibility: {
                         title: 'Доступность',
                         triggers: {
-                            a11y: 'доступность',
+                            a11y: 'a11y',
                             screenReader: 'экранный диктор',
                         },
                     },
@@ -547,20 +833,20 @@ export default {
         },
     },
     nicknameSettings: {
-        placeholder: 'Введите никнейм',
+        placeholder: 'Введите ваш никнейм',
         save: 'Сохранить',
         cancel: 'Отмена',
-        saveSuccess: 'Никнейм успешно обновлён',
+        saveSuccess: 'Никнейм успешно обновлен',
         saveError: 'Не удалось обновить никнейм',
         loadError: 'Не удалось загрузить никнейм',
         errors: {
-            required: 'Необходимо указать никнейм',
-            tooLong: 'Слишком длинный никнейм',
+            required: 'Никнейм обязателен',
+            tooLong: 'Никнейм слишком длинный',
             alreadyExists: 'Никнейм уже существует',
         },
     },
     signatureSettings: {
-        placeholder: 'Введите подпись',
+        placeholder: 'Введите вашу подпись',
         save: 'Сохранить',
         cancel: 'Отмена',
         saveSuccess: 'Подпись успешно обновлена',
@@ -574,7 +860,7 @@ export default {
         placeholder: 'Выберите язык',
         save: 'Сохранить',
         cancel: 'Отмена',
-        saveSuccess: 'Язык успешно обновлён',
+        saveSuccess: 'Язык успешно обновлен',
         saveError: 'Не удалось обновить язык',
         loadError: 'Не удалось загрузить язык',
     },
@@ -582,20 +868,56 @@ export default {
         placeholder: 'Выберите часовой пояс',
         save: 'Сохранить',
         cancel: 'Отмена',
-        saveSuccess: 'Часовой пояс успешно обновлён',
+        saveSuccess: 'Часовой пояс успешно обновлен',
         saveError: 'Не удалось обновить часовой пояс',
         loadError: 'Не удалось загрузить часовой пояс',
     },
     styles: {
+        preview: {
+            save: 'Добавить в мою коллекцию',
+            alreadyAdded: 'Стиль добавлен',
+            goToCollection: 'Перейти к коллекции стилей',
+        },
+        form: {
+            title: {
+                add: 'Добавить новый стиль',
+                edit: 'Редактировать стиль',
+            },
+            name: {
+                placeholder: 'введите название стиля',
+            },
+            description: {
+                placeholder: 'введите описание стиля',
+            },
+            css: {
+                placeholder: 'введите содержимое CSS-стиля',
+            },
+            button: {
+                add: 'добавить стиль',
+                update: 'обновить стиль',
+                cancel: 'отмена',
+            }
+        },
+        footer: {
+            delete: {
+                confirmation: 'Вы уверены, что хотите удалить этот стиль?',
+            },
+        },
+        reorder: {
+            button: {
+                save: 'сохранить порядок',
+                cancel: 'отмена',
+            },
+        },
         title: 'Стили дневника',
         addNew: 'Добавить новый стиль',
         addNewStyle: 'Добавить новый стиль',
         save: 'Сохранить изменения',
         cancel: 'Отменить изменения',
-        add: 'Добавить',
+        add: 'добавить стиль',
         name: 'Название',
-        styleContent: 'Содержимое CSS стиля',
-        enabled: 'Включен',
+        styleContent: 'Содержимое CSS-стиля',
+        enabled: 'Включено',
         previewImage: 'Изображение предпросмотра',
         confirmDelete: 'Вы уверены, что хотите удалить этот стиль?',
         loadError: 'Не удалось загрузить стили',
@@ -608,48 +930,35 @@ export default {
         saveSuccess: 'Изменения успешно сохранены',
         saveError: 'Не удалось сохранить изменения',
         changesCancelled: 'Изменения отменены',
-        requiredFields: 'Название и содержимое CSS стиля обязательны',
+        requiredFields: 'Название и содержимое CSS-стиля обязательны',
         previewUrlApplied: 'URL изображения предпросмотра успешно применен'
     },
-    feed: {
-        latest: 'Свежее',
-        popular: 'Популярное',
-        following: 'Подписки',
-        friends: 'Друзья'
-    },
-    errors: {
-        not_found: 'Страница или пост не найдены'
-    },
-    buttons: {
-        go_home: 'На главную',
-        go_back: 'Назад'
-    },
     ignoreListSettings: {
-        empty: 'Ваш список игнорируемых пуст.',
+        empty: 'Ваш список игнора пуст.',
         loading: 'Загрузка...',
-        loadError: 'Не удалось загрузить список игнорируемых.',
-        confirmTitle: 'Разигнорировать пользователя',
-        confirmUnignore: 'Вы уверены, что хотите разигнорировать {nickname}?',
-        confirm: 'Разигнорировать',
+        loadError: 'Не удалось загрузить список игнора.',
+        confirmTitle: 'Убрать из игнора',
+        confirmUnignore: 'Вы уверены, что хотите убрать {nickname} из игнора?',
+        confirm: 'Убрать из игнора',
         cancel: 'Отмена',
-        unignoreSuccess: '{nickname} удалён из списка игнорируемых.',
+        unignoreSuccess: '{nickname} был удален из вашего списка игнора.',
     },
     hiddenUsersSettings: {
         loading: 'Загрузка...',
         loadError: 'Не удалось загрузить список скрытых пользователей.',
         empty: 'Ваш список скрытых пользователей пуст.',
         confirmTitle: 'Показать пользователя',
-        confirmUnhide: 'Вы уверены, что хотите показать {nickname}?',
+        confirmUnhide: 'Вы уверены, что хотите убрать {nickname} из скрытых?',
         confirm: 'Показать',
         cancel: 'Отмена',
-        unhideSuccess: '{nickname} удалён из списка скрытых пользователей.',
+        unhideSuccess: '{nickname} был удален из списка скрытых пользователей.',
     },
     diaryTitleSettings: {
         titlePlaceholder: 'Название дневника',
         subtitlePlaceholder: 'Подзаголовок дневника',
         save: 'Сохранить',
         cancel: 'Отмена',
-        saveSuccess: 'Название дневника обновлено',
+        saveSuccess: 'Название дневника успешно обновлено',
         saveError: 'Не удалось обновить название дневника',
         loadError: 'Не удалось загрузить название дневника',
     },
