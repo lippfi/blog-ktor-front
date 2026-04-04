@@ -2,7 +2,7 @@
 import PostComponent from "@/components/post/PostComponent.vue";
 import PostEdit from "@/components/post/PostEdit.vue";
 import {computed, onMounted, ref, watch} from 'vue';
-import {isSignedIn} from "@/api/userClient.ts";
+import {getCurrentUserLogin, isSignedIn} from "@/api/userClient.ts";
 import {useRoute} from "vue-router";
 import type {DiaryHeaderInfo, PostViewDto} from "@/api/dto/postServiceDto.ts";
 import DiaryMenuComponent from "@/components/DiaryMenuComponent.vue";
@@ -17,6 +17,7 @@ const props = defineProps<{
 }>();
 
 const loggedIn: boolean = isSignedIn();
+const canEditPost = computed(() => loggedIn && getCurrentUserLogin() === props.login);
 const posts = ref<PostViewDto[]>(route.meta.posts as PostViewDto[] || []);
 const currentPage = ref<number>(route.meta.currentPage as number || 0);
 const totalPages = ref<number>(route.meta.totalPages as number || 0);
@@ -67,7 +68,7 @@ watch(() => [props.login, props.page], fetchPosts);
   />
 
   <PostEdit
-      v-if="loggedIn"
+      v-if="canEditPost"
       :type="'post'"
       :diary-login="props.login"
   />
