@@ -1,11 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { computed, ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { getUserByLogin } from '@/api/userMapService';
 
 const props = defineProps<{
   login: string,
 }>();
 const originalText = '@' + props.login;
+const router = useRouter();
+
+const profileHref = computed(() => {
+  return router.resolve({ path: `/${props.login}` }).href;
+});
 
 const displayNickname = ref(props.login);
 const isUserFound = ref(false);
@@ -20,7 +26,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <a v-if="isUserFound" :href="`/${login}`" class="user-mention">{{ displayNickname }}</a>
+  <a v-if="isUserFound" :href="profileHref" class="user-mention">{{ displayNickname }}</a>
   <span v-else>{{ originalText }}</span>
 </template>
 
