@@ -83,7 +83,7 @@ watch(() => props.isMobile, (isMobile) => {
         <template #title>{{ t('menu.home') }}</template>
       </el-menu-item>
 
-      <el-menu-item index="2" @click="navigateTo(`/${currentUser}/profile`)">
+      <el-menu-item index="2" @click="navigateTo(`/${currentUser}`)">
         <el-icon><User /></el-icon>
         <template #title>{{ t('menu.profile') }}</template>
       </el-menu-item>

@@ -1,14 +1,21 @@
 <script setup lang="ts">
-import {backendURL} from "@/constants";
+import {computed} from "vue";
+import {useRouter} from "vue-router";
 
 const props = defineProps<{
   nickname: string,
   login: string,
 }>();
+
+const router = useRouter();
+
+const profileHref = computed(() => {
+  return router.resolve({path: `/${props.login}`}).href;
+});
 </script>
 
 <template>
-  <el-link :href="backendURL + '/' + props.login" type="primary">{{ props.nickname }}</el-link>
+  <el-link :href="profileHref" type="primary">{{ props.nickname }}</el-link>
 </template>
 
 <style scoped>
