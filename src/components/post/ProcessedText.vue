@@ -298,16 +298,13 @@ function replaceVideo(text: string): string {
 
 function replaceAvatars(text: string): string {
   let result = text;
-  const pattern = /\[avatars\]([\s\S]*?)\[\/avatars\]\n?/;
+  const pattern = /\[\s*avatars\s*\]([\s\S]*?)\[\/\s*avatars\s*\]\n?/;
   let match = result.match(pattern);
 
   while (match !== null) {
     const content = match[1];
-
-    const uris = content
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line.length > 0);
+    const avatarPattern = /\[\s*avatar\s+img\s*=\s*"(.*?)"\s*\]/g;
+    const uris = [...content.matchAll(avatarPattern)].map(avatarMatch => avatarMatch[1]);
 
     const avatarCollectionJson = JSON.stringify(uris);
     const avatarCollectionComponent = `<AvatarCollectionComponent avatar-collection-json='${avatarCollectionJson}' />`;
