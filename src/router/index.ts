@@ -19,6 +19,7 @@ import {updateStyles} from "@/styles/stylesManager";
 import NotFoundView from "@/views/NotFoundView.vue";
 import FeedView from "@/views/FeedView.vue";
 import SettingsView from "@/views/SettingsView.vue";
+import CreateWelcomePostTestView from "@/views/CreateWelcomePostTestView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -68,6 +69,11 @@ const router = createRouter({
       path: '/register',
       name: 'register',
       component: RegistrationView,
+    },
+    {
+      path: '/test/create-welcome-post',
+      name: 'create welcome post test',
+      component: CreateWelcomePostTestView,
     },
     {
       path: '/reset-password',

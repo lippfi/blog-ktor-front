@@ -8,7 +8,7 @@ import LanguageChooser from '@/components/LanguageChooser.vue';
 import ConfirmEmailForm from "@/components/ConfirmEmailForm.vue";
 import {getCurrentUserLogin, isSignedIn, logOut} from "@/api/userClient.ts";
 import {useRouter} from "vue-router";
-import {getBasicAccessGroups} from "@/api/accessGroupService.ts";
+import {createWelcomePostForCurrentSession} from "@/views/registrationWelcomePost.ts";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -28,9 +28,22 @@ const goToNextStep = () => {
   step.value++;
 };
 
-const finishRegistration = () => {
-  logOut()
-  router.push(`/login`);
+const createWelcomePost = async () => {
+  const result = await createWelcomePostForCurrentSession();
+  if (result.type !== 'ok') {
+    console.error(result.message);
+  }
+}
+
+const finishRegistration = async () => {
+  try {
+    await createWelcomePost();
+  } catch (error) {
+    console.error('Failed to create welcome post:', error);
+  }
+
+  logOut();
+  await router.push(`/login`);
 }
 
 </script>
