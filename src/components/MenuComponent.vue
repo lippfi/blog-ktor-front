@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  DArrowLeft,
   Hide,
   HomeFilled,
   Memo,
@@ -12,16 +13,17 @@ import {
   User
 } from "@element-plus/icons-vue";
 import {useI18n} from "vue-i18n";
-import {RouterLink, useRouter} from 'vue-router';
+import {useRouter} from 'vue-router';
 import {getCurrentUserLogin, logOut} from "@/api/userClient.ts";
-import {computed, onMounted, ref} from 'vue';
+import {computed, onMounted, ref, watch} from 'vue';
 
-defineProps({
-  collapsed: {
-    type: Boolean,
-    default: true
-  }
-});
+const props = withDefaults(defineProps<{
+  isMobile?: boolean
+}>(), {
+  isMobile: false
+})
+
+const isCollapse = ref(false)
 
 const { t } = useI18n()
 const router = useRouter()
@@ -61,90 +63,105 @@ onMounted(() => {
 
   applyTheme(shouldUseDarkTheme)
 })
+
+watch(() => props.isMobile, (isMobile) => {
+  if (isMobile) {
+    isCollapse.value = false
+  }
+})
 </script>
 
 <template>
-  <el-menu
-      v-if="!collapsed"
-      class="el-menu-vertical"
-  >
-    <el-menu-item index="1">
-      <RouterLink to="/" class="menu-link">
+  <div class="menu-shell" :class="{ 'is-collapsed': isCollapse }">
+    <el-menu
+        class="el-menu-vertical"
+        :collapse="isCollapse"
+        :collapse-transition="false"
+    >
+      <el-menu-item index="1" @click="navigateTo('/')">
         <el-icon><HomeFilled /></el-icon>
-        <span>{{ t('menu.home') }}</span>
-      </RouterLink>
-    </el-menu-item>
+        <template #title>{{ t('menu.home') }}</template>
+      </el-menu-item>
 
-    <el-menu-item index="2">
-      <RouterLink :to="`/${currentUser}/profile`" class="menu-link">
+      <el-menu-item index="2" @click="navigateTo(`/${currentUser}/profile`)">
         <el-icon><User /></el-icon>
-        <span>{{ t('menu.profile') }}</span>
-      </RouterLink>
-    </el-menu-item>
+        <template #title>{{ t('menu.profile') }}</template>
+      </el-menu-item>
 
-    <el-menu-item index="3">
-      <RouterLink :to="`/${currentUser}/diary`" class="menu-link">
+      <el-menu-item index="3" @click="navigateTo(`/${currentUser}/diary`)">
         <el-icon><Memo /></el-icon>
-        <span>{{ t('menu.diary') }}</span>
-      </RouterLink>
-    </el-menu-item>
+        <template #title>{{ t('menu.diary') }}</template>
+      </el-menu-item>
 
-    <!-- <el-menu-item index="4">
-      <RouterLink to="/messages" class="menu-link">
+      <!-- <el-menu-item index="4" @click="navigateTo('/messages')">
         <el-icon><Message /></el-icon>
-        <span>{{ t('menu.messages') }}</span>
-      </RouterLink>
-    </el-menu-item> -->
+        <template #title>{{ t('menu.messages') }}</template>
+      </el-menu-item> -->
 
-    <el-menu-item index="5">
-      <RouterLink to="/search" class="menu-link">
+      <el-menu-item index="5" @click="navigateTo('/search')">
         <el-icon><Search /></el-icon>
-        <span>{{ t('menu.search') }}</span>
-      </RouterLink>
-    </el-menu-item>
+        <template #title>{{ t('menu.search') }}</template>
+      </el-menu-item>
 
-    <el-menu-item index="6">
-      <RouterLink to="/settings" class="menu-link">
+      <el-menu-item index="6" @click="navigateTo('/settings')">
         <el-icon><Setting /></el-icon>
-        <span>{{ t('menu.settings') }}</span>
-      </RouterLink>
-    </el-menu-item>
+        <template #title>{{ t('menu.settings') }}</template>
+      </el-menu-item>
 
-    <!-- <el-menu-item index="7">
-      <el-icon><Hide /></el-icon>
-      <span>{{ t('menu.designOff') }}</span>
-    </el-menu-item> -->
+      <!-- <el-menu-item index="7">
+        <el-icon><Hide /></el-icon>
+        <template #title>{{ t('menu.designOff') }}</template>
+      </el-menu-item> -->
 
-    <el-menu-item index="8" @click="signOut">
-      <el-icon><SwitchButton /></el-icon>
-      <span>{{ t('menu.logout') }}</span>
-    </el-menu-item>
+      <el-menu-item index="8" @click="signOut">
+        <el-icon><SwitchButton /></el-icon>
+        <template #title>{{ t('menu.logout') }}</template>
+      </el-menu-item>
 
-    <!-- <div class="theme-toggle-item">
-      <button
-        class="theme-toggle-button"
-        type="button"
-        :title="themeToggleLabel"
-        :aria-label="themeToggleLabel"
-        @click="toggleTheme"
-      >
-        <el-icon>
-          <Sunny v-if="isDarkTheme" />
-          <Moon v-else />
-        </el-icon>
-      </button>
-    </div> -->
-  </el-menu>
+      <!-- <div class="theme-toggle-item">
+        <button
+          class="theme-toggle-button"
+          type="button"
+          :title="themeToggleLabel"
+          :aria-label="themeToggleLabel"
+          @click="toggleTheme"
+        >
+          <el-icon>
+            <Sunny v-if="isDarkTheme" />
+            <Moon v-else />
+          </el-icon>
+        </button>
+      </div> -->
+    </el-menu>
+
+    <button
+      v-if="!props.isMobile"
+      class="collapse-toggle-button"
+      type="button"
+      :aria-label="t('menu.collapse')"
+      @click="isCollapse = !isCollapse"
+    >
+      <el-icon class="collapse-toggle-icon" :class="{ 'is-collapsed': isCollapse }"><DArrowLeft /></el-icon>
+      <span class="collapse-title">{{ t('menu.collapse') }}</span>
+    </button>
+  </div>
 </template>
 
 <style scoped>
-.el-menu-vertical {
+.menu-shell {
   display: flex;
   flex-direction: column;
-  width: 240px;
   height: 100%;
+}
+
+.el-menu-vertical:not(.el-menu--collapse) {
+  width: 240px;
+}
+
+.el-menu-vertical {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  transition: width 0.3s ease;
 }
 
 .el-menu-item {
@@ -153,18 +170,62 @@ onMounted(() => {
   align-items: center;
   gap: 10px;
   padding: 0;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.menu-link {
+.collapse-toggle-button {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
   width: 100%;
-  height: 100%;
+  min-height: 56px;
   padding: 0;
+  border: none;
+  background: transparent;
   color: inherit;
-  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.collapse-toggle-button:hover {
+  background-color: #303030;
+  color: white;
+}
+
+.collapse-toggle-button:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: -1px;
+}
+
+.collapse-toggle-icon {
+  position: relative;
+}
+
+.collapse-toggle-button :deep(.el-icon) {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.collapse-title {
+  display: block;
+  width: 100%;
+  font-size: 16px;
+  text-align: center;
+}
+
+.collapse-toggle-icon {
+  transition: transform 0.15s ease;
+}
+
+.collapse-toggle-icon.is-collapsed {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.menu-shell.is-collapsed .collapse-title {
+  display: none;
 }
 
 .el-menu-item:hover {

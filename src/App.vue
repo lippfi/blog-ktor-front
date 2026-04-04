@@ -1,5 +1,5 @@
 <template>
-  <HeaderComponent v-if="signedIn" @toggleMenu="toggleMenuCollapse"/>
+  <HeaderComponent v-if="signedIn" @toggleMenu="toggleMobileMenu"/>
   <!-- Apply all styles globally -->
   <link v-for="style in getStyles()" :key="style" rel="stylesheet" :href="style" data-diary-style="true" />
   <div class="content-wrapper">
@@ -7,10 +7,10 @@
       <router-view v-if="isLoaded" @reaction-added="reactionsStore.addReaction"/>
     </div>
     <MenuComponent
-      v-if="signedIn && $route.name !== 'register'"
+      v-if="signedIn && $route.name !== 'register' && (!isMobileView || isMobileMenuVisible)"
       class="right-menu"
       :style="rightMenuStyle"
-      :collapsed="menuCollapsed"
+      :is-mobile="isMobileView"
     />
   </div>
 </template>
@@ -28,10 +28,11 @@ import HeaderComponent from "@/components/HeaderComponent.vue";
 const router = useRouter()
 const signedIn = ref(isSignedIn())
 const isLoaded = ref(false)
-const menuCollapsed = ref(true)
-const MENU_COLLAPSED_STORAGE_KEY = 'menuCollapsed'
 const DEFAULT_HEADER_HEIGHT = 74
+const MOBILE_BREAKPOINT = 768
 const menuTopOffset = ref(DEFAULT_HEADER_HEIGHT)
+const isMobileView = ref(false)
+const isMobileMenuVisible = ref(false)
 let menuOffsetAnimationFrame: number | null = null
 const reactionsStore = useReactionsStore()
 
@@ -53,6 +54,15 @@ const updateMenuOffset = () => {
   }
 }
 
+const updateViewportState = () => {
+  const mobileView = window.innerWidth <= MOBILE_BREAKPOINT
+
+  if (isMobileView.value !== mobileView) {
+    isMobileView.value = mobileView
+    isMobileMenuVisible.value = false
+  }
+}
+
 const scheduleMenuOffsetUpdate = () => {
   if (menuOffsetAnimationFrame !== null) {
     return
@@ -64,27 +74,36 @@ const scheduleMenuOffsetUpdate = () => {
   })
 }
 
-const toggleMenuCollapse = () => {
-  menuCollapsed.value = !menuCollapsed.value
-  localStorage.setItem(MENU_COLLAPSED_STORAGE_KEY, String(menuCollapsed.value))
+const handleResize = () => {
+  updateViewportState()
+  scheduleMenuOffsetUpdate()
+}
+
+const toggleMobileMenu = () => {
+  if (!isMobileView.value) {
+    return
+  }
+
+  isMobileMenuVisible.value = !isMobileMenuVisible.value
 }
 
 // Update signedIn state when route changes
 watch(() => router.currentRoute.value.fullPath, () => {
   signedIn.value = isSignedIn()
+
+  if (isMobileView.value) {
+    isMobileMenuVisible.value = false
+  }
+
   nextTick(scheduleMenuOffsetUpdate)
 })
 
 onMounted(async () => {
-  const savedMenuCollapsed = localStorage.getItem(MENU_COLLAPSED_STORAGE_KEY)
-  if (savedMenuCollapsed !== null) {
-    menuCollapsed.value = savedMenuCollapsed === 'true'
-  }
-
   signedIn.value = isSignedIn()
+  updateViewportState()
   updateMenuOffset()
   window.addEventListener('scroll', scheduleMenuOffsetUpdate, { passive: true })
-  window.addEventListener('resize', scheduleMenuOffsetUpdate)
+  window.addEventListener('resize', handleResize)
   if (!signedIn.value) {
     isLoaded.value = true;
     return
@@ -112,7 +131,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   window.removeEventListener('scroll', scheduleMenuOffsetUpdate)
-  window.removeEventListener('resize', scheduleMenuOffsetUpdate)
+  window.removeEventListener('resize', handleResize)
 
   if (menuOffsetAnimationFrame !== null) {
     window.cancelAnimationFrame(menuOffsetAnimationFrame)

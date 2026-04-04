@@ -1,25 +1,28 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import { computed, defineEmits } from 'vue';
+import { computed } from 'vue';
 import type {DiaryHeaderInfo} from "@/api/dto/postServiceDto.ts";
 
+const emit = defineEmits<{
+  (e: 'toggleMenu'): void
+}>()
+
 const route = useRoute();
-const emit = defineEmits(['toggleMenu']);
 
 const diaryHeaderInfo = computed(() => route.meta.diaryHeaderInfo as DiaryHeaderInfo | undefined);
 const name = computed(() => diaryHeaderInfo.value?.name || '');
 const subtitle = computed(() => diaryHeaderInfo.value?.subtitle || '');
 
-const toggleMenu = () => {
-  emit('toggleMenu');
-};
+const onLogoClick = () => {
+  emit('toggleMenu')
+}
 </script>
 
 <template>
   <header class="app-header">
     <div class="header-content">
       <div class="left">
-        <img src="@/assets/logo.png" alt="Logo" class="header-logo" @click="toggleMenu" style="cursor: pointer;">
+        <img src="@/assets/logo.png" alt="Logo" class="header-logo" @click="onLogoClick">
         <div v-if="diaryHeaderInfo" class="diary-title">
           <h3 style="margin: 0;">{{ name }}</h3>
           <p style="margin: 0;">{{ subtitle }}</p>
@@ -54,6 +57,7 @@ const toggleMenu = () => {
 .header-logo {
   height: 50px;
   width: auto;
+  cursor: pointer;
 }
 
 .left {

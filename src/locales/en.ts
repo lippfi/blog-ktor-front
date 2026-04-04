@@ -540,6 +540,7 @@ export default {
         designOff: 'Turn off design',
         settings: 'Settings',
         logout: 'Logout',
+        collapse: 'Collapse',
     },
     feed: {
         latest: 'Latest',
