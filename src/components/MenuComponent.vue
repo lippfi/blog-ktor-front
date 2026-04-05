@@ -30,6 +30,7 @@ const router = useRouter()
 const currentUser = getCurrentUserLogin()
 const isDarkTheme = ref(false)
 const THEME_STORAGE_KEY = 'theme'
+const THEME_MIGRATION_KEY = 'theme_without_system_fallback_migration_v1'
 const DARK_THEME_VALUE = 'dark'
 
 const themeToggleLabel = computed(() =>
@@ -41,6 +42,15 @@ const applyTheme = (darkTheme: boolean) => {
   document.documentElement.classList.toggle('dark', darkTheme)
   document.body.classList.toggle('dark', darkTheme)
   localStorage.setItem(THEME_STORAGE_KEY, darkTheme ? DARK_THEME_VALUE : 'light')
+}
+
+const runThemeMigration = () => {
+  if (localStorage.getItem(THEME_MIGRATION_KEY)) {
+    return
+  }
+
+  localStorage.removeItem(THEME_STORAGE_KEY)
+  localStorage.setItem(THEME_MIGRATION_KEY, 'done')
 }
 
 const navigateTo = (path: string) => {
@@ -57,9 +67,10 @@ function toggleTheme() {
 }
 
 onMounted(() => {
+  runThemeMigration()
+
   const savedTheme = localStorage.getItem(THEME_STORAGE_KEY)
-  const isSystemDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
-  const shouldUseDarkTheme = savedTheme ? savedTheme === DARK_THEME_VALUE : isSystemDark
+  const shouldUseDarkTheme = savedTheme === DARK_THEME_VALUE
 
   applyTheme(shouldUseDarkTheme)
 })
