@@ -283,6 +283,23 @@ export default {
                     label: 'skip',
                 },
             },
+            validation: {
+                name: {
+                    required: 'Diary name is required',
+                },
+                description: {
+                    required: 'Subtitle is required',
+                },
+                read: {
+                    required: 'Read privacy is required',
+                },
+                comment: {
+                    required: 'Comment privacy is required',
+                },
+                react: {
+                    required: 'Reaction privacy is required',
+                },
+            },
         }
     },
     diaryImport: {

@@ -262,6 +262,23 @@ export default {
                     label: 'өткізіп жіберу',
                 },
             },
+            validation: {
+                name: {
+                    required: 'Күнделік атауын көрсетіңіз',
+                },
+                description: {
+                    required: 'Қосымша тақырыпты көрсетіңіз',
+                },
+                read: {
+                    required: 'Оқу құпиялығын көрсетіңіз',
+                },
+                comment: {
+                    required: 'Пікір құпиялығын көрсетіңіз',
+                },
+                react: {
+                    required: 'Реакция құпиялығын көрсетіңіз',
+                },
+            },
         }
     },
     diaryImport: {

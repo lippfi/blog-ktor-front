@@ -1,5 +1,5 @@
 <template>
-  <el-form ref="diaryInfoFormRef" :model="diaryInfoForm" status-icon label-width="auto">
+  <el-form ref="diaryInfoFormRef" :model="diaryInfoForm" :rules="rules" status-icon label-width="auto">
     <el-space fill>
       <el-alert type="success" :closable="false">
         <p>
@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive, ref} from 'vue'
+import {computed, onMounted, reactive, ref} from 'vue'
 import type {FormInstance, FormRules} from "element-plus";
 import {
   getCurrentUserLogin,
@@ -83,6 +83,24 @@ const diaryInfoForm = reactive<DiaryInfoForm>({
   react: '',
 })
 const emit = defineEmits(['on-success']);
+
+const rules = computed<FormRules>(() => ({
+  name: [
+    { required: true, message: t('diaryInfo.form.validation.name.required'), trigger: 'blur' }
+  ],
+  description: [
+    { required: true, message: t('diaryInfo.form.validation.description.required'), trigger: 'blur' }
+  ],
+  read: [
+    { required: true, message: t('diaryInfo.form.validation.read.required'), trigger: 'change' }
+  ],
+  comment: [
+    { required: true, message: t('diaryInfo.form.validation.comment.required'), trigger: 'change' }
+  ],
+  react: [
+    { required: true, message: t('diaryInfo.form.validation.react.required'), trigger: 'change' }
+  ],
+}))
 
 const submitForm = (form: FormInstance | undefined) => {
   if (!form) return

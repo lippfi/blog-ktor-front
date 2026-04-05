@@ -283,6 +283,23 @@ export default {
                     label: 'пропустить',
                 },
             },
+            validation: {
+                name: {
+                    required: 'Укажите название дневника',
+                },
+                description: {
+                    required: 'Укажите подзаголовок',
+                },
+                read: {
+                    required: 'Укажите приватность чтения',
+                },
+                comment: {
+                    required: 'Укажите приватность комментариев',
+                },
+                react: {
+                    required: 'Укажите приватность реакций',
+                },
+            },
         }
     },
     diaryImport: {
