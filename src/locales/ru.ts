@@ -217,6 +217,27 @@ export default {
                     label: 'пропустить',
                 },
             },
+            validation: {
+                sex: {
+                    required: 'Укажите пол',
+                    invalid: 'Некорректное значение пола',
+                },
+                nsfw: {
+                    required: 'Укажите политику NSFW',
+                    invalid: 'Некорректное значение политики NSFW',
+                },
+                language: {
+                    required: 'Укажите язык',
+                    invalid: 'Некорректное значение языка',
+                },
+                timezone: {
+                    required: 'Укажите часовой пояс',
+                },
+                birthday: {
+                    required: 'Укажите дату рождения',
+                    invalid: 'Некорректная дата',
+                },
+            },
         }
     },
     diaryInfo: {

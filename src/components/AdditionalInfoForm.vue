@@ -1,5 +1,5 @@
 <template>
-  <el-form  ref="additionalInfoFormRef" :model="additionalInfoForm" status-icon label-width="auto">
+  <el-form  ref="additionalInfoFormRef" :model="additionalInfoForm" :rules="rules" status-icon label-width="auto">
     <div class="center_input">
       <el-space fill>
         <el-alert type="success" :closable="false">
@@ -33,6 +33,7 @@
       </el-form-item>
       <el-form-item prop="birthday">
         <el-date-picker
+            class="birthday-picker"
             v-model="additionalInfoForm.birthday"
             type="date"
             :placeholder="t('additionalInfo.form.fields.birthday.label')"
@@ -88,7 +89,7 @@ const handleLocaleChange = (value: string) => {
 }
 
 interface AdditionalInfoForm {
-  birthday: Date,
+  birthday: Date | null,
   timezone: string,
   sex: string,
   nsfw: string,
@@ -96,7 +97,7 @@ interface AdditionalInfoForm {
 }
 const additionalInfoFormRef = ref<FormInstance>()
 const additionalInfoForm = reactive<AdditionalInfoForm>({
-  birthday: new Date("2000-01-01"),
+  birthday: null,
   timezone: '',
   sex: '',
   nsfw: '',
@@ -196,7 +197,33 @@ button {
   text-align: center;
 }
 
+.center_input >>> .birthday-picker .el-input__wrapper {
+  position: relative;
+}
+
+.center_input >>> .birthday-picker .el-input__prefix {
+  position: absolute;
+  left: 8px;
+  z-index: 1;
+}
+
+.center_input >>> .birthday-picker .el-input__suffix {
+  position: absolute;
+  right: 8px;
+  z-index: 1;
+}
+
+.center_input >>> .birthday-picker .el-input__inner {
+  padding-left: 30px !important;
+  padding-right: 30px !important;
+  width: 100%;
+}
+
 .el-select-dropdown__item {
   text-align: center !important;
+}
+
+.center_input >>> .el-form-item__label::before {
+  display: none !important;
 }
 </style>

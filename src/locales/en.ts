@@ -217,6 +217,27 @@ export default {
                     label: 'skip',
                 },
             },
+            validation: {
+                sex: {
+                    required: 'Gender is required',
+                    invalid: 'Invalid gender value',
+                },
+                nsfw: {
+                    required: 'NSFW policy is required',
+                    invalid: 'Invalid NSFW policy value',
+                },
+                language: {
+                    required: 'Language is required',
+                    invalid: 'Invalid language value',
+                },
+                timezone: {
+                    required: 'Timezone is required',
+                },
+                birthday: {
+                    required: 'Birth date is required',
+                    invalid: 'Invalid date',
+                },
+            },
         }
     },
     diaryInfo: {
