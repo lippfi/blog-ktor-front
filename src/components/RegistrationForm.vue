@@ -34,12 +34,12 @@
     {{ error }}
   </el-alert>
   <div style="text-align: center;">
-    <el-button type="primary" round :loading="loading" @click="submitForm(registrationFormRef)">{{ $t('registration.form.button.label')}}</el-button>
+    <el-button type="primary" round :loading="loading" :style="{ width: locale === 'RU' ? '190px' : '160px' }" @click="submitForm(registrationFormRef)">{{ $t('registration.form.button.label')}}</el-button>
   </div>
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, reactive, ref} from 'vue'
+import {computed, onMounted, reactive, ref, watch} from 'vue'
 import type {FormInstance, FormRules} from "element-plus";
 import {isEmailBusy, isLoginBusy, isNicknameBusy, signUp} from "@/api/userClient.ts";
 import router from "@/router";
@@ -48,6 +48,10 @@ import {inviteCodeRequired} from "@/constants.ts";
 
 const { locale, t } = useI18n()
 const currentLocale = ref(locale.value)
+
+watch(locale, (newLocale) => {
+  currentLocale.value = newLocale
+})
 
 onMounted(() => {
   document.title = t('registration.title');
@@ -170,7 +174,6 @@ const submitForm = (form: FormInstance | undefined) => {
 button {
   background-color: #000000;
   color: white;
-  width: 160px;
   margin: 0 0 0;
 }
 </style>
