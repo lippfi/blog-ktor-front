@@ -10,7 +10,6 @@
       v-if="signedIn && $route.name !== 'register' && (!isMobileView || isMobileMenuVisible)"
       class="right-menu"
       :style="rightMenuStyle"
-      style="background-color: blue"
       :is-mobile="isMobileView"
     />
   </div>
@@ -25,27 +24,20 @@ import { computed, ref, onMounted, watch, onUnmounted, nextTick } from 'vue'
 import { getStyles } from "@/styles/stylesManager";
 import { useReactionsStore } from "@/stores/reactionsStore";
 import HeaderComponent from "@/components/HeaderComponent.vue";
-import { getMenuTopOffset, getRightMenuStyle, getViewportMetrics } from "@/utils/menuLayout";
+import { getMenuTopOffset, getRightMenuStyle } from "@/utils/menuLayout";
 
 const router = useRouter()
 const signedIn = ref(isSignedIn())
 const isLoaded = ref(false)
 const DEFAULT_HEADER_HEIGHT = 74
 const MOBILE_BREAKPOINT = 768
-const FALLBACK_VIEWPORT_HEIGHT = typeof window !== 'undefined' ? window.innerHeight : 0
 const menuTopOffset = ref(DEFAULT_HEADER_HEIGHT)
-const viewportHeight = ref(FALLBACK_VIEWPORT_HEIGHT)
-const viewportOffsetTop = ref(0)
 const isMobileView = ref(false)
 const isMobileMenuVisible = ref(false)
 let menuOffsetAnimationFrame: number | null = null
 const reactionsStore = useReactionsStore()
 
-const rightMenuStyle = computed(() => getRightMenuStyle(
-  menuTopOffset.value,
-  viewportHeight.value,
-  viewportOffsetTop.value,
-))
+const rightMenuStyle = computed(() => getRightMenuStyle(menuTopOffset.value))
 
 const getHeaderHeight = () => {
   const header = document.querySelector('.app-header') as HTMLElement | null
@@ -58,12 +50,6 @@ const updateMenuOffset = () => {
   if (menuTopOffset.value !== nextOffset) {
     menuTopOffset.value = nextOffset
   }
-}
-
-const updateViewportMetrics = () => {
-  const nextViewportMetrics = getViewportMetrics(window)
-  viewportHeight.value = nextViewportMetrics.height
-  viewportOffsetTop.value = nextViewportMetrics.offsetTop
 }
 
 const updateViewportState = () => {
@@ -88,12 +74,6 @@ const scheduleMenuOffsetUpdate = () => {
 
 const handleResize = () => {
   updateViewportState()
-  updateViewportMetrics()
-  scheduleMenuOffsetUpdate()
-}
-
-const handleVisualViewportChange = () => {
-  updateViewportMetrics()
   scheduleMenuOffsetUpdate()
 }
 
@@ -119,12 +99,9 @@ watch(() => router.currentRoute.value.fullPath, () => {
 onMounted(async () => {
   signedIn.value = isSignedIn()
   updateViewportState()
-  updateViewportMetrics()
   updateMenuOffset()
   window.addEventListener('scroll', scheduleMenuOffsetUpdate, { passive: true })
   window.addEventListener('resize', handleResize)
-  window.visualViewport?.addEventListener('resize', handleVisualViewportChange)
-  window.visualViewport?.addEventListener('scroll', handleVisualViewportChange)
   if (!signedIn.value) {
     isLoaded.value = true;
     return
@@ -153,8 +130,6 @@ onMounted(async () => {
 onUnmounted(() => {
   window.removeEventListener('scroll', scheduleMenuOffsetUpdate)
   window.removeEventListener('resize', handleResize)
-  window.visualViewport?.removeEventListener('resize', handleVisualViewportChange)
-  window.visualViewport?.removeEventListener('scroll', handleVisualViewportChange)
 
   if (menuOffsetAnimationFrame !== null) {
     window.cancelAnimationFrame(menuOffsetAnimationFrame)
@@ -237,6 +212,8 @@ textarea {
 
 #app {
   padding: 0;
+  margin: 0;
+  max-width: none;
   font-family: 'JetBrains Mono', monospace;
   font-size: 15px;
   -webkit-font-smoothing: antialiased;
@@ -350,7 +327,10 @@ html {
 
 .right-menu {
   position: fixed;
+  top: 0;
+  bottom: 0;
   left: 0;
   z-index: 90;
+  box-sizing: border-box;
 }
 </style>
