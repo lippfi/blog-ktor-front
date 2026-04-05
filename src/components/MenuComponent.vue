@@ -84,66 +84,37 @@ watch(() => props.isMobile, (isMobile) => {
 
 <template>
   <div class="menu-shell" :class="{ 'is-collapsed': isCollapse }">
-    <el-menu
-        class="el-menu-vertical"
-        :collapse="isCollapse"
-        :collapse-transition="false"
-    >
-      <el-menu-item index="1" @click="navigateTo('/')">
-        <el-icon><HomeFilled /></el-icon>
-        <template #title>{{ t('menu.home') }}</template>
-      </el-menu-item>
+    <nav class="menu-nav">
+      <button class="menu-button" type="button" @click="navigateTo('/')">
+        <el-icon size="20"><HomeFilled /></el-icon>
+        <span class="menu-button-title">{{ t('menu.home') }}</span>
+      </button>
 
-      <el-menu-item index="2" @click="navigateTo(`/${currentUser}`)">
-        <el-icon><User /></el-icon>
-        <template #title>{{ t('menu.profile') }}</template>
-      </el-menu-item>
+      <button class="menu-button" type="button" @click="navigateTo(`/${currentUser}`)">
+        <el-icon size="20"><User /></el-icon>
+        <span class="menu-button-title">{{ t('menu.profile') }}</span>
+      </button>
 
-      <el-menu-item index="3" @click="navigateTo(`/${currentUser}/diary`)">
-        <el-icon><Memo /></el-icon>
-        <template #title>{{ t('menu.diary') }}</template>
-      </el-menu-item>
+      <button class="menu-button" type="button" @click="navigateTo(`/${currentUser}/diary`)">
+        <el-icon size="20"><Memo /></el-icon>
+        <span class="menu-button-title">{{ t('menu.diary') }}</span>
+      </button>
 
-      <!-- <el-menu-item index="4" @click="navigateTo('/messages')">
-        <el-icon><Message /></el-icon>
-        <template #title>{{ t('menu.messages') }}</template>
-      </el-menu-item> -->
+      <button class="menu-button" type="button" @click="navigateTo('/search')">
+        <el-icon size="20"><Search /></el-icon>
+        <span class="menu-button-title">{{ t('menu.search') }}</span>
+      </button>
 
-      <el-menu-item index="5" @click="navigateTo('/search')">
-        <el-icon><Search /></el-icon>
-        <template #title>{{ t('menu.search') }}</template>
-      </el-menu-item>
+      <button class="menu-button" type="button" @click="navigateTo('/settings')">
+        <el-icon size="20"><Setting /></el-icon>
+        <span class="menu-button-title">{{ t('menu.settings') }}</span>
+      </button>
 
-      <el-menu-item index="6" @click="navigateTo('/settings')">
-        <el-icon><Setting /></el-icon>
-        <template #title>{{ t('menu.settings') }}</template>
-      </el-menu-item>
-
-      <!-- <el-menu-item index="7">
-        <el-icon><Hide /></el-icon>
-        <template #title>{{ t('menu.designOff') }}</template>
-      </el-menu-item> -->
-
-      <el-menu-item index="8" @click="signOut">
-        <el-icon><SwitchButton /></el-icon>
-        <template #title>{{ t('menu.logout') }}</template>
-      </el-menu-item>
-
-      <!-- <div class="theme-toggle-item">
-        <button
-          class="theme-toggle-button"
-          type="button"
-          :title="themeToggleLabel"
-          :aria-label="themeToggleLabel"
-          @click="toggleTheme"
-        >
-          <el-icon>
-            <Sunny v-if="isDarkTheme" />
-            <Moon v-else />
-          </el-icon>
-        </button>
-      </div> -->
-    </el-menu>
+      <button class="menu-button" type="button" @click="signOut">
+        <el-icon size="20"><SwitchButton /></el-icon>
+        <span class="menu-button-title">{{ t('menu.logout') }}</span>
+      </button>
+    </nav>
 
     <button
       v-if="!props.isMobile"
@@ -152,7 +123,7 @@ watch(() => props.isMobile, (isMobile) => {
       :aria-label="t('menu.collapse')"
       @click="isCollapse = !isCollapse"
     >
-      <el-icon class="collapse-toggle-icon" :class="{ 'is-collapsed': isCollapse }"><DArrowLeft /></el-icon>
+      <el-icon size="20" class="collapse-toggle-icon" :class="{ 'is-collapsed': isCollapse }"><DArrowLeft /></el-icon>
       <span class="collapse-title">{{ t('menu.collapse') }}</span>
     </button>
   </div>
@@ -165,29 +136,64 @@ watch(() => props.isMobile, (isMobile) => {
   height: 100%;
   background-color: var(--el-menu-bg-color);
   border-right: 1px solid var(--el-menu-border-color);
+  transition: width 0.3s ease;
+  overflow: hidden;
 }
 
-.el-menu {
-  border-right: none;
-}
-
-.el-menu-vertical:not(.el-menu--collapse) {
-  width: 240px;
-}
-
-.el-menu-vertical {
+.menu-nav {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
-.el-menu-item {
+.menu-shell:not(.is-collapsed) {
+  width: 240px;
+}
+
+.menu-shell.is-collapsed {
+  width: 64px;
+}
+
+.menu-button {
+  position: relative;
   display: flex;
-  font-size: 16px;
   align-items: center;
-  gap: 10px;
+  width: 100%;
+  min-height: 56px;
   padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+  cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.menu-button :deep(.el-icon) {
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.menu-button-title {
+  display: block;
+  width: 100%;
+  font-size: 16px;
+  text-align: left;
+  padding-left: 60px;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.menu-shell.is-collapsed .menu-button-title {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .collapse-toggle-button {
@@ -224,6 +230,7 @@ watch(() => props.isMobile, (isMobile) => {
   left: 20px;
   top: 50%;
   transform: translateY(-50%);
+  font-size: 24px;
 }
 
 .collapse-title {
@@ -241,13 +248,26 @@ watch(() => props.isMobile, (isMobile) => {
   transform: translateY(-50%) rotate(180deg);
 }
 
-.menu-shell.is-collapsed .collapse-title {
-  display: none;
+.collapse-title {
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity 0.2s ease;
 }
 
-.el-menu-item:hover {
+.menu-shell.is-collapsed .collapse-title {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.menu-button:hover {
   background-color: #303030;
   color: white;
+}
+
+.menu-button:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: -1px;
 }
 
 .theme-toggle-item {
