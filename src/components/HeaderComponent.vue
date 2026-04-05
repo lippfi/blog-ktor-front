@@ -50,6 +50,7 @@ const scrollToBottom = () => {
   top: 0;
   z-index: 100;
   border-bottom: #dadada 1px solid;
+  background-color: var(--el-menu-bg-color);
 }
 
 .header-content {
