@@ -1,13 +1,14 @@
 <template>
   <div class="feed">
     <div v-if="loggedIn" class="feed-buttons">
-      <el-button type="text" @click="changeFeed('latest')">{{ t('feed.latest') }}
+      <el-button type="text" :class="{ active: currentFeed === 'latest' }" @click="changeFeed('latest')">{{ t('feed.latest') }}
       </el-button>
-      <el-button type="text" @click="changeFeed('popular')">{{ t('feed.popular') }}</el-button>
-      <el-button type="text" @click="changeFeed('following')">{{ t('feed.following') }}</el-button>
-      <el-button type="text" @click="changeFeed('friends')">{{ t('feed.friends') }}</el-button>
+      <el-button type="text" :class="{ active: currentFeed === 'popular' }" @click="changeFeed('popular')">{{ t('feed.popular') }}</el-button>
+      <el-button type="text" :class="{ active: currentFeed === 'following' }" @click="changeFeed('following')">{{ t('feed.following') }}</el-button>
+      <el-button type="text" :class="{ active: currentFeed === 'friends' }" @click="changeFeed('friends')">{{ t('feed.friends') }}</el-button>
     </div>
     <div class="posts" v-loading="loading">
+      <div v-if="!loading && posts.length === 0" class="no-results">No posts found</div>
       <PostComponent
           v-for="post in posts"
           :key="post.id"
@@ -117,7 +118,7 @@ onMounted(() => {
 }
 
 .feed-buttons {
-  margin-bottom: 20px;
+  margin-bottom: 40px;
   display: flex;
   gap: 10px;
   justify-content: center;
@@ -134,6 +135,11 @@ onMounted(() => {
 }
 
 .el-button:hover {
+  background-color: #303030;
+  color: white;
+}
+
+.el-button.active {
   background-color: #303030;
   color: white;
 }
