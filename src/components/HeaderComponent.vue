@@ -2,6 +2,7 @@
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 import type {DiaryHeaderInfo} from "@/api/dto/postServiceDto.ts";
+import { ArrowDown } from '@element-plus/icons-vue';
 
 const emit = defineEmits<{
   (e: 'toggleMenu'): void
@@ -16,6 +17,10 @@ const subtitle = computed(() => diaryHeaderInfo.value?.subtitle || '');
 const onLogoClick = () => {
   emit('toggleMenu')
 }
+
+const scrollToBottom = () => {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+}
 </script>
 
 <template>
@@ -29,7 +34,9 @@ const onLogoClick = () => {
         </div>
       </div>
       <div class="right">
-
+        <el-icon class="scroll-down-icon" @click="scrollToBottom">
+          <ArrowDown />
+        </el-icon>
       </div>
     </div>
   </header>
@@ -69,6 +76,17 @@ const onLogoClick = () => {
 .diary-title {
   display: flex;
   flex-direction: column;
+}
+
+.scroll-down-icon {
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--el-text-color-regular);
+  transition: color 0.15s ease;
+}
+
+.scroll-down-icon:hover {
+  color: var(--el-color-primary);
 }
 
 </style>
