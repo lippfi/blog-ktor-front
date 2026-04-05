@@ -38,7 +38,7 @@ const reactionsStore = useReactionsStore()
 
 const rightMenuStyle = computed(() => ({
   transform: `translate3d(0, ${menuTopOffset.value}px, 0)`,
-  height: `calc(100vh - ${menuTopOffset.value}px)`
+  height: `calc(100dvh - ${menuTopOffset.value}px)`
 }))
 
 const getHeaderHeight = () => {
