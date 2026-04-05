@@ -12,6 +12,7 @@ import PostClientImpl from "@/api/postClient/postClient.ts";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import DiarySearchView, { extractSearchParams } from "@/views/DiarySearchView.vue";
+import SearchView, { extractSearchParams as extractGeneralSearchParams } from "@/views/SearchView.vue";
 import RepostView from "@/views/RepostView.vue";
 import StylesComponent from "@/components/styles/StylesComponent.vue";
 import {diaryClient} from "@/api/diaryClient.ts";
@@ -94,6 +95,26 @@ const router = createRouter({
       path: '/settings/:categoryId?/:itemId?',
       name: 'settings',
       component: SettingsView,
+    },
+    {
+      path: '/search',
+      name: 'search',
+      component: SearchView,
+      beforeEnter: async (to, _, next) => {
+        const postClient = new PostClientImpl();
+        const params = extractGeneralSearchParams(to);
+        const result = await postClient.searchPosts(params);
+
+        if (result.type === 'ok') {
+          to.meta.posts = result.data.content;
+          to.meta.currentPage = result.data.currentPage;
+          to.meta.totalPages = result.data.totalPages;
+          next();
+        } else {
+          to.meta.error = result.message;
+          next();
+        }
+      }
     },
     {
       path: '/:login/diary',

@@ -17,6 +17,7 @@ export interface IPostClient {
     getDiaryPosts(diary: string, page: number): Promise<Result<DiaryPageDto>>;
     getPost(login: string, uri: string): Promise<Result<PostPageDto>>;
     searchDiaryPosts(params: SearchPostsParamsDto): Promise<Result<DiaryPageDto>>;
+    searchPosts(params: SearchPostsParamsDto): Promise<Result<PostSearchResult>>;
     getLatestPosts(page?: number): Promise<Result<PostSearchResult>>;
     getDiscussedPosts(page?: number, size?: number): Promise<Result<PostSearchResult>>;
     getFollowedPosts(page?: number, size?: number): Promise<Result<PostSearchResult>>;
@@ -126,6 +127,32 @@ class PostClientImpl implements IPostClient {
             if (params.sort) queryParams.set('sort', params.sort.toLowerCase() === 'asc' ? 'asc' : 'desc');
 
             const response = await optionalAuthenticatedRequest(`/posts/diary?${queryParams.toString()}`);
+            if (response.ok) {
+                const data = await response.json();
+                return { type: 'ok', data };
+            } else {
+                const message = await response.text();
+                return { type: 'error', message, status: response.status };
+            }
+        } catch (error) {
+            return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        }
+    }
+
+    public async searchPosts(params: SearchPostsParamsDto): Promise<Result<PostSearchResult>> {
+        try {
+            const queryParams = new URLSearchParams();
+            if (params.author) queryParams.set('author', params.author);
+            if (params.text) queryParams.set('text', params.text);
+            if (params.tags) queryParams.set('tags', params.tags.join(','));
+            if (params.tagPolicy) queryParams.set('tagPolicy', params.tagPolicy);
+            if (params.from) queryParams.set('from', params.from);
+            if (params.to) queryParams.set('to', params.to);
+            if (params.page !== undefined) queryParams.set('page', params.page.toString());
+            if (params.sort) queryParams.set('sort', params.sort.toLowerCase() === 'asc' ? 'asc' : 'desc');
+            queryParams.set('isHidden', 'false');
+
+            const response = await optionalAuthenticatedRequest(`/posts/search?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };
