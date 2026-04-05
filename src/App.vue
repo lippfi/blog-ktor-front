@@ -10,6 +10,7 @@
       v-if="signedIn && $route.name !== 'register' && (!isMobileView || isMobileMenuVisible)"
       class="right-menu"
       :style="rightMenuStyle"
+      style="background-color: red"
       :is-mobile="isMobileView"
     />
   </div>
@@ -37,8 +38,8 @@ let menuOffsetAnimationFrame: number | null = null
 const reactionsStore = useReactionsStore()
 
 const rightMenuStyle = computed(() => ({
-  transform: `translate3d(0, ${menuTopOffset.value}px, 0)`,
-  height: `calc(100dvh - ${menuTopOffset.value}px)`
+  top: `${menuTopOffset.value}px`,
+  bottom: '0',
 }))
 
 const getHeaderHeight = () => {
@@ -327,9 +328,7 @@ html {
 
 .right-menu {
   position: fixed;
-  top: 0;
   left: 0;
   z-index: 90;
-  will-change: transform;
 }
 </style>
