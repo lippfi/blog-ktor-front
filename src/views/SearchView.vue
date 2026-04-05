@@ -35,8 +35,10 @@ import PaginationComponent from "@/components/PaginationComponent.vue";
 import PostClientImpl from '@/api/postClient/postClient';
 import type { PostViewDto } from '@/api/dto/postServiceDto';
 import PostSearchComponent from '@/components/PostSearchComponent.vue';
+import {useI18n} from "vue-i18n";
 
 const route = useRoute();
+const t = useI18n().t;
 const postClient = new PostClientImpl();
 const posts = ref<PostViewDto[]>([]);
 const loading = ref(false);
@@ -71,6 +73,7 @@ const fetchPosts = async () => {
 
 // Check for pre-fetched data when component is mounted
 onMounted(() => {
+  document.title = t('search.title');
   const meta = route.meta as any;
   if (meta.posts) {
     posts.value = meta.posts as PostViewDto[];
@@ -95,7 +98,7 @@ watch(() => route.query, fetchPosts, { deep: true });
 
     <div v-if="loading" class="loading">Loading...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
-    <div v-else-if="posts.length === 0" class="no-results">No posts found</div>
+    <div v-else-if="posts.length === 0" class="no-results">{{ $t('search.noPostsFound') }}</div>
     <div v-else class="posts-container">
       <PostComponent v-for="post in posts"
                      :key="post.id" :login="post.diaryLogin"
@@ -128,5 +131,8 @@ watch(() => route.query, fetchPosts, { deep: true });
   display: flex;
   flex-direction: column;
   gap: 60px;
+}
+.no-results {
+  text-align: center;
 }
 </style>

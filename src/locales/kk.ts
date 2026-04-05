@@ -1,5 +1,6 @@
 export default {
     search: {
+        title: 'Іздеу',
         placeholder: 'Жазбаларды іздеу...',
         advanced: {
             label: 'Кеңейтілген іздеу',
@@ -37,7 +38,8 @@ export default {
         button: {
             search: 'Іздеу',
             clear: 'Тазарту'
-        }
+        },
+        noPostsFound: 'Жазбалар табылмады'
     },
     registration: {
         title: 'Тіркелу',
@@ -560,6 +562,7 @@ export default {
         collapse: 'Жию',
     },
     feed: {
+        title: 'Лента',
         latest: 'Соңғылары',
         popular: 'Танымал',
         following: 'Жазылымдар',

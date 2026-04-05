@@ -1,5 +1,6 @@
 export default {
     search: {
+        title: 'Поиск',
         placeholder: 'Искать записи...',
         advanced: {
             label: 'Расширенный поиск',
@@ -37,7 +38,8 @@ export default {
         button: {
             search: 'Искать',
             clear: 'Очистить'
-        }
+        },
+        noPostsFound: 'Записи не найдены'
     },
     registration: {
         title: 'Регистрация',
@@ -581,6 +583,7 @@ export default {
         collapse: 'Свернуть',
     },
     feed: {
+        title: 'Лента',
         latest: 'Новые',
         popular: 'Популярные',
         following: 'Подписки',

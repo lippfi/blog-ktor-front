@@ -36,6 +36,7 @@ export const extractSearchParams = (route: RouteLocationNormalized): SearchPosts
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import PostComponent from '@/components/post/PostComponent.vue';
 import PaginationComponent from "@/components/PaginationComponent.vue";
 import PostClientImpl from '@/api/postClient/postClient';
@@ -83,7 +84,10 @@ const fetchPosts = async () => {
 };
 
 // Check for pre-fetched data when component is mounted
+const { t } = useI18n();
+
 onMounted(() => {
+  document.title = t('search.title');
   // If we have pre-fetched data in route.meta, use it
   const meta = route.meta as any;
   if (meta.posts) {
@@ -117,7 +121,7 @@ watch(() => route.params, fetchPosts, { deep: true });
 
     <div v-if="loading" class="loading">Loading...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
-    <div v-else-if="posts.length === 0" class="no-results">No posts found</div>
+    <div v-else-if="posts.length === 0" class="no-results">{{ $t('search.noPostsFound') }}</div>
     <div v-else class="posts-container">
       <PostComponent v-for="post in posts"
                      :key="post.id" :login="login"
@@ -150,5 +154,8 @@ watch(() => route.params, fetchPosts, { deep: true });
   display: flex;
   flex-direction: column;
   gap: 60px;
+}
+.no-results {
+  text-align: center;
 }
 </style>

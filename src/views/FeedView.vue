@@ -8,7 +8,7 @@
       <el-button type="text" :class="{ active: currentFeed === 'friends' }" @click="changeFeed('friends')">{{ t('feed.friends') }}</el-button>
     </div>
     <div class="posts" v-loading="loading">
-      <div v-if="!loading && posts.length === 0" class="no-results">No posts found</div>
+      <div v-if="!loading && posts.length === 0" class="no-results">{{ $t('search.noPostsFound') }}</div>
       <PostComponent
           v-for="post in posts"
           :key="post.id"
@@ -97,6 +97,7 @@ watch(() => [route.query.feed, route.query.page], () => {
 });
 
 onMounted(() => {
+  document.title = t('feed.title');
   if (posts.value.length === 0) {
     loadPosts();
   }
@@ -142,5 +143,8 @@ onMounted(() => {
 .el-button.active {
   background-color: #303030;
   color: white;
+}
+.no-results {
+  text-align: center;
 }
 </style>

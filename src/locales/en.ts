@@ -1,5 +1,6 @@
 export default {
     search: {
+        title: 'Search',
         placeholder: 'Search posts...',
         advanced: {
             label: 'Advanced search',
@@ -37,7 +38,8 @@ export default {
         button: {
             search: 'Search',
             clear: 'Clear'
-        }
+        },
+        noPostsFound: 'No posts found'
     },
     registration: {
         title: 'Registration',
@@ -581,6 +583,7 @@ export default {
         collapse: 'Collapse',
     },
     feed: {
+        title: 'Feed',
         latest: 'Latest',
         popular: 'Popular',
         following: 'Following',
