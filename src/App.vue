@@ -167,7 +167,7 @@ onUnmounted(() => {
 }
 
 img {
-  max-width: unset;
+  max-width: 100%;
 }
 
 h1 {
@@ -257,6 +257,7 @@ textarea {
 body {
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
 .snakes > .post-content {
