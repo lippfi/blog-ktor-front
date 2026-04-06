@@ -1,22 +1,25 @@
 <template>
-  <HeaderComponent v-if="signedIn" @toggleMenu="toggleMobileMenu"/>
+  <HeaderComponent v-if="signedIn" :is-menu-open="isMobileView && isMobileMenuVisible" @toggleMenu="toggleMobileMenu"/>
   <!-- Apply all styles globally -->
   <link v-for="style in getStyles()" :key="style" rel="stylesheet" :href="style" data-diary-style="true" />
   <div class="content-wrapper">
     <div class="centralized-block">
       <router-view v-if="isLoaded" @reaction-added="reactionsStore.addReaction"/>
     </div>
-    <div
-      v-if="signedIn && $route.name !== 'register' && isMobileView && isMobileMenuVisible"
-      class="mobile-menu-backdrop"
-      @click="closeMobileMenu"
-    />
-    <MenuComponent
-      v-if="signedIn && $route.name !== 'register' && (!isMobileView || isMobileMenuVisible)"
-      class="right-menu"
-      :style="rightMenuStyle"
-      :is-mobile="isMobileView"
-    />
+    <Transition name="backdrop-fade">
+      <div
+        v-if="signedIn && $route.name !== 'register' && isMobileView && isMobileMenuVisible"
+        class="mobile-menu-backdrop"
+        @click="closeMobileMenu"
+      />
+    </Transition>
+    <Transition name="menu-slide">
+      <MenuComponent
+        v-if="signedIn && $route.name !== 'register' && (!isMobileView || isMobileMenuVisible)"
+        class="right-menu"
+        :is-mobile="isMobileView"
+      />
+    </Transition>
   </div>
 </template>
 
@@ -25,61 +28,25 @@ import {RouterView, useRouter} from 'vue-router'
 import MenuComponent from "@/components/MenuComponent.vue";
 import {isSignedIn, getCurrentSessionInfo} from "@/api/userClient.ts";
 import { i18n } from "@/i18n";
-import { computed, ref, onMounted, watch, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, watch, onUnmounted } from 'vue'
 import { getStyles } from "@/styles/stylesManager";
 import { useReactionsStore } from "@/stores/reactionsStore";
 import HeaderComponent from "@/components/HeaderComponent.vue";
-import { getMenuTopOffset, getRightMenuStyle } from "@/utils/menuLayout";
 
 const router = useRouter()
 const signedIn = ref(isSignedIn())
 const isLoaded = ref(false)
-const DEFAULT_HEADER_HEIGHT = 74
 const MOBILE_BREAKPOINT = 768
-const menuTopOffset = ref(DEFAULT_HEADER_HEIGHT)
 const isMobileView = ref(false)
 const isMobileMenuVisible = ref(false)
-let menuOffsetAnimationFrame: number | null = null
 const reactionsStore = useReactionsStore()
-
-const rightMenuStyle = computed(() => getRightMenuStyle(menuTopOffset.value))
-
-const getHeaderHeight = () => {
-  const header = document.querySelector('.app-header') as HTMLElement | null
-  return header?.offsetHeight ?? DEFAULT_HEADER_HEIGHT
-}
-
-const updateMenuOffset = () => {
-  const nextOffset = getMenuTopOffset(getHeaderHeight(), window.scrollY)
-
-  if (menuTopOffset.value !== nextOffset) {
-    menuTopOffset.value = nextOffset
-  }
-}
 
 const updateViewportState = () => {
   const mobileView = window.innerWidth <= MOBILE_BREAKPOINT
-
   if (isMobileView.value !== mobileView) {
     isMobileView.value = mobileView
     isMobileMenuVisible.value = false
   }
-}
-
-const scheduleMenuOffsetUpdate = () => {
-  if (menuOffsetAnimationFrame !== null) {
-    return
-  }
-
-  menuOffsetAnimationFrame = window.requestAnimationFrame(() => {
-    menuOffsetAnimationFrame = null
-    updateMenuOffset()
-  })
-}
-
-const handleResize = () => {
-  updateViewportState()
-  scheduleMenuOffsetUpdate()
 }
 
 const toggleMobileMenu = () => {
@@ -94,6 +61,10 @@ const closeMobileMenu = () => {
   isMobileMenuVisible.value = false
 }
 
+watch(isMobileMenuVisible, (visible) => {
+  document.body.style.overflow = visible ? 'hidden' : ''
+})
+
 // Update signedIn state when route changes
 watch(() => router.currentRoute.value.fullPath, () => {
   signedIn.value = isSignedIn()
@@ -101,16 +72,12 @@ watch(() => router.currentRoute.value.fullPath, () => {
   if (isMobileView.value) {
     isMobileMenuVisible.value = false
   }
-
-  nextTick(scheduleMenuOffsetUpdate)
 })
 
 onMounted(async () => {
   signedIn.value = isSignedIn()
   updateViewportState()
-  updateMenuOffset()
-  window.addEventListener('scroll', scheduleMenuOffsetUpdate, { passive: true })
-  window.addEventListener('resize', handleResize)
+  window.addEventListener('resize', updateViewportState)
   if (!signedIn.value) {
     isLoaded.value = true;
     return
@@ -137,13 +104,7 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', scheduleMenuOffsetUpdate)
-  window.removeEventListener('resize', handleResize)
-
-  if (menuOffsetAnimationFrame !== null) {
-    window.cancelAnimationFrame(menuOffsetAnimationFrame)
-    menuOffsetAnimationFrame = null
-  }
+  window.removeEventListener('resize', updateViewportState)
 })
 </script>
 
@@ -320,6 +281,19 @@ html {
   position: relative;
   width: 100%;
   height: 100%;
+  padding-top: 0;
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding-top: 65px;
+  }
+
+  .right-menu {
+    position: fixed;
+    top: 65px;
+    bottom: 0;
+  }
 }
 
 .centralized-block {
@@ -335,7 +309,7 @@ html {
 }
 
 .right-menu {
-  position: fixed;
+  position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
@@ -350,6 +324,26 @@ html {
   bottom: 0;
   left: 0;
   z-index: 89;
-  background: transparent;
+  background: #00000050;
+}
+
+.backdrop-fade-enter-active,
+.backdrop-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.backdrop-fade-enter-from,
+.backdrop-fade-leave-to {
+  opacity: 0;
+}
+
+.menu-slide-enter-active .menu-nav,
+.menu-slide-leave-active .menu-nav {
+  transition: transform 0.3s ease !important;
+}
+
+.menu-slide-enter-from .menu-nav,
+.menu-slide-leave-to .menu-nav {
+  transform: translateX(-100%);
 }
 </style>

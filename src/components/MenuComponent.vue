@@ -83,7 +83,7 @@ watch(() => props.isMobile, (isMobile) => {
 </script>
 
 <template>
-  <div class="menu-shell" :class="{ 'is-collapsed': isCollapse }">
+  <div class="menu-shell" :class="{ 'is-collapsed': isCollapse, 'is-mobile': props.isMobile }">
     <nav class="menu-nav">
       <button class="menu-button" type="button" @click="navigateTo('/')">
         <el-icon size="20"><HomeFilled /></el-icon>
@@ -114,18 +114,18 @@ watch(() => props.isMobile, (isMobile) => {
         <el-icon size="20"><SwitchButton /></el-icon>
         <span class="menu-button-title">{{ t('menu.logout') }}</span>
       </button>
-    </nav>
 
-    <button
-      v-if="!props.isMobile"
-      class="collapse-toggle-button"
-      type="button"
-      :aria-label="t('menu.collapse')"
-      @click="isCollapse = !isCollapse"
-    >
-      <el-icon size="20" class="collapse-toggle-icon" :class="{ 'is-collapsed': isCollapse }"><DArrowLeft /></el-icon>
-      <span class="collapse-title">{{ t('menu.collapse') }}</span>
-    </button>
+      <button
+        v-if="!props.isMobile"
+        class="collapse-toggle-button"
+        type="button"
+        :aria-label="t('menu.collapse')"
+        @click="isCollapse = !isCollapse"
+      >
+        <el-icon size="20" class="collapse-toggle-icon" :class="{ 'is-collapsed': isCollapse }"><DArrowLeft /></el-icon>
+        <span class="collapse-title">{{ t('menu.collapse') }}</span>
+      </button>
+    </nav>
   </div>
 </template>
 
@@ -146,6 +146,32 @@ watch(() => props.isMobile, (isMobile) => {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 75px;
+  bottom: 0;
+  width: 240px;
+  transition: width 0.3s ease;
+  background-color: var(--el-menu-bg-color);
+}
+
+.menu-shell.is-collapsed .menu-nav {
+  width: 64px;
+}
+
+.menu-shell.is-mobile {
+  width: 240px;
+  background-color: transparent;
+  border-right: none;
+}
+
+.menu-shell.is-mobile .menu-nav {
+  position: fixed;
+  left: 0;
+  top: 65px;
+  bottom: 0;
+  height: auto;
+  border-right: 1px solid var(--el-menu-border-color);
 }
 
 .menu-shell:not(.is-collapsed) {
@@ -197,6 +223,7 @@ watch(() => props.isMobile, (isMobile) => {
 }
 
 .collapse-toggle-button {
+  margin-top: auto;
   position: relative;
   display: flex;
   align-items: center;
