@@ -133,11 +133,11 @@ watch(() => props.isMobile, (isMobile) => {
 .menu-shell {
   display: flex;
   flex-direction: column;
-  height: 100%;
   background-color: var(--el-menu-bg-color);
   border-right: 1px solid var(--el-menu-border-color);
   transition: width 0.3s ease;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .menu-nav {
