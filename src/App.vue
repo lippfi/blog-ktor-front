@@ -6,6 +6,11 @@
     <div class="centralized-block">
       <router-view v-if="isLoaded" @reaction-added="reactionsStore.addReaction"/>
     </div>
+    <div
+      v-if="signedIn && $route.name !== 'register' && isMobileView && isMobileMenuVisible"
+      class="mobile-menu-backdrop"
+      @click="closeMobileMenu"
+    />
     <MenuComponent
       v-if="signedIn && $route.name !== 'register' && (!isMobileView || isMobileMenuVisible)"
       class="right-menu"
@@ -83,6 +88,10 @@ const toggleMobileMenu = () => {
   }
 
   isMobileMenuVisible.value = !isMobileMenuVisible.value
+}
+
+const closeMobileMenu = () => {
+  isMobileMenuVisible.value = false
 }
 
 // Update signedIn state when route changes
@@ -332,5 +341,15 @@ html {
   left: 0;
   z-index: 90;
   box-sizing: border-box;
+}
+
+.mobile-menu-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 89;
+  background: transparent;
 }
 </style>
