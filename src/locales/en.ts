@@ -601,6 +601,8 @@ export default {
         addToCollection: 'Add to my collection',
         adding: 'Adding...',
         added: 'Added successfully',
+        cropTitle: 'Crop image',
+        cropConfirm: 'Crop',
     },
     errors: {
         failedToLoadAvatars: 'Failed to load avatars',

@@ -580,6 +580,8 @@ export default {
         addToCollection: 'Жинағыма қосу',
         adding: 'Қосылуда...',
         added: 'Сәтті қосылды',
+        cropTitle: 'Суретті қию',
+        cropConfirm: 'Қию',
     },
     errors: {
         failedToLoadAvatars: 'Аватарларды жүктеу сәтсіз аяқталды',

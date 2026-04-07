@@ -601,6 +601,8 @@ export default {
         addToCollection: 'Добавить в мою коллекцию',
         adding: 'Добавление...',
         added: 'Успешно добавлено',
+        cropTitle: 'Обрезать изображение',
+        cropConfirm: 'Обрезать',
     },
     errors: {
         failedToLoadAvatars: 'Не удалось загрузить аватары',
