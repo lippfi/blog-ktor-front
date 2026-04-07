@@ -19,6 +19,7 @@ import {diaryClient} from "@/api/diaryClient.ts";
 import {updateStyles} from "@/styles/stylesManager";
 import NotFoundView from "@/views/NotFoundView.vue";
 import FeedView from "@/views/FeedView.vue";
+import DiscussionsView from "@/views/DiscussionsView.vue";
 import SettingsView from "@/views/SettingsView.vue";
 import CreateWelcomePostTestView from "@/views/CreateWelcomePostTestView.vue";
 
@@ -51,6 +52,27 @@ const router = createRouter({
           to.meta.currentPage = postSearchResult.currentPage;
           to.meta.totalPages = postSearchResult.totalPages;
           to.meta.currentFeed = feedType;
+          next();
+        } else {
+          to.meta.error = result?.message || 'Failed to load posts';
+          next();
+        }
+      }
+    },
+    {
+      path: '/discussions',
+      name: 'discussions',
+      component: DiscussionsView,
+      beforeEnter: async (to, _, next) => {
+        const postClient = new PostClientImpl();
+        const page = parseInt(to.query.page as string) || 1;
+        const result = await postClient.getFollowedPosts(page);
+
+        if (result && result.type === 'ok') {
+          const postSearchResult = result.data;
+          to.meta.posts = postSearchResult.content;
+          to.meta.currentPage = postSearchResult.currentPage;
+          to.meta.totalPages = postSearchResult.totalPages;
           next();
         } else {
           to.meta.error = result?.message || 'Failed to load posts';

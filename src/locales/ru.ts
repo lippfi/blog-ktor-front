@@ -571,6 +571,7 @@ export default {
     },
     menu: {
         home: 'Главная',
+        discussions: 'Обсуждения',
         profile: 'Профиль',
         diary: 'Дневник',
         messages: 'Сообщения',

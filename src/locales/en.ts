@@ -571,6 +571,7 @@ export default {
     },
     menu: {
         home: 'Home',
+        discussions: 'Discussions',
         profile: 'Profile',
         diary: 'Diary',
         messages: 'Messages',

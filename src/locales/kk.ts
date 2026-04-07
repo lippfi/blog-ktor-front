@@ -550,6 +550,7 @@ export default {
     },
     menu: {
         home: 'Басты бет',
+        discussions: 'Талқылаулар',
         profile: 'Профиль',
         diary: 'Күнделік',
         messages: 'Хабарламалар',

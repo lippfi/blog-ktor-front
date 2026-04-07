@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  ChatLineRound,
   DArrowLeft,
   Hide,
   HomeFilled,
@@ -119,6 +120,11 @@ watch(() => props.isMobile, (isMobile) => {
       <button class="menu-button" type="button" @click="navigateTo('/')">
         <el-icon size="20"><HomeFilled /></el-icon>
         <span class="menu-button-title">{{ t('menu.home') }}</span>
+      </button>
+
+      <button class="menu-button" type="button" @click="navigateTo('/discussions')">
+        <el-icon size="20"><ChatLineRound /></el-icon>
+        <span class="menu-button-title">{{ t('menu.discussions') }}</span>
       </button>
 
       <button class="menu-button" type="button" @click="navigateTo(`/${currentUser}`)">
