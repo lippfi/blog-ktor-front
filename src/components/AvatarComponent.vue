@@ -382,7 +382,7 @@ const handleFileUpload = async (event: Event) => {
       <el-dialog
         v-model="showCropDialog"
         :title="t('avatars.cropTitle')"
-        width="500px"
+        width="min(500px, 90vw)"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         :show-close="false"
