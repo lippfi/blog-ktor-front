@@ -161,8 +161,7 @@ watch(() => props.isMobile, (isMobile) => {
 
 .menu-shell.is-mobile {
   width: 240px;
-  background-color: transparent;
-  border-right: none;
+  background-color: var(--el-menu-bg-color);
 }
 
 .menu-shell.is-mobile .menu-nav {
