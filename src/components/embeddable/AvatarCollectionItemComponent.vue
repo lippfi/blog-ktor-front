@@ -86,7 +86,7 @@ async function addAvatarToCollection() {
 
 <style scoped>
 .avatar-container {
-  display: inline-block;
+  display: block;
   position: relative;
   border-radius: 3px;
   overflow: hidden;
@@ -94,8 +94,8 @@ async function addAvatarToCollection() {
 
 .avatar-img {
   display: block;
-  width: 100px;
-  height: 100px;
+  width: 100%;
+  aspect-ratio: 1;
 }
 
 .add-avatar-btn {
