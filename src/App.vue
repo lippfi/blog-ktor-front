@@ -337,13 +337,13 @@ html {
   opacity: 0;
 }
 
-.menu-slide-enter-active .menu-nav,
-.menu-slide-leave-active .menu-nav {
+.menu-slide-enter-active,
+.menu-slide-leave-active {
   transition: transform 0.3s ease !important;
 }
 
-.menu-slide-enter-from .menu-nav,
-.menu-slide-leave-to .menu-nav {
+.menu-slide-enter-from,
+.menu-slide-leave-to {
   transform: translateX(-100%);
 }
 </style>
