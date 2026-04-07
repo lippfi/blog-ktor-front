@@ -25,7 +25,9 @@ const props = withDefaults(defineProps<{
 
 const isCollapse = ref(false)
 const HEADER_HEIGHT = 75
+const MOBILE_HEADER_HEIGHT = 65
 const menuTopOffset = ref(HEADER_HEIGHT)
+const mobileNavMarginTop = ref(MOBILE_HEADER_HEIGHT)
 
 const { t } = useI18n()
 const router = useRouter()
@@ -72,9 +74,16 @@ const updateMenuTop = () => {
   menuTopOffset.value = Math.max(0, HEADER_HEIGHT - window.scrollY)
 }
 
+const updateMobileNavMargin = () => {
+  mobileNavMarginTop.value = MOBILE_HEADER_HEIGHT + window.scrollY
+}
+
 onMounted(() => {
   runThemeMigration()
-  if (!props.isMobile) {
+  if (props.isMobile) {
+    updateMobileNavMargin()
+    window.addEventListener('scroll', updateMobileNavMargin, { passive: true })
+  } else {
     updateMenuTop()
     window.addEventListener('scroll', updateMenuTop, { passive: true })
   }
@@ -87,13 +96,17 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('scroll', updateMenuTop)
+  window.removeEventListener('scroll', updateMobileNavMargin)
 })
 
 watch(() => props.isMobile, (isMobile) => {
   if (isMobile) {
     isCollapse.value = false
     window.removeEventListener('scroll', updateMenuTop)
+    updateMobileNavMargin()
+    window.addEventListener('scroll', updateMobileNavMargin, { passive: true })
   } else {
+    window.removeEventListener('scroll', updateMobileNavMargin)
     updateMenuTop()
     window.addEventListener('scroll', updateMenuTop, { passive: true })
   }
@@ -102,7 +115,7 @@ watch(() => props.isMobile, (isMobile) => {
 
 <template>
   <div class="menu-shell" :class="{ 'is-collapsed': isCollapse, 'is-mobile': props.isMobile }">
-    <nav class="menu-nav" :style="!props.isMobile ? { top: menuTopOffset + 'px' } : undefined">
+    <nav class="menu-nav" :style="!props.isMobile ? { top: menuTopOffset + 'px' } : { marginTop: mobileNavMarginTop + 'px' }">
       <button class="menu-button" type="button" @click="navigateTo('/')">
         <el-icon size="20"><HomeFilled /></el-icon>
         <span class="menu-button-title">{{ t('menu.home') }}</span>
@@ -181,7 +194,6 @@ watch(() => props.isMobile, (isMobile) => {
 }
 
 .menu-shell.is-mobile .menu-nav {
-  margin-top: 65px;
   position: static;
   width: 100%;
   height: 100%;
