@@ -42,6 +42,10 @@ const AVATAR_BLOCK = `[avatars]
 [avatar img="https://lipp.fi/blog-file/u/74bbb266-3e92-4a6e-97ca-571a384c4cbb/avatar/d59edb8d-1d2a-4499-a8d6-6faec9a6c149.png"]
 [avatar img="https://lipp.fi/blog-file/u/74bbb266-3e92-4a6e-97ca-571a384c4cbb/avatar/8387fec8-6d54-4e44-a993-4090f3a73d8e.png"]
 [avatar img="https://lipp.fi/blog-file/u/74bbb266-3e92-4a6e-97ca-571a384c4cbb/avatar/2e0ca494-4c67-4fea-9e6a-fe278f47247b.png"]
+[avatar img="https://lipp.fi/blog-file/u/12791740-8302-4310-85f8-2fcde1db6b06/avatar/901f2ed9-3329-4bde-b252-34f275a601a4.png"]
+[avatar img="https://lipp.fi/blog-file/u/12791740-8302-4310-85f8-2fcde1db6b06/avatar/f97f318c-44db-49f2-96a4-f0dfbe476003.jpg"]
+[avatar img="https://lipp.fi/blog-file/u/12791740-8302-4310-85f8-2fcde1db6b06/avatar/75703686-2260-4035-a055-35be54ad7264.jpg"]
+[avatar img="https://lipp.fi/blog-file/u/12791740-8302-4310-85f8-2fcde1db6b06/avatar/52ae0c76-1a4b-40d9-bba7-569f4b4ce5ab.png"]
 [/avatars]`;
 
 const WELCOME_POST_CONTENT_BY_LANGUAGE: Record<Language, WelcomePostContent> = {
@@ -61,7 +65,7 @@ Good luck!`
         title: "Приветственный пост",
         text: `Привет! Только ты видишь этот пост, и можешь удалить его в любой момент.
 
-Сайт долгое время был для однопользовательским и сейчас работает в тестовом режиме. Сообщества, личные сообщения, уведомления и всё остальное будут добавлены, но не сразу. Пока главная цель — развернуть всё, найти баги и убедиться, что всё работает как ожидается.
+Сайт долгое время был однопользовательским и сейчас работает в тестовом режиме. Сообщества, личные сообщения, уведомления и всё остальное будут добавлены, но не сразу. Пока главная цель — развернуть всё, найти баги и убедиться, что всё работает как ожидается.
 
 А пока вот список случайных аватаров (спасибо пользователю damanick за них):
 ${AVATAR_BLOCK}
