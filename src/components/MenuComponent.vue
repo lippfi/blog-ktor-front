@@ -181,11 +181,10 @@ watch(() => props.isMobile, (isMobile) => {
 }
 
 .menu-shell.is-mobile .menu-nav {
-  position: fixed;
-  left: 0;
-  top: 65px;
-  bottom: 0;
-  height: auto;
+  margin-top: 65px;
+  position: static;
+  width: 100%;
+  height: 100%;
 }
 
 .menu-shell:not(.is-collapsed) {
