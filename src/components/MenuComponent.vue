@@ -15,7 +15,7 @@ import {
 import {useI18n} from "vue-i18n";
 import {useRouter} from 'vue-router';
 import {getCurrentUserLogin, logOut} from "@/api/userClient.ts";
-import {computed, onMounted, ref, watch} from 'vue';
+import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
 
 const props = withDefaults(defineProps<{
   isMobile?: boolean
@@ -24,6 +24,8 @@ const props = withDefaults(defineProps<{
 })
 
 const isCollapse = ref(false)
+const HEADER_HEIGHT = 75
+const menuTopOffset = ref(HEADER_HEIGHT)
 
 const { t } = useI18n()
 const router = useRouter()
@@ -66,8 +68,16 @@ function toggleTheme() {
   applyTheme(!isDarkTheme.value)
 }
 
+const updateMenuTop = () => {
+  menuTopOffset.value = Math.max(0, HEADER_HEIGHT - window.scrollY)
+}
+
 onMounted(() => {
   runThemeMigration()
+  if (!props.isMobile) {
+    updateMenuTop()
+    window.addEventListener('scroll', updateMenuTop, { passive: true })
+  }
 
   const savedTheme = localStorage.getItem(THEME_STORAGE_KEY)
   const shouldUseDarkTheme = savedTheme === DARK_THEME_VALUE
@@ -75,16 +85,24 @@ onMounted(() => {
   applyTheme(shouldUseDarkTheme)
 })
 
+onUnmounted(() => {
+  window.removeEventListener('scroll', updateMenuTop)
+})
+
 watch(() => props.isMobile, (isMobile) => {
   if (isMobile) {
     isCollapse.value = false
+    window.removeEventListener('scroll', updateMenuTop)
+  } else {
+    updateMenuTop()
+    window.addEventListener('scroll', updateMenuTop, { passive: true })
   }
 })
 </script>
 
 <template>
   <div class="menu-shell" :class="{ 'is-collapsed': isCollapse, 'is-mobile': props.isMobile }">
-    <nav class="menu-nav">
+    <nav class="menu-nav" :style="!props.isMobile ? { top: menuTopOffset + 'px' } : undefined">
       <button class="menu-button" type="button" @click="navigateTo('/')">
         <el-icon size="20"><HomeFilled /></el-icon>
         <span class="menu-button-title">{{ t('menu.home') }}</span>
@@ -134,7 +152,6 @@ watch(() => props.isMobile, (isMobile) => {
   display: flex;
   flex-direction: column;
   background-color: var(--el-menu-bg-color);
-  border-right: 1px solid var(--el-menu-border-color);
   transition: width 0.3s ease;
   overflow-y: auto;
   overflow-x: hidden;
@@ -148,7 +165,6 @@ watch(() => props.isMobile, (isMobile) => {
   flex-direction: column;
   position: fixed;
   left: 0;
-  top: 75px;
   bottom: 0;
   width: 240px;
   transition: width 0.3s ease;
@@ -170,7 +186,6 @@ watch(() => props.isMobile, (isMobile) => {
   top: 65px;
   bottom: 0;
   height: auto;
-  border-right: 1px solid var(--el-menu-border-color);
 }
 
 .menu-shell:not(.is-collapsed) {
