@@ -1444,4 +1444,11 @@ const handleMentionSelect = (option: MentionOption) => {
   font-size: 14px;
   font-weight: normal;
 }
+
+/* Prevent mobile browsers from zooming in on textarea focus */
+@media screen and (max-width: 768px) {
+  .textarea :deep(.el-textarea__inner) {
+    font-size: 16px !important;
+  }
+}
 </style>
