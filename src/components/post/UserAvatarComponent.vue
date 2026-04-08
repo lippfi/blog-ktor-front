@@ -231,6 +231,7 @@ const handleMenuClick = async (command: string) => {
 }
 
 .avatar-image {
+  max-width: unset;
   width: v-bind(avatarSize);
   height: v-bind(avatarSize);
   cursor: pointer;
