@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue';
-import { getAvatars, reorderAvatars, addAvatars } from '@/api/userClient';
+import { ref, onMounted } from 'vue';
+import { getAvatars, reorderAvatars } from '@/api/userClient';
 import { useReactionsStore } from '@/stores/reactionsStore';
 import { ElMessage } from 'element-plus';
 import { useI18n } from 'vue-i18n';
-import { Close, Plus } from '@element-plus/icons-vue';
-import Cropper from 'cropperjs';
-import 'cropperjs/dist/cropper.css';
+import { Close } from '@element-plus/icons-vue';
+import AddAvatarButton from '@/components/AddAvatarButton.vue';
 
 
 const { t } = useI18n();
@@ -127,204 +126,19 @@ const removeAvatar = (avatarId: string) => {
   hasChanges.value = true;
 };
 
-// File input reference for uploading avatars
-const fileInput = ref<HTMLInputElement | null>(null);
+// Handle avatars added from the AddAvatarButton component
+const handleAvatarsAdded = (data: Record<string, string>) => {
+  const newAvatars = { ...avatars.value };
+  const newAvatarIds: string[] = [];
 
-// Crop dialog state
-const showCropDialog = ref(false);
-const cropImageSrc = ref('');
-const cropImageRef = ref<HTMLImageElement | null>(null);
-let cropperInstance: Cropper | null = null;
-
-// Trigger file selection dialog
-const triggerFileUpload = () => {
-  if (fileInput.value) {
-    fileInput.value.click();
-  }
-};
-
-// Load image dimensions
-const getImageDimensions = (file: File): Promise<{ width: number; height: number }> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      resolve({ width: img.width, height: img.height });
-      URL.revokeObjectURL(img.src);
-    };
-    img.onerror = reject;
-    img.src = URL.createObjectURL(file);
-  });
-};
-
-// Resize image to max 200px square
-const resizeImage = (file: File, maxSize: number): Promise<File> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      if (img.width <= maxSize && img.height <= maxSize) {
-        URL.revokeObjectURL(img.src);
-        resolve(file);
-        return;
-      }
-      const canvas = document.createElement('canvas');
-      canvas.width = maxSize;
-      canvas.height = maxSize;
-      const ctx = canvas.getContext('2d')!;
-      ctx.drawImage(img, 0, 0, maxSize, maxSize);
-      canvas.toBlob((blob) => {
-        URL.revokeObjectURL(img.src);
-        if (blob) {
-          resolve(new File([blob], file.name, { type: file.type || 'image/png' }));
-        } else {
-          reject(new Error('Failed to resize image'));
-        }
-      }, file.type || 'image/png');
-    };
-    img.onerror = reject;
-    img.src = URL.createObjectURL(file);
-  });
-};
-
-// Process a single file: check if square, if not show crop dialog
-const processFile = async (file: File): Promise<File | null> => {
-  const dims = await getImageDimensions(file);
-  if (dims.width === dims.height) {
-    // Already square, just resize if needed
-    return resizeImage(file, 200);
-  }
-  // Not square — need cropping
-  return new Promise((resolve) => {
-    cropImageSrc.value = URL.createObjectURL(file);
-    showCropDialog.value = true;
-
-    const initCropper = async () => {
-      await nextTick();
-      // Wait for image to load
-      const imgEl = cropImageRef.value;
-      if (!imgEl) return;
-
-      imgEl.onload = () => {
-        cropperInstance = new Cropper(imgEl, {
-          aspectRatio: 1,
-          viewMode: 1,
-          autoCropArea: 1,
-          movable: false,
-          zoomable: false,
-          rotatable: false,
-          scalable: false,
-        });
-      };
-
-      // Store resolve for later use
-      (window as any).__cropResolve = resolve;
-      (window as any).__cropFile = file;
-    };
-    initCropper();
-  });
-};
-
-// Confirm crop
-const confirmCrop = async () => {
-  if (!cropperInstance) return;
-  const resolve = (window as any).__cropResolve as (value: File | null) => void;
-  const file = (window as any).__cropFile as File;
-
-  const canvas = cropperInstance.getCroppedCanvas({
-    width: 200,
-    height: 200,
+  Object.entries(data).forEach(([avatarId, avatarUri]) => {
+    newAvatars[avatarId] = avatarUri;
+    newAvatarIds.push(avatarId);
   });
 
-  canvas.toBlob((blob) => {
-    destroyCropper();
-    showCropDialog.value = false;
-    if (blob) {
-      resolve(new File([blob], file.name, { type: file.type || 'image/png' }));
-    } else {
-      resolve(null);
-    }
-  }, file.type || 'image/png');
-};
-
-// Cancel crop
-const cancelCrop = () => {
-  const resolve = (window as any).__cropResolve as (value: File | null) => void;
-  destroyCropper();
-  showCropDialog.value = false;
-  resolve(null);
-};
-
-// Destroy cropper instance
-const destroyCropper = () => {
-  if (cropperInstance) {
-    cropperInstance.destroy();
-    cropperInstance = null;
-  }
-  if (cropImageSrc.value) {
-    URL.revokeObjectURL(cropImageSrc.value);
-    cropImageSrc.value = '';
-  }
-  delete (window as any).__cropResolve;
-  delete (window as any).__cropFile;
-};
-
-onBeforeUnmount(() => {
-  destroyCropper();
-});
-
-// Handle file selection and upload
-const handleFileUpload = async (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  if (!target.files || target.files.length === 0) return;
-
-  try {
-    const files = Array.from(target.files);
-    const processed: File[] = [];
-
-    for (const file of files) {
-      const result = await processFile(file);
-      if (result) {
-        processed.push(result);
-      }
-    }
-
-    if (processed.length === 0) return;
-
-    const result = await addAvatars(processed);
-
-    if (result.type === 'error') {
-      ElMessage.error(result.message || t('errors.failedToUploadAvatars'));
-    } else if (result.data) {
-      // Create new avatar entries for each uploaded avatar
-      const newAvatars = { ...avatars.value };
-      const newAvatarIds: string[] = [];
-
-      // Iterate over the avatar ID to URI mapping
-      Object.entries(result.data).forEach(([avatarId, avatarUri]) => {
-        newAvatars[avatarId] = avatarUri;
-        newAvatarIds.push(avatarId);
-      });
-
-      // Update avatars object
-      avatars.value = newAvatars;
-
-      // Append new avatar IDs to the order array
-      avatarOrder.value = [...avatarOrder.value, ...newAvatarIds];
-
-      // Update original avatars to include the new ones
-      originalAvatars.value = { ...newAvatars };
-
-      await reactionsStore.loadAvatars();
-      ElMessage.success(t('avatars.uploadSuccess'));
-    }
-  } catch (error) {
-    console.error('Failed to upload avatars:', error);
-    ElMessage.error(t('errors.failedToUploadAvatars'));
-  } finally {
-    // Reset file input
-    if (fileInput.value) {
-      fileInput.value.value = '';
-    }
-  }
+  avatars.value = newAvatars;
+  avatarOrder.value = [...avatarOrder.value, ...newAvatarIds];
+  originalAvatars.value = { ...newAvatars };
 };
 </script>
 
@@ -355,49 +169,13 @@ const handleFileUpload = async (event: Event) => {
           </div>
 
           <!-- Add avatar block -->
-          <div
+          <AddAvatarButton
             key="add-avatar"
-            class="avatar-item add-avatar-item"
-            @click="triggerFileUpload"
-          >
-            <el-icon class="add-avatar-icon">
-              <Plus />
-            </el-icon>
-            <div class="add-avatar-text">{{ t('avatars.addAvatar') }}</div>
-          </div>
+            class="avatar-item"
+            @avatars-added="handleAvatarsAdded"
+          />
         </transition-group>
-
-        <!-- Hidden file input for uploading avatars -->
-        <input
-          ref="fileInput"
-          type="file"
-          accept="image/*"
-          multiple
-          class="hidden-file-input"
-          @change="handleFileUpload"
-        />
       </div>
-
-      <!-- Crop dialog -->
-      <el-dialog
-        v-model="showCropDialog"
-        :title="t('avatars.cropTitle')"
-        width="min(500px, 90vw)"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :show-close="false"
-        destroy-on-close
-      >
-        <div class="crop-container">
-          <img ref="cropImageRef" :src="cropImageSrc" alt="Crop" class="crop-image" />
-        </div>
-        <template #footer>
-          <div class="crop-dialog-footer">
-            <el-button @click="cancelCrop">{{ t('avatars.cancel') }}</el-button>
-            <el-button type="primary" @click="confirmCrop">{{ t('avatars.cropConfirm') }}</el-button>
-          </div>
-        </template>
-      </el-dialog>
 
       <div v-if="hasChanges" class="action-buttons">
         <el-button type="primary" @click="saveChanges" :loading="saveLoading">{{ t('avatars.save') }}</el-button>
@@ -537,71 +315,4 @@ const handleFileUpload = async (event: Event) => {
   transform: scale(0.5);
 }
 
-/* Add avatar styles */
-.add-avatar-item {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #f5f7fa;
-  border: 2px dashed #dcdfe6;
-  cursor: pointer;
-}
-
-.add-avatar-item:hover:not(.disabled) {
-  background-color: #e6e8eb;
-  border-color: #c0c4cc;
-}
-
-.add-avatar-item.disabled {
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.add-avatar-icon {
-  font-size: 24px;
-  color: #909399;
-  margin-bottom: 8px;
-}
-
-.add-avatar-icon.loading-icon {
-  animation: rotating 2s linear infinite;
-}
-
-.add-avatar-text {
-  text-align: center;
-  font-size: 14px;
-  color: #909399;
-}
-
-@keyframes rotating {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Hidden file input */
-.hidden-file-input {
-  display: none;
-}
-
-/* Crop dialog */
-.crop-container {
-  max-height: 400px;
-  overflow: hidden;
-}
-
-.crop-image {
-  display: block;
-  max-width: 100%;
-}
-
-.crop-dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
 </style>

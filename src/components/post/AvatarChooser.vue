@@ -11,13 +11,18 @@
         <input type="radio" name="avatar" :id="String(index)" :value="avatar" v-model="selectedAvatarModel">
         <label class="avatar-box" :for="String(index)"><img class="avatar" :src="avatar" alt="avatar"></label>
       </template>
-      <input type="radio" name="avatar" :id="String(reactionsStore.avatars.length)" :value="customAvatar" v-model="selectedAvatarModel">
-      <label :for="String(reactionsStore.avatars.length)" class="one-time-avatar">
-        <div class="avatar">
-          <p style="margin: 5px; text-align: center;">{{ t('avatarChooser.oneTimeAvatar') }}</p>
-          <el-input v-model="customAvatar" style="padding: 0 10px;"/>
-        </div>
-      </label>
+      <template v-if="showCustomAvatar">
+        <input type="radio" name="avatar" :id="String(reactionsStore.avatars.length)" :value="customAvatar" v-model="selectedAvatarModel">
+        <label :for="String(reactionsStore.avatars.length)" class="one-time-avatar">
+          <div class="avatar">
+            <p style="margin: 5px; text-align: center;">{{ t('avatarChooser.oneTimeAvatar') }}</p>
+            <el-input v-model="customAvatar" style="padding: 0 10px;"/>
+          </div>
+        </label>
+      </template>
+      <div class="add-avatar-block">
+        <AddAvatarButton />
+      </div>
     </div>
     <div v-if="showButtons" class="right-button" @click="scroll_right" :style="isVertical ? 'border-radius: 0 0 3px 3px;' : 'border-radius: 0 3px 3px 0;'">
       <el-icon size="20" color="white">
@@ -33,6 +38,8 @@ import { ref, computed, watch, onMounted } from 'vue'
 import {ArrowDownBold, ArrowLeftBold, ArrowRightBold, ArrowUpBold} from "@element-plus/icons-vue";
 import {useI18n} from "vue-i18n";
 import { useReactionsStore } from "@/stores/reactionsStore";
+import { showCustomAvatar } from "@/constants";
+import AddAvatarButton from "@/components/AddAvatarButton.vue";
 
 const { t } = useI18n()
 const reactionsStore = useReactionsStore()
@@ -148,6 +155,7 @@ onMounted(() => {
   width: v-bind(width);
   overflow-y: v-bind(overflow_y);
   overflow-x: v-bind(overflow_x);
+  padding-bottom: 5px;
 }
 
 .avatar {
@@ -186,6 +194,17 @@ input[type="radio"]:checked+label .avatar {
 .one-time-avatar {
   background: white;
   cursor: pointer;
+}
+
+.add-avatar-block {
+  flex-shrink: 0;
+  width: v-bind(avatarSizePx);
+  height: v-bind(avatarSizePx);
+}
+
+.add-avatar-block :deep(.add-avatar-item) {
+  width: 100%;
+  height: 100%;
 }
 
 label {
