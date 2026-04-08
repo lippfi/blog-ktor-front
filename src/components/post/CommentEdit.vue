@@ -141,6 +141,15 @@ onUnmounted(() => {
   document.removeEventListener('mousedown', documentClickHandler);
   mediaQuery.removeEventListener('change', updateScreenSize);
 
+  // Save draft on unmount so text is preserved when switching between root and reply mode
+  if (!props.isEdit && localContent.value.trim()) {
+    // Always save to root key so text transfers between root and reply modes
+    saveDraft(rootDraftKey, {
+      content: localContent.value,
+      avatar: localAvatar.value,
+    });
+  }
+
   // The mouseup event listener will be removed by the watch effect
 });
 
@@ -168,12 +177,24 @@ const emit = defineEmits<{
 const localContent = ref<string>(props.content || '');
 const localAvatar = ref<string | undefined>(props.avatar);
 
+const rootDraftKey = buildDraftKey('comment', `${props.postId}:root`);
+
 function restoreCommentDraft() {
   if (props.isEdit) {
     return;
   }
 
-  const draft = readDraft<CommentDraft>(commentDraftKey);
+  let draft = readDraft<CommentDraft>(commentDraftKey);
+
+  // If no draft for the current key, check the root draft as fallback
+  // This handles text transfer between root and reply modes in both directions
+  if (!draft && commentDraftKey !== rootDraftKey) {
+    draft = readDraft<CommentDraft>(rootDraftKey);
+    if (draft) {
+      clearDraft(rootDraftKey);
+    }
+  }
+
   if (!draft) {
     return;
   }
@@ -207,6 +228,14 @@ function cancelEdit() {
 }
 
 function cancelReply() {
+  // Save draft before emitting cancel so the root CommentEdit can restore it on mount
+  // (Vue mounts the root component before unmounting the reply component)
+  if (localContent.value.trim()) {
+    saveDraft(rootDraftKey, {
+      content: localContent.value,
+      avatar: localAvatar.value,
+    });
+  }
   emit('cancel-reply');
 }
 
