@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { i18n } from '@/i18n'
+import { i18n, cacheLocale } from '@/i18n'
 import { getLanguage, updateLanguage, updateCurrentSessionInfo } from '@/api/userClient'
 import type { Language } from '@/api/userClient'
 import { ElMessage } from 'element-plus'
@@ -51,6 +51,7 @@ async function save() {
     const result = await updateLanguage(language.value as Language)
     if (result.type === 'ok') {
       originalLanguage.value = language.value
+      cacheLocale(language.value)
       ElMessage.success(t('languageSettings.saveSuccess'))
       await updateCurrentSessionInfo()
     } else {
