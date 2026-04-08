@@ -11,6 +11,7 @@ import {getCurrentUserLogin} from "@/api/userClient.ts";
 import {useI18n} from "vue-i18n";
 import PostClientMock from "@/api/postClient/postClientMock.ts";
 import PostClientImpl from "@/api/postClient/postClient.ts";
+import {showPostHiding} from "@/constants";
 
 const { t } = useI18n()
 
@@ -148,10 +149,10 @@ const props = defineProps<{
           </template>
         </el-popconfirm>
       </div>
-      <el-icon v-if="showHiddenButtons && !comment && post.authorLogin === getCurrentUserLogin() && !post.isHidden" size="20" class="hide" @click="handleHide">
+      <el-icon v-if="showPostHiding && showHiddenButtons && !comment && post.authorLogin === getCurrentUserLogin() && !post.isHidden" size="20" class="hide" @click="handleHide">
         <Hide />
       </el-icon>
-      <el-icon v-if="showHiddenButtons && !comment && post.authorLogin === getCurrentUserLogin() && post.isHidden" size="20" class="view" @click="handleShow">
+      <el-icon v-if="showPostHiding && showHiddenButtons && !comment && post.authorLogin === getCurrentUserLogin() && post.isHidden" size="20" class="view" @click="handleShow">
         <View />
       </el-icon>
       <el-icon v-if="showHiddenButtons && (post.authorLogin !== getCurrentUserLogin() || (comment && comment.authorLogin !== getCurrentUserLogin())) && getCurrentUserLogin()" size="20" class="warning">
