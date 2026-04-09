@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { Notification } from '@/api/notificationClient';
+import type { FriendRequestNotification } from '@/api/notificationClient';
 import { useI18n } from 'vue-i18n';
 
 defineProps<{
-  notification: Notification;
+  notification: FriendRequestNotification;
 }>();
 
 const { t } = useI18n();
@@ -12,11 +12,10 @@ const { t } = useI18n();
 <template>
   <div class="notification-body">
     <span class="notification-type">{{ t('notificationTypes.FRIEND_REQUEST') }}</span>
-    <span v-if="notification.senderLogin" class="notification-detail">
-      {{ t('notificationItem.from', { user: notification.senderLogin }) }}
+    <span class="notification-detail">
+      {{ t('notificationItem.from', { user: notification.senderNickname }) }}
     </span>
     <router-link
-        v-if="notification.senderLogin"
         :to="`/${notification.senderLogin}`"
         class="notification-link"
     >

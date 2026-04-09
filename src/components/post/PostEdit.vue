@@ -87,6 +87,8 @@ const props = withDefaults(defineProps<{
   reactionGroup?: string;
   commentGroup?: string;
   readGroup?: string;
+  repostId?: string;
+  repostType?: 'post' | 'comment';
 }>(), {
   tags: () => [],
   content: '',
@@ -266,7 +268,14 @@ async function createPost() {
   }
 
   try {
-    const res = await client.addPost(newPost)
+    let res: Result<PostViewDto>;
+    if (props.type === 'repost' && props.repostId && props.repostType === 'comment') {
+      res = await client.repostComment(newPost, props.repostId);
+    } else if (props.type === 'repost' && props.repostId) {
+      res = await client.repost(newPost, props.repostId);
+    } else {
+      res = await client.addPost(newPost);
+    }
     if (res.type == 'ok') {
       clearPostDraft();
       await router.push({name: 'post', params: {'login': props.diaryLogin, 'postUri': res.data.uri}})

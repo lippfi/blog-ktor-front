@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { Notification } from '@/api/notificationClient';
+import type { PrivateMessageNotification } from '@/api/notificationClient';
 import { useI18n } from 'vue-i18n';
 
 defineProps<{
-  notification: Notification;
+  notification: PrivateMessageNotification;
 }>();
 
 const { t } = useI18n();
@@ -12,15 +12,14 @@ const { t } = useI18n();
 <template>
   <div class="notification-body">
     <span class="notification-type">{{ t('notificationTypes.PRIVATE_MESSAGE') }}</span>
-    <span v-if="notification.senderLogin" class="notification-detail">
-      {{ t('notificationItem.from', { user: notification.senderLogin }) }}
+    <span class="notification-detail">
+      {{ t('notificationItem.from', { user: notification.senderNickname }) }}
     </span>
     <router-link
-        v-if="notification.senderLogin"
         :to="`/messages/${notification.senderLogin}`"
         class="notification-link"
     >
-      {{ t('notificationItem.openChat') }}
+      {{ t('notificationItem.viewMessage') }}
     </router-link>
   </div>
 </template>

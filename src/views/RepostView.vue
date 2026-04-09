@@ -28,6 +28,7 @@ const content = props.type === 'post' ? post.text : comment.text
 
 const repostTitle = props.type === 'post' ? t('post.form.title.repostTemplate') + ' ' + post.title : t('post.form.title.repostCommentTemplate')
 const wrappedContent = `[repost author="${authorLogin}" origin="${origin}" collapsed="false"]\n${content}\n[/repost]`
+const repostId = props.type === 'post' ? post.id : comment.id
 </script>
 
 <template>
@@ -38,6 +39,8 @@ const wrappedContent = `[repost author="${authorLogin}" origin="${origin}" colla
       :diaryLogin="currentUserLogin"
       :content="wrappedContent"
       :title="repostTitle"
+      :repostId="repostId"
+      :repostType="props.type"
   />
 </template>
 

@@ -1029,5 +1029,13 @@ export default {
         viewPost: 'Перейти к записи',
         openChat: 'Открыть чат',
         viewProfile: 'Перейти к профилю',
+        timeJustNow: 'Только что',
+        timeMinutesAgo: '{n} мин назад',
+        timeHoursAgo: '{n} ч назад',
+        timeYesterday: 'Вчера',
+        postReactionText: '{nickname} добавил(а) реакцию {reaction} к вашей записи: {post}',
+        commentReactionText: '{nickname} добавил(а) реакцию {reaction} к вашему комментарию в записи: {post}',
+        commentText: '{nickname} оставил(а) комментарий к вашей записи: {post}',
+        commentReplyText: '{nickname} ответил(а) на ваш комментарий в записи: {post}',
     },
 }

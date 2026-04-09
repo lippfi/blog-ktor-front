@@ -1008,5 +1008,13 @@ export default {
         viewPost: 'Жазбаны көру',
         openChat: 'Чатты ашу',
         viewProfile: 'Профильді көру',
+        timeJustNow: 'Жаңа ғана',
+        timeMinutesAgo: '{n} мин бұрын',
+        timeHoursAgo: '{n} сағ бұрын',
+        timeYesterday: 'Кеше',
+        postReactionText: '{nickname} сіздің жазбаңызға {reaction} реакция қосты: {post}',
+        commentReactionText: '{nickname} сіздің пікіріңізге {reaction} реакция қосты, жазба: {post}',
+        commentText: '{nickname} сіздің жазбаңызға пікір қалдырды: {post}',
+        commentReplyText: '{nickname} сіздің пікіріңізге жауап берді жазбада: {post}',
     },
 }

@@ -476,5 +476,13 @@ export default {
         viewPost: 'Jazbanı körw',
         openChat: 'Chattı aşw',
         viewProfile: 'Profildi körw',
+        timeJustNow: 'Jaña ğana',
+        timeMinutesAgo: '{n} min burın',
+        timeHoursAgo: '{n} sağ burın',
+        timeYesterday: 'Keşe',
+        postReactionText: '{nickname} sizdiñ jazbañızğa {reaction} reakciya qostı: {post}',
+        commentReactionText: '{nickname} sizdiñ pikiriñizge {reaction} reakciya qostı, jazba: {post}',
+        commentText: '{nickname} sizdiñ jazbañızğa pikir qaldırdı: {post}',
+        commentReplyText: '{nickname} sizdiñ pikiriñizge jawap berdi jazbada: {post}',
     },
 }

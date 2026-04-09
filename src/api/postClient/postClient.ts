@@ -28,6 +28,8 @@ export interface IPostClient {
     hidePost(postId: string): Promise<Result>;
     showPost(postId: string): Promise<Result>;
     addPost(post: PostCreateDto): Promise<Result<PostViewDto>>
+    repost(post: PostCreateDto, repostedPostId: string): Promise<Result<PostViewDto>>;
+    repostComment(post: PostCreateDto, repostedCommentId: string): Promise<Result<PostViewDto>>;
     getComment(commentId: string): Promise<Result<CommentDto>>;
     addComment(comment: CommentCreateRequest): Promise<Result<CommentDto>>;
     updateComment(comment: CommentUpdateRequest): Promise<Result<CommentDto>>;
@@ -60,6 +62,50 @@ class PostClientImpl implements IPostClient {
     public async addPost(post: PostCreateDto): Promise<Result<PostViewDto>> {
         try {
             const response = await authenticatedRequest('/posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(post)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                return { type: 'ok', data };
+            } else {
+                const message = await response.text();
+                return { type: 'error', message };
+            }
+        } catch (error) {
+            return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        }
+    }
+
+    public async repost(post: PostCreateDto, repostedPostId: string): Promise<Result<PostViewDto>> {
+        try {
+            const response = await authenticatedRequest(`/posts/repost?id=${encodeURIComponent(repostedPostId)}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(post)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                return { type: 'ok', data };
+            } else {
+                const message = await response.text();
+                return { type: 'error', message };
+            }
+        } catch (error) {
+            return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        }
+    }
+
+    public async repostComment(post: PostCreateDto, repostedCommentId: string): Promise<Result<PostViewDto>> {
+        try {
+            const response = await authenticatedRequest(`/posts/repost-comment?id=${encodeURIComponent(repostedCommentId)}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

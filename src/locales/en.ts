@@ -1029,5 +1029,13 @@ export default {
         viewPost: 'View post',
         openChat: 'Open chat',
         viewProfile: 'View profile',
+        timeJustNow: 'Just now',
+        timeMinutesAgo: '{n} min ago',
+        timeHoursAgo: '{n} h ago',
+        timeYesterday: 'Yesterday',
+        postReactionText: '{nickname} added reaction {reaction} to your post: {post}',
+        commentReactionText: '{nickname} added reaction {reaction} to your comment in post: {post}',
+        commentText: '{nickname} commented on your post: {post}',
+        commentReplyText: '{nickname} replied to your comment in post: {post}',
     },
 }

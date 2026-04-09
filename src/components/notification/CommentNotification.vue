@@ -1,48 +1,37 @@
 <script setup lang="ts">
-import type { Notification } from '@/api/notificationClient';
+import type { CommentNotification } from '@/api/notificationClient';
+import NicknameComponent from '@/components/NicknameComponent.vue';
 import { useI18n } from 'vue-i18n';
 
 defineProps<{
-  notification: Notification;
+  notification: CommentNotification;
 }>();
 
 const { t } = useI18n();
 </script>
 
 <template>
-  <div class="notification-body">
-    <span class="notification-type">{{ t('notificationTypes.COMMENT') }}</span>
-    <span v-if="notification.senderLogin" class="notification-detail">
-      {{ t('notificationItem.from', { user: notification.senderLogin }) }}
-    </span>
-    <router-link
-        v-if="notification.diaryLogin && notification.postUri"
-        :to="{ name: 'post', params: { login: notification.diaryLogin, postUri: notification.postUri } }"
-        class="notification-link"
-    >
-      {{ t('notificationItem.viewPost') }}
-    </router-link>
-  </div>
+  <i18n-t keypath="notificationItem.commentText" tag="span" class="notification-text">
+    <template #nickname>
+      <NicknameComponent :nickname="notification.commentAuthorNickname" :login="notification.commentAuthorLogin" />
+    </template>
+    <template #post>
+      <router-link
+          :to="{ name: 'post', params: { login: notification.diaryLogin, postUri: notification.postUri } }"
+          class="notification-link"
+      >{{ notification.postTitle }}</router-link>
+    </template>
+  </i18n-t>
 </template>
 
 <style scoped>
-.notification-body {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.notification-type {
-  font-weight: 600;
-}
-
-.notification-detail {
+.notification-text {
   font-size: 13px;
   color: var(--el-text-color-secondary);
+  line-height: 1.5;
 }
 
 .notification-link {
-  font-size: 13px;
   color: var(--el-color-primary);
   text-decoration: none;
 }

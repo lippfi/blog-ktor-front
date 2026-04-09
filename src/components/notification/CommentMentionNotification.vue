@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { Notification } from '@/api/notificationClient';
+import type { CommentMentionNotification } from '@/api/notificationClient';
 import { useI18n } from 'vue-i18n';
 
 defineProps<{
-  notification: Notification;
+  notification: CommentMentionNotification;
 }>();
 
 const { t } = useI18n();
@@ -12,15 +12,14 @@ const { t } = useI18n();
 <template>
   <div class="notification-body">
     <span class="notification-type">{{ t('notificationTypes.COMMENT_MENTION') }}</span>
-    <span v-if="notification.senderLogin" class="notification-detail">
-      {{ t('notificationItem.from', { user: notification.senderLogin }) }}
+    <span class="notification-detail">
+      {{ t('notificationItem.from', { user: notification.commentAuthorNickname }) }}
     </span>
     <router-link
-        v-if="notification.diaryLogin && notification.postUri"
         :to="{ name: 'post', params: { login: notification.diaryLogin, postUri: notification.postUri } }"
         class="notification-link"
     >
-      {{ t('notificationItem.viewPost') }}
+      {{ notification.commentTitle }}
     </router-link>
   </div>
 </template>

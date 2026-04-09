@@ -3,30 +3,125 @@ import { authenticatedRequest } from "@/api/apiUtils";
 
 // Types
 
-export type NotificationType =
-    | 'COMMENT'
-    | 'NEW_POST'
-    | 'COMMENT_REPLY'
-    | 'POST_REACTION'
-    | 'COMMENT_REACTION'
-    | 'POST_MENTION'
-    | 'COMMENT_MENTION'
-    | 'PRIVATE_MESSAGE'
-    | 'FRIEND_REQUEST'
-    | 'REPOST'
-    | 'COMMENT_REPOST';
-
-export interface Notification {
+interface NotificationBase {
     id: string;
-    type: NotificationType;
+    type: string;
     isRead: boolean;
     createdAt: string;
-    diaryLogin?: string;
-    postUri?: string;
-    senderLogin?: string;
-    requestId?: string;
-    dialogId?: string;
+    avatarUrl?: string | null;
 }
+
+export interface NewPostNotification extends NotificationBase {
+    type: 'NEW_POST';
+    diaryLogin: string;
+    postUri: string;
+    postTitle: string;
+}
+
+export interface CommentNotification extends NotificationBase {
+    type: 'COMMENT';
+    diaryLogin: string;
+    postUri: string;
+    postTitle: string;
+    commentAuthorLogin: string;
+    commentAuthorNickname: string;
+}
+
+export interface CommentReplyNotification extends NotificationBase {
+    type: 'COMMENT_REPLY';
+    diaryLogin: string;
+    postUri: string;
+    postTitle: string;
+    commentAuthorLogin: string;
+    commentAuthorNickname: string;
+}
+
+export interface PostReactionNotification extends NotificationBase {
+    type: 'POST_REACTION';
+    diaryLogin: string;
+    postUri: string;
+    postTitle: string;
+    reactionURL: string;
+    reactorLogin: string;
+    reactorNickname: string;
+}
+
+export interface CommentReactionNotification extends NotificationBase {
+    type: 'COMMENT_REACTION';
+    diaryLogin: string;
+    postUri: string;
+    postTitle: string;
+    commentText: string;
+    reactionURL: string;
+    reactorLogin: string;
+    reactorNickname: string;
+}
+
+export interface PostMentionNotification extends NotificationBase {
+    type: 'POST_MENTION';
+    diaryLogin: string;
+    postUri: string;
+    postTitle: string;
+    postAuthorLogin: string;
+    postAuthorNickname: string;
+}
+
+export interface CommentMentionNotification extends NotificationBase {
+    type: 'COMMENT_MENTION';
+    diaryLogin: string;
+    postUri: string;
+    commentTitle: string;
+    commentAuthorLogin: string;
+    commentAuthorNickname: string;
+}
+
+export interface FriendRequestNotification extends NotificationBase {
+    type: 'FRIEND_REQUEST';
+    senderLogin: string;
+    senderNickname: string;
+    message?: string | null;
+    requestId: string;
+}
+
+export interface PrivateMessageNotification extends NotificationBase {
+    type: 'PRIVATE_MESSAGE';
+    senderLogin: string;
+    senderNickname: string;
+    dialogId: string;
+}
+
+export interface RepostNotification extends NotificationBase {
+    type: 'REPOST';
+    diaryLogin: string;
+    authorLogin: string;
+    authorNickname: string;
+    postUri: string;
+    postTitle: string;
+}
+
+export interface CommentRepostNotification extends NotificationBase {
+    type: 'COMMENT_REPOST';
+    diaryLogin: string;
+    postUri: string;
+    authorLogin: string;
+    authorNickname: string;
+    postTitle: string;
+}
+
+export type Notification =
+    | NewPostNotification
+    | CommentNotification
+    | CommentReplyNotification
+    | PostReactionNotification
+    | CommentReactionNotification
+    | PostMentionNotification
+    | CommentMentionNotification
+    | FriendRequestNotification
+    | PrivateMessageNotification
+    | RepostNotification
+    | CommentRepostNotification;
+
+export type NotificationType = Notification['type'];
 
 export interface NotificationSettings {
     notifyAboutComments: boolean;
