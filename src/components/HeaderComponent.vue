@@ -64,6 +64,7 @@ function onNotificationRead(id: string) {
 onMounted(() => {
   fetchNotifications();
   setupWebSocket();
+  window.addEventListener('resize', updateIsMobile);
 });
 
 onUnmounted(() => {
@@ -72,10 +73,17 @@ onUnmounted(() => {
     ws.close();
     ws = null;
   }
+  window.removeEventListener('resize', updateIsMobile);
 });
 
 const onLogoClick = () => {
   emit('toggleMenu')
+}
+
+const isMobile = ref(window.innerWidth <= 768);
+
+function updateIsMobile() {
+  isMobile.value = window.innerWidth <= 768;
 }
 
 const scrollToBottom = () => {
@@ -102,7 +110,7 @@ const scrollToBottom = () => {
             </el-icon>
           </el-badge>
         </button>
-        <button v-else class="scroll-down-button" type="button" @click="scrollToBottom">
+        <button v-if="notificationCount === 0 || !isMobile" class="scroll-down-button" type="button" @click="scrollToBottom">
           <el-icon class="scroll-down-icon">
             <ArrowDown />
           </el-icon>
