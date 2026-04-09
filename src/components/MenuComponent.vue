@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<{
 
 const isCollapse = ref(false)
 const HEADER_HEIGHT = 75
-const MOBILE_HEADER_HEIGHT = 65
+const MOBILE_HEADER_HEIGHT = 68
 const menuTopOffset = ref(HEADER_HEIGHT)
 const mobileNavMarginTop = ref(MOBILE_HEADER_HEIGHT)
 
