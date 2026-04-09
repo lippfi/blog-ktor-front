@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
 import type {DiaryHeaderInfo} from "@/api/dto/postServiceDto.ts";
 import { ArrowDown, Bell } from '@element-plus/icons-vue';
 import { isSignedIn } from '@/api/userClient';
@@ -20,6 +20,7 @@ const emit = defineEmits<{
 }>()
 
 const route = useRoute();
+const router = useRouter();
 const { t } = useI18n();
 
 const diaryHeaderInfo = computed(() => route.meta.diaryHeaderInfo as DiaryHeaderInfo | undefined);
@@ -58,13 +59,20 @@ function openNotifications() {
 }
 
 function onNotificationRead(id: string) {
-  notifications.value = notifications.value.map(n => n.id === id ? { ...n, isRead: true } : n);
+  notifications.value = notifications.value.filter(n => n.id !== id);
 }
 
 onMounted(() => {
   fetchNotifications();
   setupWebSocket();
   window.addEventListener('resize', updateIsMobile);
+});
+
+router.afterEach(() => {
+  dialogVisible.value = false;
+  nextTick(() => {
+    fetchNotifications();
+  });
 });
 
 onUnmounted(() => {
