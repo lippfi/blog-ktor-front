@@ -174,6 +174,7 @@ watch(() => props.isMobile, (isMobile) => {
   transition: width 0.3s ease;
   overflow-y: auto;
   overflow-x: hidden;
+  user-select: none;
 }
 
 .menu-nav {

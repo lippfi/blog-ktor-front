@@ -197,6 +197,7 @@ const props = defineProps<{
   gap: 12px;
   height: 25px;
   margin-top: 3px;
+  user-select: none;
 }
 .right-buttons .el-icon {
   cursor: pointer;
