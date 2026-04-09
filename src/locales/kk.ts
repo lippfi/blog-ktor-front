@@ -985,4 +985,28 @@ export default {
         saveError: 'Күнделік атауын жаңарту сәтсіз аяқталды',
         loadError: 'Күнделік атауын жүктеу сәтсіз аяқталды',
     },
+    headerNotifications: {
+        title: 'Хабарламалар',
+        noNotifications: 'Хабарлама жоқ',
+    },
+    notificationTypes: {
+        COMMENT: 'Жаңа пікір',
+        NEW_POST: 'Жаңа жазба',
+        COMMENT_REPLY: 'Пікірге жауап',
+        POST_REACTION: 'Жазбаға реакция',
+        COMMENT_REACTION: 'Пікірге реакция',
+        POST_MENTION: 'Жазбада аталды',
+        COMMENT_MENTION: 'Пікірде аталды',
+        PRIVATE_MESSAGE: 'Жеке хабарлама',
+        FRIEND_REQUEST: 'Достық сұранысы',
+        REPOST: 'Репост',
+        COMMENT_REPOST: 'Пікір репосты',
+    },
+    notificationItem: {
+        markAsRead: 'Оқылды деп белгілеу',
+        from: '{user} жіберді',
+        viewPost: 'Жазбаны көру',
+        openChat: 'Чатты ашу',
+        viewProfile: 'Профильді көру',
+    },
 }

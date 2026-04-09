@@ -453,4 +453,28 @@ export default {
         saveError: 'Kündelik atawın jañartw sätsiz ayaqtaldı',
         loadError: 'Kündelik atawın jüktew sätsiz ayaqtaldı',
     },
+    headerNotifications: {
+        title: 'Xabarlamalar',
+        noNotifications: 'Xabarlama joq',
+    },
+    notificationTypes: {
+        COMMENT: 'Jaña pikir',
+        NEW_POST: 'Jaña jazba',
+        COMMENT_REPLY: 'Pikirge jawap',
+        POST_REACTION: 'Jazbağa reaksiya',
+        COMMENT_REACTION: 'Pikirge reaksiya',
+        POST_MENTION: 'Jazbada ataldı',
+        COMMENT_MENTION: 'Pikirde ataldı',
+        PRIVATE_MESSAGE: 'Jeke xabarlama',
+        FRIEND_REQUEST: 'Dostıq suranısı',
+        REPOST: 'Repost',
+        COMMENT_REPOST: 'Pikir repostı',
+    },
+    notificationItem: {
+        markAsRead: 'Oqıldı dep belgilew',
+        from: '{user} jiberdi',
+        viewPost: 'Jazbanı körw',
+        openChat: 'Chattı aşw',
+        viewProfile: 'Profildi körw',
+    },
 }

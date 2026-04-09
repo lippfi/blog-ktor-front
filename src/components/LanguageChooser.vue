@@ -1,7 +1,7 @@
 <template>
   <div class="language-chooser">
     <el-icon>
-      <img src="../assets/icons/language.svg" alt="language" style="width: 32px; height: 32px;">
+      <img src="../assets/icons/language.svg" alt="language" style="width: 32px; height: 32px; max-width: unset;">
     </el-icon>
     <el-select
       v-model="currentLocale"

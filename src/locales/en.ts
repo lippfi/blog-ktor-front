@@ -1006,4 +1006,28 @@ export default {
         saveError: 'Failed to update diary title',
         loadError: 'Failed to load diary title',
     },
+    headerNotifications: {
+        title: 'Notifications',
+        noNotifications: 'No notifications',
+    },
+    notificationTypes: {
+        COMMENT: 'New comment',
+        NEW_POST: 'New post',
+        COMMENT_REPLY: 'Reply to comment',
+        POST_REACTION: 'Post reaction',
+        COMMENT_REACTION: 'Comment reaction',
+        POST_MENTION: 'Mentioned in post',
+        COMMENT_MENTION: 'Mentioned in comment',
+        PRIVATE_MESSAGE: 'Private message',
+        FRIEND_REQUEST: 'Friend request',
+        REPOST: 'Repost',
+        COMMENT_REPOST: 'Comment repost',
+    },
+    notificationItem: {
+        markAsRead: 'Mark as read',
+        from: 'From {user}',
+        viewPost: 'View post',
+        openChat: 'Open chat',
+        viewProfile: 'View profile',
+    },
 }

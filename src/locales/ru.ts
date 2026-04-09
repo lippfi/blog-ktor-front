@@ -1006,4 +1006,28 @@ export default {
         saveError: 'Не удалось обновить название дневника',
         loadError: 'Не удалось загрузить название дневника',
     },
+    headerNotifications: {
+        title: 'Уведомления',
+        noNotifications: 'Нет уведомлений',
+    },
+    notificationTypes: {
+        COMMENT: 'Новый комментарий',
+        NEW_POST: 'Новая запись',
+        COMMENT_REPLY: 'Ответ на комментарий',
+        POST_REACTION: 'Реакция на запись',
+        COMMENT_REACTION: 'Реакция на комментарий',
+        POST_MENTION: 'Упоминание в записи',
+        COMMENT_MENTION: 'Упоминание в комментарии',
+        PRIVATE_MESSAGE: 'Личное сообщение',
+        FRIEND_REQUEST: 'Заявка в друзья',
+        REPOST: 'Репост',
+        COMMENT_REPOST: 'Репост комментария',
+    },
+    notificationItem: {
+        markAsRead: 'Отметить как прочитанное',
+        from: 'От {user}',
+        viewPost: 'Перейти к записи',
+        openChat: 'Открыть чат',
+        viewProfile: 'Перейти к профилю',
+    },
 }
