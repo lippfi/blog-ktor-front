@@ -1018,5 +1018,7 @@ export default {
         commentReplyText: '{nickname} сіздің пікіріңізге жауап берді жазбада: {post}',
         repostText: '{nickname} сіздің жазбаңызды репост жасады: {post}',
         commentRepostText: '{nickname} сіздің пікіріңізді репост жасады: {post}',
+        postMentionText: '{nickname} сізді жазбада атап өтті: {post}',
+        commentMentionText: '{nickname} сізді жазбаға пікірде атап өтті: {post}',
     },
 }

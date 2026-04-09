@@ -486,5 +486,7 @@ export default {
         commentReplyText: '{nickname} sizdiñ pikiriñizge jawap berdi jazbada: {post}',
         repostText: '{nickname} sizdiñ jazbañyzdy repost jasady: {post}',
         commentRepostText: '{nickname} sizdiñ pikirińizdi repost jasady: {post}',
+        postMentionText: '{nickname} sizdi jazbada atap ötti: {post}',
+        commentMentionText: '{nickname} sizdi jazbağa pikirde atap ötti: {post}',
     },
 }

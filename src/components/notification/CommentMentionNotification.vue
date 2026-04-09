@@ -1,47 +1,34 @@
 <script setup lang="ts">
 import type { CommentMentionNotification } from '@/api/notificationClient';
-import { useI18n } from 'vue-i18n';
+import NicknameComponent from '@/components/NicknameComponent.vue';
 
 defineProps<{
   notification: CommentMentionNotification;
 }>();
-
-const { t } = useI18n();
 </script>
 
 <template>
-  <div class="notification-body">
-    <span class="notification-type">{{ t('notificationTypes.COMMENT_MENTION') }}</span>
-    <span class="notification-detail">
-      {{ t('notificationItem.from', { user: notification.commentAuthorNickname }) }}
-    </span>
-    <router-link
-        :to="{ name: 'post', params: { login: notification.diaryLogin, postUri: notification.postUri } }"
-        class="notification-link"
-    >
-      {{ notification.commentTitle }}
-    </router-link>
-  </div>
+  <i18n-t keypath="notificationItem.commentMentionText" tag="span" class="notification-text">
+    <template #nickname>
+      <NicknameComponent :nickname="notification.commentAuthorNickname" :login="notification.commentAuthorLogin" />
+    </template>
+    <template #post>
+      <router-link
+          :to="{ name: 'post', params: { login: notification.diaryLogin, postUri: notification.postUri } }"
+          class="notification-link"
+      >{{ notification.commentTitle }}</router-link>
+    </template>
+  </i18n-t>
 </template>
 
 <style scoped>
-.notification-body {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.notification-type {
-  font-weight: 600;
-}
-
-.notification-detail {
+.notification-text {
   font-size: 13px;
   color: var(--el-text-color-secondary);
+  line-height: 1.5;
 }
 
 .notification-link {
-  font-size: 13px;
   color: var(--el-color-primary);
   text-decoration: none;
 }

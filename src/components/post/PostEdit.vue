@@ -65,6 +65,7 @@ import AvatarChooser from "@/components/post/AvatarChooser.vue";
 import {getCurrentSessionInfo, getCurrentUserLogin} from "@/api/userClient.ts";
 import PostClientImpl, {type Result} from "@/api/postClient/postClient.ts";
 import type {PostCreateDto, PostEditDto, PostViewDto} from "@/api/dto/postServiceDto.ts";
+import {notifyAboutPostMention} from "@/api/notificationClient.ts";
 import {getAccessGroups, getDefaultAccessGroups} from "@/api/accessGroupService.ts";
 import router from "@/router";
 import { useReactionsStore } from "@/stores/reactionsStore";
@@ -278,6 +279,10 @@ async function createPost() {
     }
     if (res.type == 'ok') {
       clearPostDraft();
+      const mentions = extractMentions(newPost.text);
+      for (const login of mentions) {
+        notifyAboutPostMention(res.data.id, login).catch(console.error);
+      }
       await router.push({name: 'post', params: {'login': props.diaryLogin, 'postUri': res.data.uri}})
     } else {
       savePostDraft();
@@ -320,6 +325,12 @@ function handleSubmit() {
   } else {
     createPost();
   }
+}
+
+function extractMentions(text: string): string[] {
+  const matches = text.match(/@([a-zA-Z0-9_-]+)/g);
+  if (!matches) return [];
+  return [...new Set(matches.map(m => m.slice(1)))];
 }
 
 function preprocessPostTitle(title: string): string {

@@ -1039,5 +1039,7 @@ export default {
         commentReplyText: '{nickname} replied to your comment in post: {post}',
         repostText: '{nickname} reposted your post: {post}',
         commentRepostText: '{nickname} reposted your comment in post: {post}',
+        postMentionText: '{nickname} mentioned you in post: {post}',
+        commentMentionText: '{nickname} mentioned you in comment on post: {post}',
     },
 }

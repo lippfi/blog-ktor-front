@@ -6,6 +6,7 @@ import PostClientImpl from "@/api/postClient/postClient";
 import type {CommentCreateRequest, CommentDto, CommentUpdateRequest} from "@/api/dto/postServiceDto";
 import {useI18n} from "vue-i18n";
 import { useReactionsStore } from "@/stores/reactionsStore";
+import {notifyAboutCommentMention} from "@/api/notificationClient.ts";
 import {buildDraftKey, clearDraft, readDraft, saveDraft} from "@/utils/draftStorage.ts";
 
 const { t } = useI18n();
@@ -255,6 +256,10 @@ async function addComment() {
     const result = await postClient.addComment(commentRequest);
     if (result.type === 'ok') {
       clearCommentDraft();
+      const mentions = extractMentions(commentRequest.text);
+      for (const login of mentions) {
+        notifyAboutCommentMention(result.data.id, login).catch(console.error);
+      }
       localContent.value = '';
       emit('commentAdded', result.data);
       if (props.replyingToComment) {
@@ -278,6 +283,12 @@ function handleSubmit() {
   } else {
     addComment();
   }
+}
+
+function extractMentions(text: string): string[] {
+  const matches = text.match(/@([a-zA-Z0-9_-]+)/g);
+  if (!matches) return [];
+  return [...new Set(matches.map(m => m.slice(1)))];
 }
 
 async function updateComment() {

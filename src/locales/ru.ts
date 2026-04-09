@@ -1039,5 +1039,7 @@ export default {
         commentReplyText: '{nickname} ответил(а) на ваш комментарий в записи: {post}',
         repostText: '{nickname} сделал(а) репост вашей записи: {post}',
         commentRepostText: '{nickname} сделал(а) репост вашего комментария в записи: {post}',
+        postMentionText: '{nickname} упомянул(а) вас в записи: {post}',
+        commentMentionText: '{nickname} упомянул(а) вас в комментарии к записи: {post}',
     },
 }
