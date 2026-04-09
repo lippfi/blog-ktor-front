@@ -55,13 +55,21 @@ const reply = () => {
   emit('reply', props.comment);
 };
 
+const isElementVisible = (element: HTMLElement): boolean => {
+  const rect = element.getBoundingClientRect();
+  return (
+      rect.top >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+  );
+};
+
 const scrollToComment = (commentId: string) => {
   // Emit event to update selected comment in PostView
   emit('select-comment', commentId);
 
-  // Scroll to the comment
+  // Scroll to the comment only if it's not already visible
   const commentElement = document.getElementById(`comment-${commentId}`);
-  if (commentElement) {
+  if (commentElement && !isElementVisible(commentElement)) {
     commentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 };
@@ -169,5 +177,6 @@ const scrollToComment = (commentId: string) => {
   padding: 10px;
   box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
+  width: calc(100% - 40px);
 }
 </style>

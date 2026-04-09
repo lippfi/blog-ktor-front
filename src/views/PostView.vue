@@ -42,12 +42,20 @@ const postClient = new PostClientImpl();
 let commentsSocket: WebSocket | null = null;
 
 
+const isElementVisible = (element: HTMLElement): boolean => {
+  const rect = element.getBoundingClientRect();
+  return (
+      rect.top >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+  );
+};
+
 const scrollToComment = (commentId?: string) => {
   const id = commentId || selectedCommentId.value;
   if (!id) return;
 
   const commentElement = document.getElementById(`comment-${id}`);
-  if (commentElement) {
+  if (commentElement && !isElementVisible(commentElement)) {
     commentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 };
