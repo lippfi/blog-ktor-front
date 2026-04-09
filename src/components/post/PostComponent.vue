@@ -66,6 +66,7 @@
   </div>
   <!--    todo what about other fields? -->
   <PostEdit v-if="isEditing"
+            ref="postEditRef"
             :type="'edit'"
             :content="post.text"
             :title="post.title"
@@ -82,7 +83,8 @@
 </template>
 
 <script setup lang="ts">
-import {computed} from 'vue'
+import {computed, nextTick} from 'vue'
+import {scrollToElement} from '@/utils/scrollTo';
 import Reactions from "@/components/post/reaction/Reactions.vue";
 import { ref } from 'vue';
 import {getDateTimeString} from "@/components/post/util.ts";
@@ -98,9 +100,13 @@ import UserAvatarComponent from "@/components/post/UserAvatarComponent.vue";
 
 const reactionsStore = useReactionsStore();
 let isEditing = ref(false);
+const postEditRef = ref<HTMLElement | null>(null);
 
 const startEditing = () => {
   isEditing.value = true;
+  nextTick(() => {
+    scrollToElement(postEditRef.value?.$el);
+  });
 };
 
 const cancelEditing = () => {
