@@ -1037,5 +1037,7 @@ export default {
         commentReactionText: '{nickname} добавил(а) реакцию {reaction} к вашему комментарию в записи: {post}',
         commentText: '{nickname} оставил(а) комментарий к вашей записи: {post}',
         commentReplyText: '{nickname} ответил(а) на ваш комментарий в записи: {post}',
+        repostText: '{nickname} сделал(а) репост вашей записи: {post}',
+        commentRepostText: '{nickname} сделал(а) репост вашего комментария в записи: {post}',
     },
 }

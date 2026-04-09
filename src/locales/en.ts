@@ -1037,5 +1037,7 @@ export default {
         commentReactionText: '{nickname} added reaction {reaction} to your comment in post: {post}',
         commentText: '{nickname} commented on your post: {post}',
         commentReplyText: '{nickname} replied to your comment in post: {post}',
+        repostText: '{nickname} reposted your post: {post}',
+        commentRepostText: '{nickname} reposted your comment in post: {post}',
     },
 }

@@ -484,5 +484,7 @@ export default {
         commentReactionText: '{nickname} sizdiñ pikiriñizge {reaction} reakciya qostı, jazba: {post}',
         commentText: '{nickname} sizdiñ jazbañızğa pikir qaldırdı: {post}',
         commentReplyText: '{nickname} sizdiñ pikiriñizge jawap berdi jazbada: {post}',
+        repostText: '{nickname} sizdiñ jazbañyzdy repost jasady: {post}',
+        commentRepostText: '{nickname} sizdiñ pikirińizdi repost jasady: {post}',
     },
 }
