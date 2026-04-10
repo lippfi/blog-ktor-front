@@ -112,7 +112,6 @@ onMounted(() => {
 
 <style scoped>
 .feed {
-  padding: 0 20px 20px;
   display: flex;
   flex-direction: column;
 }
