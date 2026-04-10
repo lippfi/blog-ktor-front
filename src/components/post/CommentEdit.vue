@@ -410,6 +410,10 @@ async function updateComment() {
   .chooser-container {
     height: unset;
   }
+
+  .comment-edit {
+    padding-left: 0;
+  }
 }
 .right {
   display: flex;

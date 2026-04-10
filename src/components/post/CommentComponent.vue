@@ -179,4 +179,10 @@ const scrollToComment = (commentId: string) => {
   transition: all 0.3s ease;
   width: calc(100% - 40px);
 }
+
+@media (max-width: 1023px) {
+  .comment {
+    margin-left: 0;
+  }
+}
 </style>
