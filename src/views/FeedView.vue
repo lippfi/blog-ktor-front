@@ -1,12 +1,6 @@
 <template>
   <div class="feed">
-    <div v-if="loggedIn" class="feed-buttons">
-      <el-button type="text" :class="{ active: currentFeed === 'latest' }" @click="changeFeed('latest')">{{ t('feed.latest') }}
-      </el-button>
-      <el-button type="text" :class="{ active: currentFeed === 'popular' }" @click="changeFeed('popular')">{{ t('feed.popular') }}</el-button>
-      <el-button type="text" :class="{ active: currentFeed === 'following' }" @click="changeFeed('following')">{{ t('feed.following') }}</el-button>
-      <el-button type="text" :class="{ active: currentFeed === 'friends' }" @click="changeFeed('friends')">{{ t('feed.friends') }}</el-button>
-    </div>
+    <el-segmented v-if="loggedIn" v-model="selectedFeed" :options="feedOptions" class="feed-buttons"/>
     <div class="posts" v-loading="loading">
       <div v-if="!loading && posts.length === 0" class="no-results">{{ $t('search.noPostsFound') }}</div>
       <PostComponent
@@ -47,6 +41,18 @@ const totalPages = ref(route.meta.totalPages as number || 0);
 const loading = ref(false);
 
 const currentFeed = computed(() => route.query.feed as string || 'latest');
+
+const feedOptions = computed(() => [
+  { label: t('feed.latest'), value: 'latest' },
+  { label: t('feed.popular'), value: 'popular' },
+  { label: t('feed.following'), value: 'following' },
+  { label: t('feed.friends'), value: 'friends' },
+]);
+
+const selectedFeed = computed({
+  get: () => currentFeed.value,
+  set: (val: string) => changeFeed(val),
+});
 const currentPage = computed(() => parseInt(route.query.page as string) || 1);
 const prevPageLink = computed(() => ({ query: { ...route.query, page: (currentPage.value - 1).toString() } }));
 const nextPageLink = computed(() => ({ query: { ...route.query, page: (currentPage.value + 1).toString() } }));
@@ -120,29 +126,8 @@ onMounted(() => {
 
 .feed-buttons {
   margin-bottom: 40px;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-
-.el-button {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  align-items: center;
-  cursor: pointer;
-  padding: 10px;
-  transition: all 0.30s ease;
-}
-
-.el-button:hover {
-  background-color: #303030;
-  color: white;
-}
-
-.el-button.active {
-  background-color: #303030;
-  color: white;
+  align-self: center;
+  font-size: 15px;
 }
 .no-results {
   text-align: center;
