@@ -391,12 +391,13 @@ function preprocessPostTitle(title: string): string {
   display: flex;
   align-items: center;
   gap: 5px;
-  width: 100%;
+  min-width: 0;
 }
-.read, .comment, .react {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+.read :deep(.el-select),
+.comment :deep(.el-select),
+.react :deep(.el-select) {
+  width: 200px;
+  min-width: 0;
 }
 .groups-row {
   display: flex;
@@ -406,6 +407,26 @@ function preprocessPostTitle(title: string): string {
 .groups {
   display: flex;
   gap: 10px;
+  min-width: 0;
+}
+@media (max-width: 1023px) {
+  .groups {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 5px 10px;
+  }
+  .read, .comment, .react {
+    display: contents;
+  }
+  .read span, .comment span, .react span {
+    text-align: right;
+    align-self: center;
+  }
+  .read :deep(.el-select),
+  .comment :deep(.el-select),
+  .react :deep(.el-select) {
+    width: auto;
+  }
 }
 .footer {
   display: flex;
