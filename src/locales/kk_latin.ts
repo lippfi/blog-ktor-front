@@ -253,6 +253,10 @@ export default {
                 repost: 'qayta jariyalau'
             }
         },
+        view: {
+            subscribe: 'jazylу',
+            subscribed: 'jazylyp qoydyñyz',
+        },
     },
     groups: {
         basic: {

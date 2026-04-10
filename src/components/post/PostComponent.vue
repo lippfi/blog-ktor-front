@@ -58,6 +58,7 @@
                 @reaction-added="reactionsStore.addReaction"
               />
             </div>
+            <div/>
             <FooterButtons :post="post" :show-comments-count="showCommentsCount" @startEdit="startEditing"/>
           </div>
         </div>

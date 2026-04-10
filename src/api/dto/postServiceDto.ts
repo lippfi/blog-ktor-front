@@ -81,6 +81,7 @@ export interface PostViewDto {
     reactionGroupId: string;
     commentReactionGroupId: string;
     isHidden: boolean;
+    isSubscribed?: boolean;
 }
 
 export interface DiaryHeaderInfo {

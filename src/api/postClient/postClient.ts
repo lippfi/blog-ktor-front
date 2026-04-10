@@ -28,6 +28,8 @@ export interface IPostClient {
     deletePost(postId: string): Promise<Result<string>>;
     hidePost(postId: string): Promise<Result>;
     showPost(postId: string): Promise<Result>;
+    subscribeToPost(postId: string): Promise<Result>;
+    unsubscribeFromPost(postId: string): Promise<Result>;
     addPost(post: PostCreateDto): Promise<Result<PostViewDto>>
     repost(post: PostCreateDto, repostedPostId: string): Promise<Result<PostViewDto>>;
     repostComment(post: PostCreateDto, repostedCommentId: string): Promise<Result<PostViewDto>>;
@@ -383,6 +385,40 @@ class PostClientImpl implements IPostClient {
     public async showPost(postId: string): Promise<Result> {
         try {
             const response = await authenticatedRequest(`/posts/show?postId=${encodeURIComponent(postId)}`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                return { type: 'ok' };
+            } else {
+                const message = await response.text();
+                return { type: 'error', message };
+            }
+        } catch (error) {
+            return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        }
+    }
+
+    public async subscribeToPost(postId: string): Promise<Result> {
+        try {
+            const response = await authenticatedRequest(`/posts/subscribe?postId=${encodeURIComponent(postId)}`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                return { type: 'ok' };
+            } else {
+                const message = await response.text();
+                return { type: 'error', message };
+            }
+        } catch (error) {
+            return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        }
+    }
+
+    public async unsubscribeFromPost(postId: string): Promise<Result> {
+        try {
+            const response = await authenticatedRequest(`/posts/unsubscribe?postId=${encodeURIComponent(postId)}`, {
                 method: 'POST'
             });
 

@@ -458,6 +458,8 @@ export default {
             from: 'Reposted from',
         },
         view: {
+            subscribe: 'subscribe',
+            subscribed: 'subscribed',
             footer: {
                 buttons: {
                     delete: {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRoute} from "vue-router";
 import { ref, nextTick, onMounted, onUnmounted, watch} from "vue";
+import {useI18n} from "vue-i18n";
 
 import CommentEdit from "@/components/post/CommentEdit.vue";
 import CommentComponent from "@/components/post/CommentComponent.vue";
@@ -9,6 +10,10 @@ import type {ReactionView} from "@/api/dto/reactionServiceDto";
 import PostClientImpl from "@/api/postClient/postClient.ts";
 import type {CommentDto, PostViewDto, ReactionDto} from "@/api/dto/postServiceDto.ts";
 import {getCurrentUserLogin} from "@/api/userClient.ts";
+import {ElMessageBox} from "element-plus";
+import {Bell, BellFilled} from "@element-plus/icons-vue";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   login: string;
@@ -218,15 +223,49 @@ const cancelReply = () => {
   parentCommentId.value = null;
   replyingToComment.value = null;
 };
+
+const isSubscribed = ref(post.value?.isSubscribed ?? false);
+
+watch(() => post.value, (newPost) => {
+  if (newPost) {
+    isSubscribed.value = newPost.isSubscribed ?? false;
+  }
+});
+
+async function toggleSubscription() {
+  const result = isSubscribed.value
+      ? await postClient.unsubscribeFromPost(post.value.id)
+      : await postClient.subscribeToPost(post.value.id);
+
+  if (result.type === 'ok') {
+    isSubscribed.value = !isSubscribed.value;
+  } else {
+    ElMessageBox.alert(result.message, 'Error');
+  }
+}
 </script>
 
 <template>
-    <PostComponent
-        :login="props.login"
-        :post="post"
-        :show-editing-buttons="false"
-        :show-comments-count="false"
-    />
+    <div class="post-wrapper">
+      <div v-if="getCurrentUserLogin()" class="subscribe-button-container">
+        <el-button
+            size="small"
+            :type="isSubscribed ? 'primary' : 'default'"
+            text
+            @click="toggleSubscription"
+            style="margin-right: -12px; margin-bottom: 5px;"
+        >
+          {{ isSubscribed ? t('post.view.subscribed') : t('post.view.subscribe') }}
+          <el-icon style="margin-left: 4px"><BellFilled v-if="isSubscribed" /><Bell v-else /></el-icon>
+        </el-button>
+      </div>
+      <PostComponent
+          :login="props.login"
+          :post="post"
+          :show-editing-buttons="false"
+          :show-comments-count="false"
+      />
+    </div>
     <div class="comments_block">
       <CommentComponent v-for="comment in comments" :key="comment.id"
                :comment="comment"
@@ -256,6 +295,18 @@ const cancelReply = () => {
 <style scoped>
 .centralized-block {
   gap: 20px;
+}
+
+.post-wrapper {
+  width: 100%;
+}
+
+.subscribe-button-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 10px;
 }
 
 .comments_block {

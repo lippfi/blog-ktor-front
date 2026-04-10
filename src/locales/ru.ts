@@ -458,6 +458,8 @@ export default {
             from: 'Репост из',
         },
         view: {
+            subscribe: 'подписаться',
+            subscribed: 'вы подписаны',
             footer: {
                 buttons: {
                     delete: {

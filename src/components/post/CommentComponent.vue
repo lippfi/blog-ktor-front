@@ -107,6 +107,7 @@ const scrollToComment = (commentId: string) => {
               :recent-reactions="reactionsStore.recentReactions"
               @reaction-added="reactionsStore.addReaction"
           />
+          <div/>
           <FooterButtons :post="post" :comment="comment" :show-comments-count="false" @startEdit="startEditing" @reply="reply"/>
         </div>
       </div>

@@ -437,6 +437,8 @@ export default {
             from: 'Қайта жарияланған жері',
         },
         view: {
+            subscribe: 'жазылу',
+            subscribed: 'жазылып қойдыңыз',
             footer: {
                 buttons: {
                     delete: {
