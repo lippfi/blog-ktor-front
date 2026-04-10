@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import type {DiaryHeaderInfo} from "@/api/dto/postServiceDto.ts";
 import { ArrowDown, Bell } from '@element-plus/icons-vue';
 import { isSignedIn } from '@/api/userClient';
@@ -105,9 +105,6 @@ onMounted(() => {
 
 router.afterEach(() => {
   dialogVisible.value = false;
-  nextTick(() => {
-    fetchNotifications();
-  });
 });
 
 onUnmounted(() => {
