@@ -380,13 +380,6 @@ function preprocessPostTitle(title: string): string {
   min-width: 0;  /* Prevent Element Plus inputs from overflowing */
   flex: 1;
 }
-@media (max-width: 1023px) {
-  .title-row :deep(.el-input .el-input__inner),
-  .tags-row :deep(.el-input-tag .el-input-tag__inner input),
-  .classes :deep(.el-input .el-input__inner) {
-    font-size: 16px; /* Prevent mobile zoom on focus */
-  }
-}
 .read, .comment, .react {
   display: flex;
   align-items: center;

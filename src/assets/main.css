@@ -1,5 +1,12 @@
 @import './base.css';
 
+/* Prevent mobile browsers (iOS Safari) from zooming in when focusing inputs with font-size < 16px */
+@media (max-width: 1023px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
 #app {
   max-width: 1280px;
   margin: 0 auto;
