@@ -916,6 +916,22 @@ export default {
         saveError: 'Failed to update timezone',
         loadError: 'Failed to load timezone',
     },
+    onsiteNotificationSettings: {
+        loadError: 'Failed to load notification settings',
+        saveError: 'Failed to update notification settings',
+        save: 'Save',
+        cancel: 'Cancel',
+        notifyAboutComments: 'Comments on my posts',
+        notifyAboutReplies: 'Replies to my comments',
+        notifyAboutPostReactions: 'Reactions to my posts',
+        notifyAboutCommentReactions: 'Reactions to my comments',
+        notifyAboutPrivateMessages: 'Private messages',
+        notifyAboutMentions: 'Mentions in posts',
+        notifyAboutNewPosts: 'New posts from subscriptions',
+        notifyAboutFriendRequests: 'Friend requests',
+        notifyAboutReposts: 'Reposts',
+        notifyAboutCommentMentions: 'Mentions in comments',
+    },
     styles: {
         preview: {
             save: 'Add to my collection',

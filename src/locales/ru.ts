@@ -916,6 +916,22 @@ export default {
         saveError: 'Не удалось обновить часовой пояс',
         loadError: 'Не удалось загрузить часовой пояс',
     },
+    onsiteNotificationSettings: {
+        loadError: 'Не удалось загрузить настройки уведомлений',
+        saveError: 'Не удалось обновить настройки уведомлений',
+        save: 'Сохранить',
+        cancel: 'Отмена',
+        notifyAboutComments: 'Комментарии к моим записям',
+        notifyAboutReplies: 'Ответы на мои комментарии',
+        notifyAboutPostReactions: 'Реакции на мои записи',
+        notifyAboutCommentReactions: 'Реакции на мои комментарии',
+        notifyAboutPrivateMessages: 'Личные сообщения',
+        notifyAboutMentions: 'Упоминания в записях',
+        notifyAboutNewPosts: 'Новые записи из подписок',
+        notifyAboutFriendRequests: 'Заявки в друзья',
+        notifyAboutReposts: 'Репосты',
+        notifyAboutCommentMentions: 'Упоминания в комментариях',
+    },
     styles: {
         preview: {
             save: 'Добавить в мою коллекцию',

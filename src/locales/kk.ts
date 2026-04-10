@@ -895,6 +895,22 @@ export default {
         saveError: 'Уақыт белдеуін жаңарту сәтсіз аяқталды',
         loadError: 'Уақыт белдеуін жүктеу сәтсіз аяқталды',
     },
+    onsiteNotificationSettings: {
+        loadError: 'Хабарлама параметрлерін жүктеу сәтсіз аяқталды',
+        saveError: 'Хабарлама параметрлерін жаңарту сәтсіз аяқталды',
+        save: 'Сақтау',
+        cancel: 'Бас тарту',
+        notifyAboutComments: 'Менің жазбаларыма пікірлер',
+        notifyAboutReplies: 'Менің пікірлеріме жауаптар',
+        notifyAboutPostReactions: 'Менің жазбаларыма реакциялар',
+        notifyAboutCommentReactions: 'Менің пікірлеріме реакциялар',
+        notifyAboutPrivateMessages: 'Жеке хабарламалар',
+        notifyAboutMentions: 'Жазбалардағы аталулар',
+        notifyAboutNewPosts: 'Жазылымдардан жаңа жазбалар',
+        notifyAboutFriendRequests: 'Достық сұраныстар',
+        notifyAboutReposts: 'Репосттар',
+        notifyAboutCommentMentions: 'Пікірлердегі аталулар',
+    },
     styles: {
         preview: {
             save: 'Жинағыма қосу',

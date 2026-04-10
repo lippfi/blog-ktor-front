@@ -133,6 +133,7 @@ export interface NotificationSettings {
     notifyAboutNewPosts: boolean;
     notifyAboutFriendRequests: boolean;
     notifyAboutReposts: boolean;
+    notifyAboutCommentMentions: boolean;
 }
 
 // API Methods
@@ -177,6 +178,18 @@ export async function getNotificationSettings(): Promise<NotificationSettings> {
     const response = await authenticatedRequest('/notifications/settings');
     if (!response.ok) {
         throw new Error(`Failed to get notification settings: ${await response.text()}`);
+    }
+    return await response.json() as NotificationSettings;
+}
+
+export async function updateNotificationSettings(settings: NotificationSettings): Promise<NotificationSettings> {
+    const response = await authenticatedRequest('/notifications/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+    });
+    if (!response.ok) {
+        throw new Error(`Failed to update notification settings: ${await response.text()}`);
     }
     return await response.json() as NotificationSettings;
 }
