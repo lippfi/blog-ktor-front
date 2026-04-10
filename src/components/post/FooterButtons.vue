@@ -133,7 +133,7 @@ const props = defineProps<{
       <el-icon v-if="showHiddenButtons && ((!comment && post.authorLogin === getCurrentUserLogin()) || (comment && comment.authorLogin == getCurrentUserLogin()))" size="20" class="edit">
         <Edit @click="startEdit"/>
       </el-icon>
-      <div class="confirm-deletion" v-if="showHiddenButtons && post.authorLogin === getCurrentUserLogin()">
+      <div class="confirm-deletion" v-if="showHiddenButtons && ((post.authorLogin === getCurrentUserLogin()) || (comment && comment.authorLogin === getCurrentUserLogin()))">
         <el-popconfirm
             :title="comment ? t('comment.view.footer.buttons.delete.question') : t('post.view.footer.buttons.delete.question')"
             :confirm-button-text="comment ? t('comment.view.footer.buttons.delete.confirm') : t('post.view.footer.buttons.delete.confirm')"
