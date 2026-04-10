@@ -30,13 +30,13 @@ const settingKeys: (keyof NotificationSettings)[] = [
   'notifyAboutReposts',
   'notifyAboutFriendRequests',
   'notifyAboutPrivateMessages',
-  'notifyAboutNewPosts',
-  'notifyAboutMentions',
-  'notifyAboutCommentMentions',
-  'notifyAboutComments',
-  'notifyAboutReplies',
   'notifyAboutPostReactions',
   'notifyAboutCommentReactions',
+  // 'notifyAboutNewPosts',
+  'notifyAboutMentions',
+  'notifyAboutCommentMentions',
+  // 'notifyAboutComments',
+  'notifyAboutReplies',
 ]
 
 const hasChanges = computed(() =>

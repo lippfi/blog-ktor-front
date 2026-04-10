@@ -21,6 +21,7 @@ export interface IPostClient {
     getLatestPosts(page?: number): Promise<Result<PostSearchResult>>;
     getDiscussedPosts(page?: number, size?: number): Promise<Result<PostSearchResult>>;
     getFollowedPosts(page?: number, size?: number): Promise<Result<PostSearchResult>>;
+    getSubscribedPosts(page?: number, size?: number): Promise<Result<PostSearchResult>>;
     getFriendsPosts(page?: number, size?: number): Promise<Result<PostSearchResult>>;
     getPostForEditing(id: string): Promise<Result<PostEditDto>>;
     updatePost(post: PostEditDto): Promise<Result<PostViewDto>>;
@@ -257,6 +258,25 @@ class PostClientImpl implements IPostClient {
             queryParams.set('size', size.toString());
 
             const response = await authenticatedRequest(`/posts/followed?${queryParams.toString()}`);
+            if (response.ok) {
+                const data = await response.json();
+                return { type: 'ok', data };
+            } else {
+                const message = await response.text();
+                return { type: 'error', message, status: response.status };
+            }
+        } catch (error) {
+            return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        }
+    }
+
+    public async getSubscribedPosts(page = 1, size = 10): Promise<Result<PostSearchResult>> {
+        try {
+            const queryParams = new URLSearchParams();
+            queryParams.set('page', page.toString());
+            queryParams.set('size', size.toString());
+
+            const response = await authenticatedRequest(`/posts/subscribed?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };

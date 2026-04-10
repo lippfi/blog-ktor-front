@@ -47,7 +47,7 @@ const loadPosts = async () => {
   const page = currentPage.value;
 
   try {
-    const result = await client.getFollowedPosts(page);
+    const result = await client.getSubscribedPosts(page);
 
     if (result.type === 'ok') {
       const postSearchResult = result.data;

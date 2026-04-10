@@ -273,6 +273,14 @@ class PostClientMock implements IPostClient {
         }
     }
 
+    public async getSubscribedPosts(page = 1, size = 10): Promise<Result<PostSearchResult>> {
+        try {
+            return { type: 'ok', data: ({} as any) as PostSearchResult };
+        } catch (error) {
+            return { type: 'error', message: error instanceof Error ? error.message : 'Unknown error occurred' };
+        }
+    }
+
     public async getFriendsPosts(page = 1, size = 10): Promise<Result<PostSearchResult>> {
         try {
             return { type: 'ok', data: ({} as any) as PostSearchResult };
