@@ -2,6 +2,63 @@ import { backendURL } from '@/constants';
 import { authenticatedRequest } from '@/api/apiUtils';
 import type { ReactionView, ReactionPack, ReactionInfo } from '@/api/dto/reactionServiceDto';
 
+const REACTION_NAMES_CACHE_KEY = 'reactionNamesCache';
+const REACTION_NAMES_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 1 week
+
+interface ReactionNamesCacheEntry {
+    expiresAt: number;
+    value: ReactionView[];
+}
+
+function normalizeReactionNames(names: string): string {
+    return names
+        .split(',')
+        .map(name => name.trim())
+        .filter(Boolean)
+        .sort()
+        .join(',');
+}
+
+function getReactionNamesCacheEntry(cacheKey: string): ReactionNamesCacheEntry | null {
+    try {
+        const rawCache = localStorage.getItem(REACTION_NAMES_CACHE_KEY);
+        if (!rawCache) {
+            return null;
+        }
+
+        const cache = JSON.parse(rawCache) as Record<string, ReactionNamesCacheEntry>;
+        const cacheEntry = cache[cacheKey];
+        if (!cacheEntry) {
+            return null;
+        }
+
+        if (cacheEntry.expiresAt <= Date.now()) {
+            delete cache[cacheKey];
+            localStorage.setItem(REACTION_NAMES_CACHE_KEY, JSON.stringify(cache));
+            return null;
+        }
+
+        return cacheEntry;
+    } catch (error) {
+        console.error('Failed to read reactions cache:', error);
+        return null;
+    }
+}
+
+function setReactionNamesCacheEntry(cacheKey: string, value: ReactionView[]): void {
+    try {
+        const rawCache = localStorage.getItem(REACTION_NAMES_CACHE_KEY);
+        const cache = rawCache ? JSON.parse(rawCache) as Record<string, ReactionNamesCacheEntry> : {};
+        cache[cacheKey] = {
+            value,
+            expiresAt: Date.now() + REACTION_NAMES_CACHE_DURATION,
+        };
+        localStorage.setItem(REACTION_NAMES_CACHE_KEY, JSON.stringify(cache));
+    } catch (error) {
+        console.error('Failed to write reactions cache:', error);
+    }
+}
+
 // Re-export DTOs for convenience
 export type { ReactionView, ReactionPack, ReactionUserInfo, ReactionInfo, ReactionViewDto, ReactionPackDto } from '@/api/dto/reactionServiceDto';
 
@@ -35,9 +92,21 @@ export async function searchReactions(text?: string, pattern?: string): Promise<
 }
 
 export async function getReactionsByNames(names: string): Promise<ReactionView[]> {
-    const response = await fetch(`${backendURL}/reactions/search-names?names=${encodeURIComponent(names)}`);
+    const normalizedNames = normalizeReactionNames(names);
+    if (!normalizedNames) {
+        return [];
+    }
+
+    const cachedResponse = getReactionNamesCacheEntry(normalizedNames);
+    if (cachedResponse) {
+        return cachedResponse.value;
+    }
+
+    const response = await fetch(`${backendURL}/reactions/search-names?names=${encodeURIComponent(normalizedNames)}`);
     if (!response.ok) throw new Error(await response.text());
-    return response.json();
+    const reactions = await response.json() as ReactionView[];
+    setReactionNamesCacheEntry(normalizedNames, reactions);
+    return reactions;
 }
 
 // --- Basic & Recent ---

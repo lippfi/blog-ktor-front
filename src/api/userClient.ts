@@ -46,8 +46,61 @@ const TOKEN_PAIR_KEY = 'tokenPair';
 const SESSION_INFO_KEY = 'sessionInfo';
 const SESSION_INFO_TIME_KEY = 'timeToSessionInfo';
 const REFRESH_INTERVAL_MS = 10 * 60 * 1000;
+const USER_LOGINS_CACHE_KEY = 'userLoginsCache';
+const USER_LOGINS_CACHE_DURATION = 24 * 60 * 60 * 1000; // 1 day
+
+interface UserLoginsCacheEntry {
+    expiresAt: number;
+    value: UserView[];
+}
 
 let refreshIntervalId: ReturnType<typeof setInterval> | null = null;
+
+function normalizeLogins(logins: string[]): string {
+    return [...new Set(logins.map(login => login.trim()).filter(Boolean))]
+        .sort()
+        .join(',');
+}
+
+function getUserLoginsCacheEntry(cacheKey: string): UserLoginsCacheEntry | null {
+    try {
+        const rawCache = localStorage.getItem(USER_LOGINS_CACHE_KEY);
+        if (!rawCache) {
+            return null;
+        }
+
+        const cache = JSON.parse(rawCache) as Record<string, UserLoginsCacheEntry>;
+        const cacheEntry = cache[cacheKey];
+        if (!cacheEntry) {
+            return null;
+        }
+
+        if (cacheEntry.expiresAt <= Date.now()) {
+            delete cache[cacheKey];
+            localStorage.setItem(USER_LOGINS_CACHE_KEY, JSON.stringify(cache));
+            return null;
+        }
+
+        return cacheEntry;
+    } catch (error) {
+        console.error('Failed to read users cache:', error);
+        return null;
+    }
+}
+
+function setUserLoginsCacheEntry(cacheKey: string, value: UserView[]): void {
+    try {
+        const rawCache = localStorage.getItem(USER_LOGINS_CACHE_KEY);
+        const cache = rawCache ? JSON.parse(rawCache) as Record<string, UserLoginsCacheEntry> : {};
+        cache[cacheKey] = {
+            value,
+            expiresAt: Date.now() + USER_LOGINS_CACHE_DURATION,
+        };
+        localStorage.setItem(USER_LOGINS_CACHE_KEY, JSON.stringify(cache));
+    } catch (error) {
+        console.error('Failed to write users cache:', error);
+    }
+}
 
 // --- Token pair management ---
 
@@ -262,10 +315,22 @@ export async function searchUsers(text: string): Promise<Result<UserView[]>> {
 
 export async function getUsersByLogins(logins: string[]): Promise<Result<UserView[]>> {
     try {
-        const url = `${backendURL}/user/search-logins?logins=${encodeURIComponent(logins.join(','))}`;
+        const normalizedLogins = normalizeLogins(logins);
+        if (!normalizedLogins) {
+            return { type: 'ok', data: [] };
+        }
+
+        const cachedResponse = getUserLoginsCacheEntry(normalizedLogins);
+        if (cachedResponse) {
+            return { type: 'ok', data: cachedResponse.value };
+        }
+
+        const url = `${backendURL}/user/search-logins?logins=${encodeURIComponent(normalizedLogins)}`;
         const response = await fetch(url);
         if (response.ok) {
-            return { type: 'ok', data: await response.json() };
+            const users = await response.json() as UserView[];
+            setUserLoginsCacheEntry(normalizedLogins, users);
+            return { type: 'ok', data: users };
         } else {
             return { type: 'error', message: await response.text() };
         }
