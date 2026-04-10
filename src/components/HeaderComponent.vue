@@ -5,7 +5,7 @@ import type {DiaryHeaderInfo} from "@/api/dto/postServiceDto.ts";
 import { ArrowDown, Bell } from '@element-plus/icons-vue';
 import { isSignedIn } from '@/api/userClient';
 import { getAllNotifications, connectToNotificationsWebSocket } from '@/api/notificationClient';
-import type { Notification } from '@/api/notificationClient';
+import type { Notification, WebSocketMessage } from '@/api/notificationClient';
 import NotificationItem from '@/components/notification/NotificationItem.vue';
 import { useI18n } from 'vue-i18n';
 
@@ -42,15 +42,50 @@ async function fetchNotifications() {
   }
 }
 
+function isNotificationEvent(type: string): boolean {
+  return ['NOTIFICATIONS_READ', 'ALL_NOTIFICATIONS_READ', 'NOTIFICATIONS_DELETED', 'ALL_NOTIFICATIONS_DELETED'].includes(type);
+}
+
+function handleWebSocketMessage(message: WebSocketMessage) {
+  switch (message.type) {
+    case 'NOTIFICATIONS_READ':
+      notifications.value = notifications.value.filter(n => !message.notificationIds.includes(n.id));
+      break;
+    case 'ALL_NOTIFICATIONS_READ':
+      notifications.value = [];
+      break;
+    case 'NOTIFICATIONS_DELETED':
+      notifications.value = notifications.value.filter(n => !message.notificationIds.includes(n.id));
+      break;
+    case 'ALL_NOTIFICATIONS_DELETED':
+      notifications.value = [];
+      break;
+    default:
+      // New notification
+      if (!isNotificationEvent(message.type)) {
+        notifications.value = [message as Notification, ...notifications.value];
+      }
+      break;
+  }
+}
+
 function setupWebSocket() {
   if (!isSignedIn()) return;
   ws = connectToNotificationsWebSocket();
-  ws.onmessage = () => {
-    fetchNotifications();
+  ws.onmessage = (event) => {
+    try {
+      const message: WebSocketMessage = JSON.parse(event.data);
+      handleWebSocketMessage(message);
+    } catch {
+      // silently ignore malformed messages
+    }
   };
   ws.onclose = () => {
-    // Reconnect after 5 seconds
-    setTimeout(() => setupWebSocket(), 5000);
+    // Reconnect after 5 seconds and refetch to catch missed notifications
+    setTimeout(() => {
+      setupWebSocket();
+      fetchNotifications();
+    }, 5000);
   };
 }
 

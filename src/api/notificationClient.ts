@@ -25,6 +25,7 @@ export interface CommentNotification extends NotificationBase {
     postTitle: string;
     commentAuthorLogin: string;
     commentAuthorNickname: string;
+    commentId?: string | null;
 }
 
 export interface CommentReplyNotification extends NotificationBase {
@@ -34,6 +35,7 @@ export interface CommentReplyNotification extends NotificationBase {
     postTitle: string;
     commentAuthorLogin: string;
     commentAuthorNickname: string;
+    commentId?: string | null;
 }
 
 export interface PostReactionNotification extends NotificationBase {
@@ -55,6 +57,7 @@ export interface CommentReactionNotification extends NotificationBase {
     reactionURL: string;
     reactorLogin: string;
     reactorNickname: string;
+    commentId?: string | null;
 }
 
 export interface PostMentionNotification extends NotificationBase {
@@ -73,6 +76,7 @@ export interface CommentMentionNotification extends NotificationBase {
     commentTitle: string;
     commentAuthorLogin: string;
     commentAuthorNickname: string;
+    commentId?: string | null;
 }
 
 export interface FriendRequestNotification extends NotificationBase {
@@ -122,6 +126,34 @@ export type Notification =
     | CommentRepostNotification;
 
 export type NotificationType = Notification['type'];
+
+// WebSocket event types
+
+export interface NotificationsReadEvent {
+    type: 'NOTIFICATIONS_READ';
+    notificationIds: string[];
+}
+
+export interface AllNotificationsReadEvent {
+    type: 'ALL_NOTIFICATIONS_READ';
+}
+
+export interface NotificationsDeletedEvent {
+    type: 'NOTIFICATIONS_DELETED';
+    notificationIds: string[];
+}
+
+export interface AllNotificationsDeletedEvent {
+    type: 'ALL_NOTIFICATIONS_DELETED';
+}
+
+export type NotificationWebSocketEvent =
+    | NotificationsReadEvent
+    | AllNotificationsReadEvent
+    | NotificationsDeletedEvent
+    | AllNotificationsDeletedEvent;
+
+export type WebSocketMessage = Notification | NotificationWebSocketEvent;
 
 export interface NotificationSettings {
     notifyAboutComments: boolean;
