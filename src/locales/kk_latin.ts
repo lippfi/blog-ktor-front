@@ -440,6 +440,20 @@ export default {
         following: 'Jazylymdar',
         friends: 'Dostar'
     },
+    friendsPage: {
+        title: 'Dostar',
+        tabs: {
+            friends: 'Dostar',
+            outgoing: 'Shyǵys suranysdar',
+            incoming: 'Kiris suranysdar',
+        },
+        empty: {
+            friends: 'Sizde ázirge dostar joq',
+            outgoing: 'Shyǵys suranys joq',
+            incoming: 'Kiris suranys joq',
+        },
+        loadError: 'Dostar betin júkteu sátsiz ayaqtaldy',
+    },
     errors: {
         not_found: 'Bet nemese jazba tabylmady'
     },

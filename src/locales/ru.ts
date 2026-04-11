@@ -602,6 +602,20 @@ export default {
         following: 'Подписки',
         friends: 'Друзья'
     },
+    friendsPage: {
+        title: 'Друзья',
+        tabs: {
+            friends: 'Друзья',
+            outgoing: 'Исходящие запросы',
+            incoming: 'Входящие запросы',
+        },
+        empty: {
+            friends: 'У вас пока нет друзей',
+            outgoing: 'У вас нет исходящих запросов',
+            incoming: 'У вас нет входящих запросов',
+        },
+        loadError: 'Не удалось загрузить страницу друзей',
+    },
     avatars: {
         noAvatarsAvailable: 'Нет доступных аватаров',
         loading: 'Загрузка аватаров...',

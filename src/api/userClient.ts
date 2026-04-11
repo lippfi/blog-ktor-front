@@ -15,6 +15,8 @@ import type {
     NotificationSettings,
     FriendRequestCreate,
     FriendRequest,
+    FriendView,
+    FriendsPage,
     IgnoredUserView,
     RelationshipInfo,
     Language,
@@ -38,6 +40,8 @@ export type {
     NotificationSettings,
     FriendRequestCreate,
     FriendRequest,
+    FriendView,
+    FriendsPage,
     IgnoredUserView,
     RelationshipInfo,
 };
@@ -747,6 +751,12 @@ export async function getReceivedFriendRequests(): Promise<FriendRequest[]> {
 
 export async function getFriends(): Promise<UserView[]> {
     const response = await authenticatedRequest('/user/friends');
+    if (!response.ok) throw new Error(await response.text());
+    return response.json();
+}
+
+export async function getFriendsPage(): Promise<FriendsPage> {
+    const response = await authenticatedRequest('/user/friends-page');
     if (!response.ok) throw new Error(await response.text());
     return response.json();
 }

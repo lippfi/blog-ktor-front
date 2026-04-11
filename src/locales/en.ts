@@ -602,6 +602,20 @@ export default {
         following: 'Following',
         friends: 'Friends'
     },
+    friendsPage: {
+        title: 'Friends',
+        tabs: {
+            friends: 'Friends',
+            outgoing: 'Outgoing requests',
+            incoming: 'Incoming requests',
+        },
+        empty: {
+            friends: 'You have no friends yet',
+            outgoing: 'You have no outgoing requests',
+            incoming: 'You have no incoming requests',
+        },
+        loadError: 'Failed to load friends page',
+    },
     avatars: {
         noAvatarsAvailable: 'No avatars available',
         loading: 'Loading avatars...',

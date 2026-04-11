@@ -20,6 +20,7 @@ import {updateStyles} from "@/styles/stylesManager";
 import NotFoundView from "@/views/NotFoundView.vue";
 import FeedView from "@/views/FeedView.vue";
 import DiscussionsView from "@/views/DiscussionsView.vue";
+import FriendsView from "@/views/FriendsView.vue";
 import SettingsView from "@/views/SettingsView.vue";
 import CreateWelcomePostTestView from "@/views/CreateWelcomePostTestView.vue";
 
@@ -79,6 +80,11 @@ const router = createRouter({
           next();
         }
       }
+    },
+    {
+      path: '/friends',
+      name: 'friends',
+      component: FriendsView,
     },
     {
       path: '/about',

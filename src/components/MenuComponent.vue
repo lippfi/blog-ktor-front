@@ -16,7 +16,7 @@ import {
 import friendsIcon from "@/assets/icons/friends.svg";
 import {useI18n} from "vue-i18n";
 import {useRouter} from 'vue-router';
-import {getCurrentUserLogin, logOut} from "@/api/userClient.ts";
+import {getCurrentUserLogin, getRelationshipInfo, isSignedIn, logOut} from "@/api/userClient.ts";
 import {computed, onMounted, onUnmounted, ref, watch} from 'vue';
 
 const props = withDefaults(defineProps<{
@@ -35,6 +35,7 @@ const { t } = useI18n()
 const router = useRouter()
 const currentUser = getCurrentUserLogin()
 const isDarkTheme = ref(false)
+const showFriendsItem = ref(false)
 const THEME_STORAGE_KEY = 'theme'
 const THEME_MIGRATION_KEY = 'theme_without_system_fallback_migration_v1'
 const DARK_THEME_VALUE = 'dark'
@@ -87,6 +88,28 @@ function toggleCollapse() {
   setCollapseState(!isCollapse.value)
 }
 
+const updateFriendsVisibility = async () => {
+  if (!isSignedIn()) {
+    showFriendsItem.value = false
+    return
+  }
+
+  try {
+    const relationshipInfoResult = await getRelationshipInfo()
+    if (relationshipInfoResult.type === 'error') {
+      showFriendsItem.value = false
+      return
+    }
+
+    const relationshipInfo = relationshipInfoResult.data
+    showFriendsItem.value = relationshipInfo.friendLogins.length > 0
+      || relationshipInfo.outgoingFriendRequestLogins.length > 0
+      || relationshipInfo.incomingFriendRequestLogins.length > 0
+  } catch {
+    showFriendsItem.value = false
+  }
+}
+
 const updateMenuTop = () => {
   menuTopOffset.value = Math.max(0, HEADER_HEIGHT - window.scrollY)
 }
@@ -95,7 +118,7 @@ const updateMobileNavMargin = () => {
   mobileNavMarginTop.value = MOBILE_HEADER_HEIGHT + window.scrollY
 }
 
-onMounted(() => {
+onMounted(async () => {
   runThemeMigration()
   if (props.isMobile) {
     setCollapseState(false, false)
@@ -111,6 +134,8 @@ onMounted(() => {
   const shouldUseDarkTheme = savedTheme === DARK_THEME_VALUE
 
   applyTheme(shouldUseDarkTheme)
+
+  await updateFriendsVisibility()
 })
 
 onUnmounted(() => {
@@ -141,7 +166,7 @@ watch(() => props.isMobile, (isMobile) => {
         <span class="menu-button-title">{{ t('menu.home') }}</span>
       </button>
 
-      <button class="menu-button" type="button" @click="navigateTo('/?feed=friends&page=1')">
+      <button v-if="showFriendsItem" class="menu-button" type="button" @click="navigateTo('/friends')">
         <img class="friends-icon" :src="friendsIcon" alt="" aria-hidden="true" />
         <span class="menu-button-title">{{ t('menu.friends') }}</span>
       </button>

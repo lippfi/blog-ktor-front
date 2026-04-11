@@ -31,6 +31,8 @@ const pageTitle = computed(() => {
   switch (route.name) {
     case 'feed':
       return t('feed.title');
+    case 'friends':
+      return t('friendsPage.title');
     case 'settings':
       return t('menu.settings');
     case 'search':

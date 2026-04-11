@@ -581,6 +581,20 @@ export default {
         following: 'Жазылымдар',
         friends: 'Достар'
     },
+    friendsPage: {
+        title: 'Достар',
+        tabs: {
+            friends: 'Достар',
+            outgoing: 'Жіберілген сұраныстар',
+            incoming: 'Кіріс сұраныстар',
+        },
+        empty: {
+            friends: 'Әзірге достарыңыз жоқ',
+            outgoing: 'Жіберілген сұраныстар жоқ',
+            incoming: 'Кіріс сұраныстар жоқ',
+        },
+        loadError: 'Достар бетін жүктеу сәтсіз аяқталды',
+    },
     avatars: {
         noAvatarsAvailable: 'Қолжетімді аватарлар жоқ',
         loading: 'Аватарлар жүктелуде...',

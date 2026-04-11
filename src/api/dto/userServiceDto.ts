@@ -81,6 +81,20 @@ export interface FriendRequest {
     createdAt: string;
 }
 
+export interface FriendView {
+    login: string;
+    nickname: string;
+    avatarUri?: string | null;
+    signature?: string | null;
+    label?: string | null;
+}
+
+export interface FriendsPage {
+    friends: FriendView[];
+    outgoingRequests: FriendRequest[];
+    incomingRequests: FriendRequest[];
+}
+
 export interface UpdatePasswordRequest {
     newPassword: string;
     oldPassword: string;
