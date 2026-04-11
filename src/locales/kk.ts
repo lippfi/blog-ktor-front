@@ -556,6 +556,7 @@ export default {
         home: 'Басты бет',
         discussions: 'Талқылаулар',
         profile: 'Профиль',
+        friends: 'Достар',
         diary: 'Күнделік',
         messages: 'Хабарламалар',
         search: 'Іздеу',

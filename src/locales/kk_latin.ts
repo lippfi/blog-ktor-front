@@ -431,6 +431,9 @@ export default {
         requiredFields: 'Atauy jane CSS stil mazmuny mindetti',
         previewUrlApplied: 'Aldyn ala qarau suretinin URL mekenjayy satti qoldanyldy'
     },
+    menu: {
+        friends: 'Dostar',
+    },
     feed: {
         latest: 'Sońǵy',
         popular: 'Tanymal',

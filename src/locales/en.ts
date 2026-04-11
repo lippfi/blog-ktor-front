@@ -577,6 +577,7 @@ export default {
         home: 'Home',
         discussions: 'Discussions',
         profile: 'Profile',
+        friends: 'Friends',
         diary: 'Diary',
         messages: 'Messages',
         search: 'Search',

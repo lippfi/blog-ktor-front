@@ -13,6 +13,7 @@ import {
   SwitchButton,
   User
 } from "@element-plus/icons-vue";
+import friendsIcon from "@/assets/icons/friends.svg";
 import {useI18n} from "vue-i18n";
 import {useRouter} from 'vue-router';
 import {getCurrentUserLogin, logOut} from "@/api/userClient.ts";
@@ -120,6 +121,11 @@ watch(() => props.isMobile, (isMobile) => {
       <button class="menu-button" type="button" @click="navigateTo('/')">
         <el-icon size="20"><HomeFilled /></el-icon>
         <span class="menu-button-title">{{ t('menu.home') }}</span>
+      </button>
+
+      <button class="menu-button" type="button" @click="navigateTo('/?feed=friends&page=1')">
+        <img class="friends-icon" :src="friendsIcon" alt="" aria-hidden="true" />
+        <span class="menu-button-title">{{ t('menu.friends') }}</span>
       </button>
 
       <button class="menu-button" type="button" @click="navigateTo('/discussions')">
@@ -230,10 +236,19 @@ watch(() => props.isMobile, (isMobile) => {
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.menu-button :deep(.el-icon) {
+.menu-button > :deep(.el-icon) {
   position: absolute;
   left: 22px;
   top: 50%;
+  transform: translateY(-50%);
+}
+
+.friends-icon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  width: 40px;
+  display: block;
   transform: translateY(-50%);
 }
 

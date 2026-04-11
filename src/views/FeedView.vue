@@ -45,8 +45,8 @@ const currentFeed = computed(() => route.query.feed as string || 'latest');
 const feedOptions = computed(() => [
   { label: t('feed.latest'), value: 'latest' },
   { label: t('feed.popular'), value: 'popular' },
-  { label: t('feed.following'), value: 'following' },
   { label: t('feed.friends'), value: 'friends' },
+  { label: t('feed.following'), value: 'following' },
 ]);
 
 const selectedFeed = computed({

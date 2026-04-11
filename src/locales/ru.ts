@@ -577,6 +577,7 @@ export default {
         home: 'Главная',
         discussions: 'Обсуждения',
         profile: 'Профиль',
+        friends: 'Друзья',
         diary: 'Дневник',
         messages: 'Сообщения',
         search: 'Поиск',
