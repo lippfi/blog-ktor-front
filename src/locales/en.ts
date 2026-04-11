@@ -530,6 +530,7 @@ export default {
             addFriend: {
                 title: 'Add Friend',
                 label: 'Friend label (optional)',
+                labelInfo: 'Friend label indicates how you categorize a person in your friend list. This label is visible to other users who view your friends. It can describe the relationship, such as significant other, gaming partner, etc.',
                 message: 'Message (optional)',
                 cancel: 'Cancel',
                 confirm: 'Add Friend'

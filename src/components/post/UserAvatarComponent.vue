@@ -177,14 +177,19 @@ const handleMenuClick = async (command: string) => {
     <el-dialog
       v-model="addFriendDialogVisible"
       :title="t('userAvatar.dialog.addFriend.title')"
-      width="400"
+      width="min(400px, 92vw)"
     >
-      <el-input
-        v-model="friendLabel"
-        :placeholder="t('userAvatar.dialog.addFriend.label')"
-        clearable
-        class="mb-3"
-      />
+      <el-space fill class="mb-3">
+        <el-alert type="info" :closable="false">
+          {{ t('userAvatar.dialog.addFriend.labelInfo') }}
+        </el-alert>
+        <el-input
+            v-model="friendLabel"
+            :placeholder="t('userAvatar.dialog.addFriend.label')"
+            clearable
+            class="mb-3"
+        />
+      </el-space>
       <el-input
         v-model="friendMessage"
         type="textarea"
