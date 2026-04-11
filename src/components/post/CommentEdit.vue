@@ -389,6 +389,7 @@ async function updateComment() {
   min-width: 0;  /* Prevent flex items from overflowing */
   box-sizing: border-box;
   padding-left: 20px;
+  padding-bottom: 20px;
 }
 .form {
   display: flex;
