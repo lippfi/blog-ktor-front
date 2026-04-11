@@ -8,6 +8,7 @@ interface NotificationBase {
     type: string;
     isRead: boolean;
     createdAt: string;
+    postId?: string | null;
     avatarUrl?: string | null;
 }
 

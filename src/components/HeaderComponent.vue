@@ -4,10 +4,11 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import type {DiaryHeaderInfo} from "@/api/dto/postServiceDto.ts";
 import { ArrowDown, Bell } from '@element-plus/icons-vue';
 import { isSignedIn } from '@/api/userClient';
-import { getAllNotifications, connectToNotificationsWebSocket } from '@/api/notificationClient';
+import { connectToNotificationsWebSocket, getAllNotifications, markNotificationAsRead } from '@/api/notificationClient';
 import type { Notification, WebSocketMessage } from '@/api/notificationClient';
 import NotificationItem from '@/components/notification/NotificationItem.vue';
 import { useI18n } from 'vue-i18n';
+import { getUnreadNotificationsForPost, shouldAutoMarkNotificationForPost } from '@/components/notification/notificationReadUtils';
 
 const props = withDefaults(defineProps<{
   isMenuOpen?: boolean
@@ -32,11 +33,53 @@ const notifications = ref<Notification[]>([]);
 const notificationCount = computed(() => notifications.value.length);
 const dialogVisible = ref(false);
 let ws: WebSocket | null = null;
+const notificationsBeingMarkedAsRead = new Set<string>();
+
+function getCurrentPostId(): string | null {
+  if (route.name !== 'post') {
+    return null;
+  }
+
+  const routePost = route.meta.post as { id?: string } | undefined;
+  return typeof routePost?.id === 'string' ? routePost.id : null;
+}
+
+async function markNotificationAsReadAndRemove(notification: Notification): Promise<boolean> {
+  if (notification.isRead || notificationsBeingMarkedAsRead.has(notification.id)) {
+    return true;
+  }
+
+  notificationsBeingMarkedAsRead.add(notification.id);
+  try {
+    await markNotificationAsRead(notification.id);
+    notifications.value = notifications.value.filter((currentNotification) => currentNotification.id !== notification.id);
+    return true;
+  } catch {
+    return false;
+  } finally {
+    notificationsBeingMarkedAsRead.delete(notification.id);
+  }
+}
+
+async function markCurrentPostNotificationsAsRead() {
+  const currentPostId = getCurrentPostId();
+  if (!currentPostId) {
+    return;
+  }
+
+  const notificationsToMark = getUnreadNotificationsForPost(notifications.value, currentPostId);
+  if (notificationsToMark.length === 0) {
+    return;
+  }
+
+  await Promise.allSettled(notificationsToMark.map((notification) => markNotificationAsReadAndRemove(notification)));
+}
 
 async function fetchNotifications() {
   if (!isSignedIn()) return;
   try {
     notifications.value = await getAllNotifications();
+    await markCurrentPostNotificationsAsRead();
   } catch {
     // silently ignore
   }
@@ -63,7 +106,16 @@ function handleWebSocketMessage(message: WebSocketMessage) {
     default:
       // New notification
       if (!isNotificationEvent(message.type)) {
-        notifications.value = [message as Notification, ...notifications.value];
+        const notification = message as Notification;
+        if (shouldAutoMarkNotificationForPost(notification, getCurrentPostId())) {
+          void markNotificationAsReadAndRemove(notification).then((isMarkedAsRead) => {
+            if (!isMarkedAsRead) {
+              notifications.value = [notification, ...notifications.value];
+            }
+          });
+        } else {
+          notifications.value = [notification, ...notifications.value];
+        }
       }
       break;
   }
@@ -98,13 +150,15 @@ function onNotificationRead(id: string) {
 }
 
 onMounted(() => {
-  fetchNotifications();
+  void fetchNotifications();
   setupWebSocket();
   window.addEventListener('resize', updateIsMobile);
+  window.addEventListener('focus', onWindowFocus);
 });
 
 router.afterEach(() => {
   dialogVisible.value = false;
+  void markCurrentPostNotificationsAsRead();
 });
 
 onUnmounted(() => {
@@ -114,7 +168,12 @@ onUnmounted(() => {
     ws = null;
   }
   window.removeEventListener('resize', updateIsMobile);
+  window.removeEventListener('focus', onWindowFocus);
 });
+
+function onWindowFocus() {
+  void markCurrentPostNotificationsAsRead();
+}
 
 const onLogoClick = () => {
   emit('toggleMenu')
