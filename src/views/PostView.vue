@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute} from "vue-router";
-import { ref, nextTick, onMounted, onUnmounted, watch} from "vue";
+import { computed, ref, nextTick, onMounted, onUnmounted, watch} from "vue";
 import {useI18n} from "vue-i18n";
 
 import CommentEdit from "@/components/post/CommentEdit.vue";
@@ -33,6 +33,27 @@ const selectedCommentId = ref<string | undefined>(props.commentId);
 const route = useRoute();
 const post = ref<PostViewDto>(route.meta.post as PostViewDto);
 const comments = ref<CommentDto[]>([]);
+
+const lastUsedAvatar = computed(() => {
+  const currentUserLogin = getCurrentUserLogin();
+  if (!currentUserLogin) {
+    return undefined;
+  }
+
+  let latestComment: CommentDto | undefined;
+
+  for (const comment of comments.value) {
+    if (comment.authorLogin !== currentUserLogin || !comment.avatar) {
+      continue;
+    }
+
+    if (!latestComment || Date.parse(comment.creationTime) >= Date.parse(latestComment.creationTime)) {
+      latestComment = comment;
+    }
+  }
+
+  return latestComment?.avatar;
+});
 
 watch(() => route.meta.post, (newPost) => {
   if (newPost) {
@@ -278,12 +299,14 @@ async function toggleSubscription() {
     </div>
     <CommentEdit v-if="post.isCommentable && !parentCommentId"
                  :post-id="post.id"
+                 :initial-avatar="lastUsedAvatar"
                  :is-edit="false"
     />
     <CommentEdit v-if="post.isCommentable && parentCommentId"
                  :post-id="post.id"
                  :parent-comment-id="parentCommentId"
                  :replying-to-comment="replyingToComment"
+                 :initial-avatar="lastUsedAvatar"
                  :is-edit="false"
                  :is-reply="true"
                  @cancel-reply="cancelReply"/>

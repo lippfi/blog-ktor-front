@@ -6,7 +6,7 @@
         <ArrowUpBold v-if="isVertical"/>
       </el-icon>
     </div>
-    <div class="avatars">
+    <div ref="avatarsContainerRef" class="avatars">
       <template v-for="(avatar, index) in reactionsStore.avatars" :key="avatar">
         <input type="radio" name="avatar" :id="String(index)" :value="avatar" v-model="selectedAvatarModel">
         <label class="avatar-box" :for="String(index)"><img class="avatar" :src="avatar" alt="avatar"></label>
@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import {ArrowDownBold, ArrowLeftBold, ArrowRightBold, ArrowUpBold} from "@element-plus/icons-vue";
 import {useI18n} from "vue-i18n";
 import { useReactionsStore } from "@/stores/reactionsStore";
@@ -55,6 +55,7 @@ const props = defineProps<Props>()
 const selectedAvatarModel = defineModel<string>('selectedAvatar', { default: "" })
 
 const customAvatar = ref("")
+const avatarsContainerRef = ref<HTMLElement | null>(null)
 
 const height = computed(() => props.isVertical ? (props.showButtons ? "calc(100% - 40px)" : "100%") : props.avatarSize + 5 + "px")
 const width = computed(() => props.isVertical ? props.avatarSize + "px" : (props.showButtons ? "calc(100% - 40px)" : "100%"))
@@ -78,7 +79,7 @@ const outlineSizePx = computed(() => `${props.outlineSize}px`)
 const negativeOutlineSizePx = computed(() => `-${props.outlineSize}px`)
 
 const scroll_left = () => {
-  const content = document.querySelector(".avatars")
+  const content = avatarsContainerRef.value
   if (content) {
     if (props.isVertical) {
       content.scrollTop -= 200
@@ -89,7 +90,7 @@ const scroll_left = () => {
 }
 
 const scroll_right = () => {
-  const content = document.querySelector(".avatars")
+  const content = avatarsContainerRef.value
   if (content) {
     if (props.isVertical) {
       content.scrollTop += 200
@@ -97,6 +98,24 @@ const scroll_right = () => {
       content.scrollLeft += 200
     }
   }
+}
+
+const scrollToSelectedAvatar = (behavior: ScrollBehavior = 'auto') => {
+  const container = avatarsContainerRef.value
+  if (!container) {
+    return
+  }
+
+  const selectedInput = container.querySelector('input[type="radio"]:checked') as HTMLInputElement | null
+  if (!selectedInput) {
+    return
+  }
+
+  selectedInput.scrollIntoView({
+    behavior,
+    block: props.isVertical ? 'center' : 'nearest',
+    inline: props.isVertical ? 'nearest' : 'center',
+  })
 }
 
 // Watch for changes in customAvatar and update selectedAvatarModel
@@ -117,6 +136,22 @@ onMounted(() => {
   else if (reactionsStore.avatars.length > 0) {
     selectedAvatarModel.value = reactionsStore.avatars[0]
   }
+
+  nextTick(() => {
+    scrollToSelectedAvatar()
+  })
+})
+
+watch(selectedAvatarModel, () => {
+  nextTick(() => {
+    scrollToSelectedAvatar('smooth')
+  })
+})
+
+watch(() => [props.isVertical, reactionsStore.avatars.length], () => {
+  nextTick(() => {
+    scrollToSelectedAvatar()
+  })
 })
 </script>
 

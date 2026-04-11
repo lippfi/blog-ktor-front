@@ -14,6 +14,7 @@ const reactionsStore = useReactionsStore();
 const props = defineProps<{
   id?:string;
   avatar?: string;
+  initialAvatar?: string;
   content?: string;
   postId: string;
   replyingToComment?: CommentDto;
@@ -134,6 +135,7 @@ onMounted(() => {
   document.addEventListener('mousedown', documentClickHandler);
   mediaQuery.addEventListener('change', updateScreenSize);
   restoreCommentDraft();
+  ensureAvatarSelection();
 });
 
 onUnmounted(() => {
@@ -142,7 +144,7 @@ onUnmounted(() => {
   mediaQuery.removeEventListener('change', updateScreenSize);
 
   // Save draft on unmount so text is preserved when switching between root and reply mode
-  if (!props.isEdit && localContent.value.trim()) {
+  if (!props.isEdit && (localContent.value.trim() || localAvatar.value)) {
     // Always save to root key so text transfers between root and reply modes
     saveDraft(rootDraftKey, {
       content: localContent.value,
@@ -175,9 +177,26 @@ const emit = defineEmits<{
 }>();
 
 const localContent = ref<string>(props.content || '');
-const localAvatar = ref<string | undefined>(props.avatar);
+const localAvatar = ref<string | undefined>(props.avatar || props.initialAvatar);
 
 const rootDraftKey = buildDraftKey('comment', `${props.postId}:root`);
+
+function ensureAvatarSelection() {
+  if (!reactionsStore.avatars.length) {
+    return;
+  }
+
+  if (localAvatar.value && reactionsStore.avatars.includes(localAvatar.value)) {
+    return;
+  }
+
+  if (!localAvatar.value && props.initialAvatar && reactionsStore.avatars.includes(props.initialAvatar)) {
+    localAvatar.value = props.initialAvatar;
+    return;
+  }
+
+  localAvatar.value = reactionsStore.avatars[0];
+}
 
 function restoreCommentDraft() {
   if (props.isEdit) {
@@ -206,10 +225,12 @@ function restoreCommentDraft() {
   if (typeof draft.avatar === 'string') {
     localAvatar.value = draft.avatar;
   }
+
+  ensureAvatarSelection();
 }
 
 function saveCommentDraft() {
-  if (props.isEdit || !localContent.value.trim()) {
+  if (props.isEdit || (!localContent.value.trim() && !localAvatar.value)) {
     return;
   }
 
@@ -230,7 +251,7 @@ function cancelEdit() {
 function cancelReply() {
   // Save draft before emitting cancel so the root CommentEdit can restore it on mount
   // (Vue mounts the root component before unmounting the reply component)
-  if (localContent.value.trim()) {
+  if (localContent.value.trim() || localAvatar.value) {
     saveDraft(rootDraftKey, {
       content: localContent.value,
       avatar: localAvatar.value,
@@ -238,6 +259,10 @@ function cancelReply() {
   }
   emit('cancel-reply');
 }
+
+watch(() => reactionsStore.avatars, () => {
+  ensureAvatarSelection();
+});
 
 async function addComment() {
   isLoading.value = true;
