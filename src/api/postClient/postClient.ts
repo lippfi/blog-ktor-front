@@ -221,7 +221,7 @@ class PostClientImpl implements IPostClient {
             queryParams.set('size', size.toString());
             queryParams.set('isHidden', 'false');
             
-            const response = await optionalAuthenticatedRequest(`/posts/search?${queryParams.toString()}`);
+            const response = await optionalAuthenticatedRequest(`/posts/latest?${queryParams.toString()}`);
             if (response.ok) {
                 const data = await response.json();
                 return { type: 'ok', data };

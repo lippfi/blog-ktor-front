@@ -8,7 +8,7 @@ import {
   Remove,
   User
 } from "@element-plus/icons-vue";
-import { getCurrentUserLogin, removeFriend as removeFriendApi, sendFriendRequest } from "@/api/userClient.ts";
+import { doNotShowInFeed, getCurrentUserLogin, removeFriend as removeFriendApi, sendFriendRequest } from "@/api/userClient.ts";
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -33,9 +33,18 @@ const handleBlock = async () => {
 
 const handleHideFromFeed = async () => {
   try {
-    // TODO: Implement hide from feed API call
+    const result = await doNotShowInFeed(props.login);
+    if (result.type === 'error') {
+      ElMessage.error(t('userAvatar.notifications.hideFromFeed.error'));
+      return;
+    }
+
     ElMessage.success(t('userAvatar.notifications.hideFromFeed.success', { nickname: props.nickname }));
     blockDialogVisible.value = false;
+
+    if (router.currentRoute.value.name === 'feed' || router.currentRoute.value.path === '/') {
+      window.location.reload();
+    }
   } catch (error) {
     ElMessage.error(t('userAvatar.notifications.hideFromFeed.error'));
   }
