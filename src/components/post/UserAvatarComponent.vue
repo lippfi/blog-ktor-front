@@ -138,10 +138,10 @@ const handleMenuClick = async (command: string) => {
           <el-icon><Memo/></el-icon>
           {{ t('userAvatar.menu.diary') }}
         </el-menu-item>
-        <el-menu-item index="message">
-          <el-icon><Message/></el-icon>
-          {{ t('userAvatar.menu.privateMessage') }}
-        </el-menu-item>
+<!--        <el-menu-item index="message">-->
+<!--          <el-icon><Message/></el-icon>-->
+<!--          {{ t('userAvatar.menu.privateMessage') }}-->
+<!--        </el-menu-item>-->
         <el-menu-item v-if="getCurrentUserLogin() !== login && !isFriend" index="add-friend">
           <el-icon><CirclePlus/></el-icon>
           {{ t('userAvatar.menu.addFriend') }}
