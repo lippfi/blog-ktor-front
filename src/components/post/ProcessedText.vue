@@ -116,6 +116,9 @@ async function replaceReactions(text: string): Promise<string> {
     return result;
   }
 
+  const sourceText = result;
+  const isSingleReactionText = matches.length === 1 && sourceText.trim() === matches[0][0];
+
   const reactionNames = [...new Set(matches.map(match => match[1]))];
 
   let reactions: Awaited<ReturnType<typeof getReactions>>;
@@ -137,14 +140,47 @@ async function replaceReactions(text: string): Promise<string> {
 
     if (reactionMap.has(reactionName)) {
       const iconUrl = reactionMap.get(reactionName);
+      if (!iconUrl) {
+        continue;
+      }
+
+      const reactionClass = isSingleReactionText
+        ? 'reaction-icon-large'
+        : getReactionClassForMatch(sourceText, match.index ?? 0, fullMatch.length);
+
       result = result.replace(
         fullMatch, 
-        `<img src="${iconUrl}" alt="${reactionName}" class="reaction-icon" />`
+        `<img src="${iconUrl}" alt="${reactionName}" class="${reactionClass}" />`
       );
     }
   }
 
   return result;
+}
+
+function getReactionClassForMatch(text: string, matchStart: number, matchLength: number): string {
+  const lineBreakTokens = ['<br />', '<br/>', '<br>', '\n'];
+
+  let lineStart = 0;
+  for (const token of lineBreakTokens) {
+    const tokenIndex = text.lastIndexOf(token, matchStart - 1);
+    if (tokenIndex !== -1) {
+      lineStart = Math.max(lineStart, tokenIndex + token.length);
+    }
+  }
+
+  let lineEnd = text.length;
+  for (const token of lineBreakTokens) {
+    const tokenIndex = text.indexOf(token, matchStart + matchLength);
+    if (tokenIndex !== -1) {
+      lineEnd = Math.min(lineEnd, tokenIndex);
+    }
+  }
+
+  const lineText = text.slice(lineStart, lineEnd);
+
+  const nonReactionText = lineText.replace(/:([a-zA-Z0-9_-]+):/g, '').trim();
+  return nonReactionText.length === 0 ? 'reaction-icon-medium' : 'reaction-icon-small';
 }
 
 async function replaceMentions(text: string): Promise<string> {
@@ -446,11 +482,24 @@ export default {
   font-style: italic;
 }
 
-.reaction-icon {
+.reaction-icon-small,
+.reaction-icon-medium,
+.reaction-icon-large {
   display: inline-block;
-  height: 1.2em;
   width: auto;
   vertical-align: middle;
   margin: 0 0.1em;
+}
+
+.reaction-icon-small {
+  height: 1.2em;
+}
+
+.reaction-icon-medium {
+  height: 2em;
+}
+
+.reaction-icon-large {
+  height: 3.2em;
 }
 </style>
