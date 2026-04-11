@@ -165,14 +165,14 @@ const props = defineProps<{
           </div>
         </router-link>
     </div>
+    <el-icon v-if="!showHiddenButtons && getCurrentUserLogin()" size="20" @click="toggleHiddenButtons(true)" class="more"><More/></el-icon>
+    <el-icon v-if="showHiddenButtons && getCurrentUserLogin()" size="20" @click="toggleHiddenButtons(false)" class="more-filled"><MoreFilled/></el-icon>
     <div v-if="comment && getCurrentUserLogin()" class="reply-button" @click="reply">
       <span class="reply-text">{{ t('comment.view.footer.buttons.reply.text') }}</span>
       <el-icon size="20">
         <BottomLeft />
       </el-icon>
     </div>
-    <el-icon v-if="!showHiddenButtons && getCurrentUserLogin()" size="20" @click="toggleHiddenButtons(true)" class="more"><More/></el-icon>
-    <el-icon v-if="showHiddenButtons && getCurrentUserLogin()" size="20" @click="toggleHiddenButtons(false)" class="more-filled"><MoreFilled/></el-icon>
   </div>
 </template>
 
