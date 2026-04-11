@@ -38,6 +38,7 @@ const isDarkTheme = ref(false)
 const THEME_STORAGE_KEY = 'theme'
 const THEME_MIGRATION_KEY = 'theme_without_system_fallback_migration_v1'
 const DARK_THEME_VALUE = 'dark'
+const MENU_COLLAPSE_STORAGE_KEY = 'menu-collapsed'
 
 const themeToggleLabel = computed(() =>
   isDarkTheme.value ? t('menu.lightTheme') : t('menu.darkTheme')
@@ -59,6 +60,16 @@ const runThemeMigration = () => {
   localStorage.setItem(THEME_MIGRATION_KEY, 'done')
 }
 
+const getSavedCollapseState = () => localStorage.getItem(MENU_COLLAPSE_STORAGE_KEY) === 'true'
+
+const setCollapseState = (collapsed: boolean, persist = true) => {
+  isCollapse.value = collapsed
+
+  if (persist) {
+    localStorage.setItem(MENU_COLLAPSE_STORAGE_KEY, collapsed ? 'true' : 'false')
+  }
+}
+
 const navigateTo = (path: string) => {
   router.push(path)
 }
@@ -72,6 +83,10 @@ function toggleTheme() {
   applyTheme(!isDarkTheme.value)
 }
 
+function toggleCollapse() {
+  setCollapseState(!isCollapse.value)
+}
+
 const updateMenuTop = () => {
   menuTopOffset.value = Math.max(0, HEADER_HEIGHT - window.scrollY)
 }
@@ -83,9 +98,11 @@ const updateMobileNavMargin = () => {
 onMounted(() => {
   runThemeMigration()
   if (props.isMobile) {
+    setCollapseState(false, false)
     updateMobileNavMargin()
     window.addEventListener('scroll', updateMobileNavMargin, { passive: true })
   } else {
+    setCollapseState(getSavedCollapseState(), false)
     updateMenuTop()
     window.addEventListener('scroll', updateMenuTop, { passive: true })
   }
@@ -103,11 +120,12 @@ onUnmounted(() => {
 
 watch(() => props.isMobile, (isMobile) => {
   if (isMobile) {
-    isCollapse.value = false
+    setCollapseState(false, false)
     window.removeEventListener('scroll', updateMenuTop)
     updateMobileNavMargin()
     window.addEventListener('scroll', updateMobileNavMargin, { passive: true })
   } else {
+    setCollapseState(getSavedCollapseState(), false)
     window.removeEventListener('scroll', updateMobileNavMargin)
     updateMenuTop()
     window.addEventListener('scroll', updateMenuTop, { passive: true })
@@ -163,7 +181,7 @@ watch(() => props.isMobile, (isMobile) => {
         class="collapse-toggle-button"
         type="button"
         :aria-label="t('menu.collapse')"
-        @click="isCollapse = !isCollapse"
+        @click="toggleCollapse"
       >
         <el-icon size="20" class="collapse-toggle-icon" :class="{ 'is-collapsed': isCollapse }"><DArrowLeft /></el-icon>
         <span class="collapse-title">{{ t('menu.collapse') }}</span>
