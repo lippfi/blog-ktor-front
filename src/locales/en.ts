@@ -524,6 +524,9 @@ export default {
             privateMessage: 'Private message',
             addFriend: 'Add friend',
             removeFriend: 'Remove friend',
+            removeFromFriends: 'Remove friend',
+            friendshipRequestSent: 'Friendship request sent',
+            showInFeed: 'Show in feed',
             block: 'Block'
         },
         dialog: {
@@ -562,6 +565,10 @@ export default {
             hideFromFeed: {
                 success: 'Posts from {nickname} will be hidden from your feed',
                 error: 'Failed to hide posts from feed'
+            },
+            showInFeed: {
+                success: 'Posts from {nickname} will be shown in your feed',
+                error: 'Failed to show posts in feed'
             },
             addFriend: {
                 success: 'Friend request sent successfully',

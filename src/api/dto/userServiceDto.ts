@@ -92,3 +92,11 @@ export interface IgnoredUserView {
     avatarUri?: string | null;
     reason?: string | null;
 }
+
+export interface RelationshipInfo {
+    friendLogins: string[];
+    outgoingFriendRequestLogins: string[];
+    incomingFriendRequestLogins: string[];
+    ignoredLogins: string[];
+    hiddenFromFeedLogins: string[];
+}

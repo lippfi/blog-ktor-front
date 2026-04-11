@@ -503,6 +503,9 @@ export default {
             privateMessage: 'Жеке хабарлама',
             addFriend: 'Досқа қосу',
             removeFriend: 'Достардан өшіру',
+            removeFromFriends: 'Достардан өшіру',
+            friendshipRequestSent: 'Достық сұрауы жіберілді',
+            showInFeed: 'Таспада көрсету',
             block: 'Бұғаттау'
         },
         dialog: {
@@ -541,6 +544,10 @@ export default {
             hideFromFeed: {
                 success: '{nickname} жазбалары таспаңыздан жасырылады',
                 error: 'Жазбаларды таспадан жасыру сәтсіз аяқталды'
+            },
+            showInFeed: {
+                success: '{nickname} жазбалары қайтадан таспаңызда көрсетіледі',
+                error: 'Жазбаларды таспада қайта көрсету сәтсіз аяқталды'
             },
             addFriend: {
                 success: 'Достық сұрауы сәтті жіберілді',

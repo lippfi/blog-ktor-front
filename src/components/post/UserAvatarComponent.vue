@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { ElPopover, ElMenu, ElMenuItem, ElMessageBox, ElMessage } from 'element-plus'
 import {
+  CircleClose,
   CirclePlus,
   Close,
   Memo,
-  Message,
   Remove,
+  View,
   User
 } from "@element-plus/icons-vue";
-import { doNotShowInFeed, getCurrentUserLogin, ignoreUser, removeFriend as removeFriendApi, sendFriendRequest } from "@/api/userClient.ts";
+import { doNotShowInFeed, getCurrentUserLogin, getRelationshipInfo, ignoreUser, removeFriend as removeFriendApi, sendFriendRequest, showInFeed } from "@/api/userClient.ts";
 import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const router = useRouter();
@@ -21,6 +22,37 @@ const blockDialogVisible = ref(false);
 const blockReason = ref('');
 const friendLabel = ref('');
 const friendMessage = ref('');
+
+const props = defineProps<{
+  avatarUrl: string,
+  login: string,
+  label: string,
+  nickname: string,
+  avatarSize: string,
+}>();
+
+const relationshipInfoLoaded = ref(false);
+const friendLogins = ref<string[]>([]);
+const outgoingFriendRequestLogins = ref<string[]>([]);
+const hiddenFromFeedLogins = ref<string[]>([]);
+
+const isCurrentUser = computed(() => getCurrentUserLogin() === props.login);
+const isFriend = computed(() => friendLogins.value.includes(props.login));
+const isOutgoingFriendRequestPending = computed(() => outgoingFriendRequestLogins.value.includes(props.login));
+const isHiddenFromFeed = computed(() => hiddenFromFeedLogins.value.includes(props.login));
+const canShowRelationshipActions = computed(() => !isCurrentUser.value && relationshipInfoLoaded.value);
+
+const loadRelationshipInfo = async () => {
+  const result = await getRelationshipInfo();
+  if (result.type === 'error') {
+    return;
+  }
+
+  friendLogins.value = result.data.friendLogins;
+  outgoingFriendRequestLogins.value = result.data.outgoingFriendRequestLogins;
+  hiddenFromFeedLogins.value = result.data.hiddenFromFeedLogins;
+  relationshipInfoLoaded.value = true;
+};
 
 const handleBlock = async () => {
   try {
@@ -48,6 +80,7 @@ const handleHideFromFeed = async () => {
     }
 
     ElMessage.success(t('userAvatar.notifications.hideFromFeed.success', { nickname: props.nickname }));
+    hiddenFromFeedLogins.value = [...new Set([...hiddenFromFeedLogins.value, props.login])];
     blockDialogVisible.value = false;
 
     if (router.currentRoute.value.name === 'feed' || router.currentRoute.value.path === '/') {
@@ -58,6 +91,21 @@ const handleHideFromFeed = async () => {
   }
 };
 
+const handleShowInFeed = async () => {
+  try {
+    const result = await showInFeed(props.login);
+    if (result.type === 'error') {
+      ElMessage.error(t('userAvatar.notifications.showInFeed.error'));
+      return;
+    }
+
+    ElMessage.success(t('userAvatar.notifications.showInFeed.success', { nickname: props.nickname }));
+    hiddenFromFeedLogins.value = hiddenFromFeedLogins.value.filter(login => login !== props.login);
+  } catch (error) {
+    ElMessage.error(t('userAvatar.notifications.showInFeed.error'));
+  }
+};
+
 const handleAddFriend = async () => {
   try {
     const request = {
@@ -65,8 +113,14 @@ const handleAddFriend = async () => {
       message: friendMessage.value,
       label: friendLabel.value
     };
-    await sendFriendRequest(request);
+    const result = await sendFriendRequest(request);
+    if (result.type === 'error') {
+      ElMessage.error(t('userAvatar.notifications.addFriend.error'));
+      return;
+    }
+
     ElMessage.success(t('userAvatar.notifications.addFriend.success'));
+    outgoingFriendRequestLogins.value = [...new Set([...outgoingFriendRequestLogins.value, props.login])];
     addFriendDialogVisible.value = false;
     friendLabel.value = '';
     friendMessage.value = '';
@@ -74,16 +128,6 @@ const handleAddFriend = async () => {
     ElMessage.error(t('userAvatar.notifications.addFriend.error'));
   }
 };
-
-const props = defineProps<{
-  avatarUrl: string,
-  login: string,
-  label: string,
-  nickname: string,
-  avatarSize: string,
-}>();
-
-const isFriend: boolean = false; // todo implementation
 
 const handleMenuClick = async (command: string) => {
   switch (command) {
@@ -112,7 +156,14 @@ const handleMenuClick = async (command: string) => {
         }
       ).then(async () => {
         try {
-          await removeFriendApi(props.login);
+          const result = await removeFriendApi(props.login);
+          if (result.type === 'error') {
+            ElMessage.error(t('userAvatar.notifications.removeFriend.error'));
+            return;
+          }
+
+          friendLogins.value = friendLogins.value.filter(login => login !== props.login);
+          outgoingFriendRequestLogins.value = outgoingFriendRequestLogins.value.filter(login => login !== props.login);
           ElMessage({
             message: t('userAvatar.notifications.removeFriend.success', { nickname: `<b>${props.nickname}</b>` }),
             type: 'success',
@@ -129,8 +180,16 @@ const handleMenuClick = async (command: string) => {
       popoverRef.value?.hide?.();
       blockDialogVisible.value = true;
       break;
+    case 'show-in-feed':
+      popoverRef.value?.hide?.();
+      await handleShowInFeed();
+      break;
   }
 };
+
+onMounted(async () => {
+  await loadRelationshipInfo();
+});
 </script>
 
 <template>
@@ -138,9 +197,10 @@ const handleMenuClick = async (command: string) => {
     <el-popover
       ref="popoverRef"
       placement="right-start"
-      :width="200"
       trigger="click"
       popper-class="avatar-popover"
+      width="auto"
+      :popper-style="{ minWidth: '200px' }"
       :offset="10"
     >
       <template #reference>
@@ -155,19 +215,27 @@ const handleMenuClick = async (command: string) => {
           <el-icon><Memo/></el-icon>
           {{ t('userAvatar.menu.diary') }}
         </el-menu-item>
+        <el-menu-item v-if="canShowRelationshipActions && isHiddenFromFeed" index="show-in-feed">
+          <el-icon><View/></el-icon>
+          {{ t('userAvatar.menu.showInFeed') }}
+        </el-menu-item>
 <!--        <el-menu-item index="message">-->
 <!--          <el-icon><Message/></el-icon>-->
 <!--          {{ t('userAvatar.menu.privateMessage') }}-->
 <!--        </el-menu-item>-->
-        <el-menu-item v-if="getCurrentUserLogin() !== login && !isFriend" index="add-friend">
+        <el-menu-item v-if="canShowRelationshipActions && !isFriend && !isOutgoingFriendRequestPending" index="add-friend">
           <el-icon><CirclePlus/></el-icon>
           {{ t('userAvatar.menu.addFriend') }}
         </el-menu-item>
-        <el-menu-item v-if="getCurrentUserLogin() !== login && isFriend" index="remove-friend">
-          <el-icon><Remove/></el-icon>
-          {{ t('userAvatar.menu.removeFriend') }}
+        <el-menu-item v-if="canShowRelationshipActions && isFriend" index="remove-friend">
+          <el-icon><CircleClose/></el-icon>
+          {{ t('userAvatar.menu.removeFromFriends') }}
         </el-menu-item>
-        <el-menu-item v-if="getCurrentUserLogin() !== login" index="block">
+        <el-menu-item v-if="canShowRelationshipActions && isOutgoingFriendRequestPending" disabled>
+          <el-icon><Remove/></el-icon>
+          {{ t('userAvatar.menu.friendshipRequestSent') }}
+        </el-menu-item>
+        <el-menu-item v-if="!isCurrentUser" index="block">
           <el-icon><Close/></el-icon>
           {{ t('userAvatar.menu.block') }}
         </el-menu-item>
@@ -217,6 +285,7 @@ const handleMenuClick = async (command: string) => {
         <p v-html="t('userAvatar.dialog.block.message', { nickname: `<b>${props.nickname}</b>` })" style="text-align: left"></p>
         <p style="text-align: left">{{ t('userAvatar.dialog.block.warning') }}</p>
         <el-alert
+          v-if="!isHiddenFromFeed"
           class="hide-feed-alert"
           type="info"
           :closable="false"
@@ -269,6 +338,7 @@ const handleMenuClick = async (command: string) => {
 
 :deep(.avatar-popover) {
   padding: 0;
+  min-width: 200px;
 }
 
 :deep(.el-menu-item) {

@@ -524,6 +524,9 @@ export default {
             privateMessage: 'Личное сообщение',
             addFriend: 'Добавить в друзья',
             removeFriend: 'Удалить из друзей',
+            removeFromFriends: 'Удалить из друзей',
+            friendshipRequestSent: 'Запрос в друзья отправлен',
+            showInFeed: 'Показывать в ленте',
             block: 'Заблокировать'
         },
         dialog: {
@@ -562,6 +565,10 @@ export default {
             hideFromFeed: {
                 success: 'Записи {nickname} будут скрыты из вашей ленты',
                 error: 'Не удалось скрыть записи из ленты'
+            },
+            showInFeed: {
+                success: 'Записи {nickname} снова будут отображаться в вашей ленте',
+                error: 'Не удалось снова показать записи в ленте'
             },
             addFriend: {
                 success: 'Запрос в друзья успешно отправлен',

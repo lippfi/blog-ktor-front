@@ -16,6 +16,7 @@ import type {
     FriendRequestCreate,
     FriendRequest,
     IgnoredUserView,
+    RelationshipInfo,
     Language,
     Sex,
     NsfwPolicy,
@@ -38,6 +39,7 @@ export type {
     FriendRequestCreate,
     FriendRequest,
     IgnoredUserView,
+    RelationshipInfo,
 };
 
 export const authEvents = mitt();
@@ -48,10 +50,17 @@ const SESSION_INFO_TIME_KEY = 'timeToSessionInfo';
 const REFRESH_INTERVAL_MS = 10 * 60 * 1000;
 const USER_LOGINS_CACHE_KEY = 'userLoginsCache';
 const USER_LOGINS_CACHE_DURATION = 24 * 60 * 60 * 1000; // 1 day
+const RELATIONSHIP_INFO_CACHE_KEY = 'relationshipInfoCache';
+const RELATIONSHIP_INFO_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 interface UserLoginsCacheEntry {
     expiresAt: number;
     value: UserView[];
+}
+
+interface RelationshipInfoCacheEntry {
+    expiresAt: number;
+    value: RelationshipInfo;
 }
 
 let refreshIntervalId: ReturnType<typeof setInterval> | null = null;
@@ -99,6 +108,45 @@ function setUserLoginsCacheEntry(cacheKey: string, value: UserView[]): void {
         localStorage.setItem(USER_LOGINS_CACHE_KEY, JSON.stringify(cache));
     } catch (error) {
         console.error('Failed to write users cache:', error);
+    }
+}
+
+function getRelationshipInfoCacheEntry(): RelationshipInfo | null {
+    try {
+        const rawCache = localStorage.getItem(RELATIONSHIP_INFO_CACHE_KEY);
+        if (!rawCache) {
+            return null;
+        }
+
+        const cacheEntry = JSON.parse(rawCache) as RelationshipInfoCacheEntry;
+        if (cacheEntry.expiresAt <= Date.now()) {
+            localStorage.removeItem(RELATIONSHIP_INFO_CACHE_KEY);
+            return null;
+        }
+
+        return cacheEntry.value;
+    } catch (error) {
+        console.error('Failed to read relationship info cache:', error);
+        return null;
+    }
+}
+
+function setRelationshipInfoCacheEntry(value: RelationshipInfo): void {
+    try {
+        const cacheEntry: RelationshipInfoCacheEntry = {
+            value,
+            expiresAt: Date.now() + RELATIONSHIP_INFO_CACHE_DURATION,
+        };
+        localStorage.setItem(RELATIONSHIP_INFO_CACHE_KEY, JSON.stringify(cacheEntry));
+    } catch (error) {
+        console.error('Failed to write relationship info cache:', error);
+    }
+}
+
+async function refetchRelationshipInfoCache(): Promise<void> {
+    const result = await getRelationshipInfo(true);
+    if (result.type === 'error') {
+        console.error('Failed to refetch relationship info:', result.message);
     }
 }
 
@@ -607,6 +655,24 @@ export async function updateNotificationSettings(settings: NotificationSettings)
         : { type: 'error', message: await response.text() };
 }
 
+export async function getRelationshipInfo(forceRefresh = false): Promise<Result<RelationshipInfo>> {
+    if (!forceRefresh) {
+        const cachedResponse = getRelationshipInfoCacheEntry();
+        if (cachedResponse) {
+            return { type: 'ok', data: cachedResponse };
+        }
+    }
+
+    const response = await authenticatedRequest('/user/relationship-info');
+    if (!response.ok) {
+        return { type: 'error', message: await response.text() };
+    }
+
+    const relationshipInfo = await response.json() as RelationshipInfo;
+    setRelationshipInfoCacheEntry(relationshipInfo);
+    return { type: 'ok', data: relationshipInfo };
+}
+
 // --- Friend requests ---
 
 export async function sendFriendRequest(request: FriendRequestCreate): Promise<Result> {
@@ -616,9 +682,12 @@ export async function sendFriendRequest(request: FriendRequestCreate): Promise<R
         body: JSON.stringify(request),
     });
 
-    return response.ok
-        ? { type: 'ok' }
-        : { type: 'error', message: await response.text() };
+    if (response.ok) {
+        void refetchRelationshipInfoCache();
+        return { type: 'ok' };
+    }
+
+    return { type: 'error', message: await response.text() };
 }
 
 export async function cancelFriendRequest(requestId: string): Promise<Result> {
@@ -626,9 +695,12 @@ export async function cancelFriendRequest(requestId: string): Promise<Result> {
         method: 'DELETE',
     });
 
-    return response.ok
-        ? { type: 'ok' }
-        : { type: 'error', message: await response.text() };
+    if (response.ok) {
+        void refetchRelationshipInfoCache();
+        return { type: 'ok' };
+    }
+
+    return { type: 'error', message: await response.text() };
 }
 
 export async function acceptFriendRequest(requestId: string, label?: string): Promise<Result> {
@@ -638,9 +710,12 @@ export async function acceptFriendRequest(requestId: string, label?: string): Pr
 
     const response = await authenticatedRequest(url, { method: 'POST' });
 
-    return response.ok
-        ? { type: 'ok' }
-        : { type: 'error', message: await response.text() };
+    if (response.ok) {
+        void refetchRelationshipInfoCache();
+        return { type: 'ok' };
+    }
+
+    return { type: 'error', message: await response.text() };
 }
 
 export async function declineFriendRequest(requestId: string): Promise<Result> {
@@ -648,9 +723,12 @@ export async function declineFriendRequest(requestId: string): Promise<Result> {
         method: 'POST',
     });
 
-    return response.ok
-        ? { type: 'ok' }
-        : { type: 'error', message: await response.text() };
+    if (response.ok) {
+        void refetchRelationshipInfoCache();
+        return { type: 'ok' };
+    }
+
+    return { type: 'error', message: await response.text() };
 }
 
 export async function getSentFriendRequests(): Promise<FriendRequest[]> {
@@ -678,9 +756,12 @@ export async function removeFriend(login: string): Promise<Result> {
         method: 'DELETE',
     });
 
-    return response.ok
-        ? { type: 'ok' }
-        : { type: 'error', message: await response.text() };
+    if (response.ok) {
+        void refetchRelationshipInfoCache();
+        return { type: 'ok' };
+    }
+
+    return { type: 'error', message: await response.text() };
 }
 
 // --- Feed visibility ---
@@ -690,9 +771,12 @@ export async function doNotShowInFeed(login: string): Promise<Result> {
         method: 'POST',
     });
 
-    return response.ok
-        ? { type: 'ok' }
-        : { type: 'error', message: await response.text() };
+    if (response.ok) {
+        void refetchRelationshipInfoCache();
+        return { type: 'ok' };
+    }
+
+    return { type: 'error', message: await response.text() };
 }
 
 export async function showInFeed(login: string): Promise<Result> {
@@ -700,9 +784,12 @@ export async function showInFeed(login: string): Promise<Result> {
         method: 'POST',
     });
 
-    return response.ok
-        ? { type: 'ok' }
-        : { type: 'error', message: await response.text() };
+    if (response.ok) {
+        void refetchRelationshipInfoCache();
+        return { type: 'ok' };
+    }
+
+    return { type: 'error', message: await response.text() };
 }
 
 export async function getDoNotShowInFeedList(): Promise<UserView[]> {
@@ -721,9 +808,12 @@ export async function ignoreUser(login: string, reason?: string): Promise<Result
 
     const response = await authenticatedRequest(url, { method: 'POST' });
 
-    return response.ok
-        ? { type: 'ok' }
-        : { type: 'error', message: await response.text() };
+    if (response.ok) {
+        void refetchRelationshipInfoCache();
+        return { type: 'ok' };
+    }
+
+    return { type: 'error', message: await response.text() };
 }
 
 export async function unignoreUser(login: string): Promise<Result> {
@@ -731,9 +821,12 @@ export async function unignoreUser(login: string): Promise<Result> {
         method: 'POST',
     });
 
-    return response.ok
-        ? { type: 'ok' }
-        : { type: 'error', message: await response.text() };
+    if (response.ok) {
+        void refetchRelationshipInfoCache();
+        return { type: 'ok' };
+    }
+
+    return { type: 'error', message: await response.text() };
 }
 
 export async function getIgnoredUsers(): Promise<IgnoredUserView[]> {
