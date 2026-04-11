@@ -3,7 +3,7 @@ import {ref, nextTick, onMounted, onBeforeUnmount, computed, watchEffect} from '
 import {storageClient} from "@/api/storageClient.ts";
 import {ElMessage} from "element-plus";
 import {useI18n} from "vue-i18n";
-import {DataBoard, Tickets, Search} from "@element-plus/icons-vue";
+import {DataBoard, Tickets, Search, CaretBottom} from "@element-plus/icons-vue";
 import ReactionList from "./reaction/ReactionList.vue";
 import { searchReactions } from "@/api/reactionClient";
 import type { ReactionView, ReactionPackDto, ReactionViewDto } from "@/api/dto/reactionServiceDto";
@@ -1037,7 +1037,11 @@ const handleMentionSelect = (option: MentionOption) => {
         <el-button @click="wrapSelectedText('[s]', '[/s]')" class="format-btn" tabindex="-1">S</el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.expandable.tooltip')" :show-after="tooltipDelay" placement="top">
-        <el-button @click="wrapWithExpandable" class="format-btn" tabindex="-1">⤵</el-button>
+        <el-button @click="wrapWithExpandable" class="format-btn" tabindex="-1">
+          <el-icon size="18">
+            <CaretBottom />
+          </el-icon>
+        </el-button>
       </el-tooltip>
       <el-tooltip :content="$t('post.form.fields.textarea.buttons.quote.tooltip')" :show-after="tooltipDelay" placement="top">
         <el-button @click="wrapSelectedTextFromPage('[quote]', '[/quote]')" class="format-btn" tabindex="-1">‟</el-button>
