@@ -495,7 +495,6 @@ export default {
         from: '{user} jiberdi',
         viewPost: 'Jazbanı körw',
         openChat: 'Chattı aşw',
-        viewProfile: 'Profildi körw',
         timeJustNow: 'Jaña ğana',
         timeMinutesAgo: '{n} min burın',
         timeHoursAgo: '{n} sağ burın',

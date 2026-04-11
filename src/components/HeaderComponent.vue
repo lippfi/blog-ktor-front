@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import type {DiaryHeaderInfo} from "@/api/dto/postServiceDto.ts";
 import { ArrowDown, Bell } from '@element-plus/icons-vue';
 import { isSignedIn } from '@/api/userClient';
@@ -162,6 +162,15 @@ function openNotifications() {
 function onNotificationRead(id: string) {
   notifications.value = notifications.value.filter(n => n.id !== id);
 }
+
+watch(
+    () => notifications.value.length,
+    (notificationCount) => {
+      if (dialogVisible.value && notificationCount === 0) {
+        dialogVisible.value = false;
+      }
+    }
+);
 
 onMounted(() => {
   void fetchNotifications();
