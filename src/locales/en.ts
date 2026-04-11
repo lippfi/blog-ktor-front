@@ -538,6 +538,7 @@ export default {
                 title: 'Block User',
                 message: 'Are you sure that you want to block {nickname}?',
                 warning: 'You will not be able to see their posts and it will be impossible to undo this action in the next 7 days.',
+                reasonPlaceholder: 'Blocking reason',
                 hideFromFeed: {
                     suggestion: 'Maybe you want to hide their posts from your feed?',
                     button: 'Hide from feed'

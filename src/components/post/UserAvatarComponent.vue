@@ -8,7 +8,7 @@ import {
   Remove,
   User
 } from "@element-plus/icons-vue";
-import { doNotShowInFeed, getCurrentUserLogin, removeFriend as removeFriendApi, sendFriendRequest } from "@/api/userClient.ts";
+import { doNotShowInFeed, getCurrentUserLogin, ignoreUser, removeFriend as removeFriendApi, sendFriendRequest } from "@/api/userClient.ts";
 import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -18,14 +18,22 @@ const { t } = useI18n();
 const popoverRef = ref();
 const addFriendDialogVisible = ref(false);
 const blockDialogVisible = ref(false);
+const blockReason = ref('');
 const friendLabel = ref('');
 const friendMessage = ref('');
 
 const handleBlock = async () => {
   try {
-    // TODO: Implement block API call
+    const result = await ignoreUser(props.login, blockReason.value.trim() || undefined);
+    if (result.type === 'error') {
+      ElMessage.error(t('userAvatar.notifications.block.error'));
+      return;
+    }
+
     ElMessage.success(t('userAvatar.notifications.block.success', { nickname: props.nickname }));
     blockDialogVisible.value = false;
+    blockReason.value = '';
+    window.location.reload();
   } catch (error) {
     ElMessage.error(t('userAvatar.notifications.block.error'));
   }
@@ -201,8 +209,8 @@ const handleMenuClick = async (command: string) => {
       left-0="true"
     >
       <div class="block-dialog-content">
-        <p v-html="t('userAvatar.dialog.block.message', { nickname: `<b>${props.nickname}</b>` })"></p>
-        <p>{{ t('userAvatar.dialog.block.warning') }}</p>
+        <p v-html="t('userAvatar.dialog.block.message', { nickname: `<b>${props.nickname}</b>` })" style="text-align: left"></p>
+        <p style="text-align: left">{{ t('userAvatar.dialog.block.warning') }}</p>
         <el-alert
           class="hide-feed-alert"
           type="info"
@@ -214,6 +222,14 @@ const handleMenuClick = async (command: string) => {
             <el-button @click="handleHideFromFeed">{{ t('userAvatar.dialog.block.hideFromFeed.button') }}</el-button>
           </div>
         </el-alert>
+        <el-input
+          v-model="blockReason"
+          type="textarea"
+          :rows="3"
+          :placeholder="t('userAvatar.dialog.block.reasonPlaceholder')"
+          resize="none"
+          class="mb-3"
+        />
       </div>
       <template #footer>
         <div class="dialog-footer">
