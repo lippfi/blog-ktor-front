@@ -27,6 +27,20 @@ const { t } = useI18n();
 const diaryHeaderInfo = computed(() => route.meta.diaryHeaderInfo as DiaryHeaderInfo | undefined);
 const name = computed(() => diaryHeaderInfo.value?.name || '');
 const subtitle = computed(() => diaryHeaderInfo.value?.subtitle || '');
+const pageTitle = computed(() => {
+  switch (route.name) {
+    case 'feed':
+      return t('feed.title');
+    case 'settings':
+      return t('menu.settings');
+    case 'search':
+      return t('menu.search');
+    case 'discussions':
+      return t('menu.discussions');
+    default:
+      return '';
+  }
+});
 
 // Notifications
 const notifications = ref<Notification[]>([]);
@@ -196,6 +210,7 @@ const scrollToBottom = () => {
     <div class="header-content">
       <div class="left">
         <img src="@/assets/logo.png" alt="Logo" class="header-logo" @click="onLogoClick">
+        <h3 v-if="pageTitle" class="page-title">{{ pageTitle }}</h3>
         <div v-if="diaryHeaderInfo" class="diary-title">
           <h3 style="margin: 0;">{{ name }}</h3>
           <p style="margin: 0;">{{ subtitle }}</p>
@@ -273,6 +288,14 @@ const scrollToBottom = () => {
   display: flex;
   align-items: center;
   gap: 20px;
+}
+
+.page-title {
+  margin: 0;
+  margin-top: 5px;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--el-text-color-primary);
 }
 
 .diary-title {
