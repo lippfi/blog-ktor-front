@@ -46,6 +46,7 @@ export interface PostCreateDto {
     avatar: string;
     title: string;
     text: string;
+    mentionedLogins: string[];
     isPreface: boolean;
     isEncrypted: boolean;
     classes: string;
@@ -128,6 +129,7 @@ export interface CommentCreateRequest {
     postId: string;
     avatar?: string;
     text: string;
+    mentionedLogins: string[];
     parentCommentId?: string;
     reactionGroupId?: string;
 }

@@ -246,28 +246,6 @@ export async function markAllNotificationsAsRead(): Promise<string> {
     return await response.text();
 }
 
-export async function notifyAboutPostMention(postId: string, login: string): Promise<string> {
-    const response = await authenticatedRequest(
-        `/posts/mentions?postId=${encodeURIComponent(postId)}&login=${encodeURIComponent(login)}`,
-        { method: 'POST' }
-    );
-    if (!response.ok) {
-        throw new Error(`Failed to notify about post mention: ${await response.text()}`);
-    }
-    return await response.text();
-}
-
-export async function notifyAboutCommentMention(commentId: string, login: string): Promise<string> {
-    const response = await authenticatedRequest(
-        `/comments/mentions?commentId=${encodeURIComponent(commentId)}&login=${encodeURIComponent(login)}`,
-        { method: 'POST' }
-    );
-    if (!response.ok) {
-        throw new Error(`Failed to notify about comment mention: ${await response.text()}`);
-    }
-    return await response.text();
-}
-
 export function connectToNotificationsWebSocket(): WebSocket {
     const protocol = backendURL.startsWith('https') ? 'wss:' : 'ws:';
     const host = backendURL.replace(/^https?:\/\//, '');

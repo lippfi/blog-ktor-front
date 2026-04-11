@@ -112,6 +112,7 @@ export function buildWelcomePostDto(language: Language, privateGroupId: string):
         isEncrypted: false,
         title: content.title,
         text: content.text,
+        mentionedLogins: [],
         classes: "",
         tags: [],
         readGroupId: privateGroupId,
