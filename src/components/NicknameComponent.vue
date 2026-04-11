@@ -19,5 +19,7 @@ const profileHref = computed(() => {
 </template>
 
 <style scoped>
-
+.el-link:hover {
+  color: unset;
+}
 </style>
