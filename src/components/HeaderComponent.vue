@@ -201,7 +201,15 @@ function onWindowFocus() {
 }
 
 const onLogoClick = () => {
+  if (!isSignedIn()) {
+    return
+  }
+
   emit('toggleMenu')
+}
+
+const goToLogin = () => {
+  void router.push({ name: 'sign in' })
 }
 
 const isMobile = ref(window.innerWidth <= 768);
@@ -228,31 +236,34 @@ const scrollToBottom = () => {
         </div>
       </div>
       <div class="right">
-        <button v-if="notificationCount > 0" class="scroll-down-button" type="button" @click="openNotifications">
-          <el-badge :value="notificationCount" class="notification-badge">
+        <template v-if="isSignedIn()">
+          <button v-if="notificationCount > 0" class="scroll-down-button" type="button" @click="openNotifications">
+            <el-badge :value="notificationCount" class="notification-badge">
+              <el-icon class="scroll-down-icon">
+                <Bell />
+              </el-icon>
+            </el-badge>
+          </button>
+          <button v-if="notificationCount === 0 || !isMobile" class="scroll-down-button" type="button" @click="scrollToBottom">
             <el-icon class="scroll-down-icon">
-              <Bell />
+              <ArrowDown />
             </el-icon>
-          </el-badge>
-        </button>
-        <button v-if="notificationCount === 0 || !isMobile" class="scroll-down-button" type="button" @click="scrollToBottom">
-          <el-icon class="scroll-down-icon">
-            <ArrowDown />
-          </el-icon>
-        </button>
+          </button>
+        </template>
+        <el-button v-else type="primary" @click="goToLogin">{{ t('login.title') }}</el-button>
       </div>
 
-    <el-dialog v-model="dialogVisible" :title="t('headerNotifications.title')" width="500px" class="notifications-dialog">
-      <div v-if="notifications.length === 0" class="no-notifications">{{ t('headerNotifications.noNotifications') }}</div>
-      <div v-else class="notification-list">
-        <NotificationItem
-            v-for="notification in notifications"
-            :key="notification.id"
-            :notification="notification"
-            @read="onNotificationRead"
-        />
-      </div>
-    </el-dialog>
+      <el-dialog v-model="dialogVisible" :title="t('headerNotifications.title')" width="500px" class="notifications-dialog">
+        <div v-if="notifications.length === 0" class="no-notifications">{{ t('headerNotifications.noNotifications') }}</div>
+        <div v-else class="notification-list">
+          <NotificationItem
+              v-for="notification in notifications"
+              :key="notification.id"
+              :notification="notification"
+              @read="onNotificationRead"
+          />
+        </div>
+      </el-dialog>
     </div>
   </header>
 </template>

@@ -20,6 +20,9 @@
         <el-button type="primary" round @click="submitForm(loginFormRef)">{{ $t('login.form.button.label') }}</el-button>
         <el-link @click="router.push('/reset-password')">{{ t('login.form.forgot_password.label') }}</el-link>
       </div>
+      <div style="text-align: center; margin-top: 12px">
+        <el-link @click="router.push({name: 'register'})">{{ t('registration.title').toLowerCase() }}</el-link>
+      </div>
     </div>
     <LanguageChooser style="margin-top: 32px" />
     <div class="spacer-bottom"/>

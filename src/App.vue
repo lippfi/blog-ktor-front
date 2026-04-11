@@ -1,5 +1,9 @@
 <template>
-  <HeaderComponent v-if="signedIn" :is-menu-open="isMobileView && isMobileMenuVisible" @toggleMenu="toggleMobileMenu"/>
+  <HeaderComponent
+    v-if="$route.name !== 'register' && $route.name !== 'sign in'"
+    :is-menu-open="isMobileView && isMobileMenuVisible"
+    @toggleMenu="toggleMobileMenu"
+  />
   <!-- Apply all styles globally -->
   <link v-for="style in getStyles()" :key="style" rel="stylesheet" :href="style" data-diary-style="true" />
   <div class="content-wrapper">
